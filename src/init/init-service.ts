@@ -4,14 +4,14 @@ import {
   CLAUDE_FILE,
   DEFAULT_DOCUMENT_LANGUAGE,
   INIT_MARKERS,
-  OSLITE_DIR
-} from "../core/schema";
+  OSPEC_LITE_DIR
+} from "../core/ospec-lite-schema";
 import {
   DocumentLanguage,
   InitResult,
   InitState,
   OSpecLiteConfig
-} from "../core/types";
+} from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
 import { AgentEntryService } from "../agents/agent-entry-service";
 import { CodexAdapter } from "../agents/codex-adapter";
@@ -37,8 +37,8 @@ export class InitService {
       }
     }
 
-    const configPath = path.join(rootDir, OSLITE_DIR, "config.json");
-    const indexPath = path.join(rootDir, OSLITE_DIR, "index.json");
+    const configPath = path.join(rootDir, OSPEC_LITE_DIR, "config.json");
+    const indexPath = path.join(rootDir, OSPEC_LITE_DIR, "index.json");
     const state: InitState =
       missingMarkers.length === INIT_MARKERS.length
         ? "uninitialized"
@@ -65,15 +65,15 @@ export class InitService {
     const scan = await this.scanner.scan(rootDir);
     const summary = this.buildSummary(scan);
 
-    await this.repo.ensureDir(path.join(rootDir, OSLITE_DIR));
+    await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR));
     await this.repo.ensureDir(path.join(rootDir, "docs", "project"));
     await this.repo.ensureDir(path.join(rootDir, "docs", "agents"));
     await this.repo.ensureDir(path.join(rootDir, "changes", "active"));
     await this.repo.ensureDir(path.join(rootDir, "changes", "archived"));
 
-    await this.repo.writeJson(path.join(rootDir, OSLITE_DIR, "config.json"), config);
+    await this.repo.writeJson(path.join(rootDir, OSPEC_LITE_DIR, "config.json"), config);
     await this.repo.writeJson(
-      path.join(rootDir, OSLITE_DIR, "index.json"),
+      path.join(rootDir, OSPEC_LITE_DIR, "index.json"),
       this.indexService.buildIndex(scan, config)
     );
 

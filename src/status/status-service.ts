@@ -1,6 +1,6 @@
 import * as path from "node:path";
-import { INIT_MARKERS, OSLITE_DIR } from "../core/schema";
-import { OSpecLiteConfig, StatusReport } from "../core/types";
+import { INIT_MARKERS, OSPEC_LITE_DIR } from "../core/ospec-lite-schema";
+import { OSpecLiteConfig, StatusReport } from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
 
 export class StatusService {
@@ -21,7 +21,7 @@ export class StatusService {
           ? "initialized"
           : "incomplete";
 
-    const configPath = path.join(rootDir, OSLITE_DIR, "config.json");
+    const configPath = path.join(rootDir, OSPEC_LITE_DIR, "config.json");
     const config =
       state !== "uninitialized" && (await this.repo.exists(configPath))
         ? await this.repo.readJson<OSpecLiteConfig>(configPath)

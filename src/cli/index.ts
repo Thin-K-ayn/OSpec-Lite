@@ -9,8 +9,8 @@ import { IndexService } from "../init/index-service";
 import { InitService } from "../init/init-service";
 import { StatusService } from "../status/status-service";
 import { ChangeService } from "../change/change-service";
-import { DocumentLanguage } from "../core/types";
-import { InitIncompleteError, OSpecLiteError } from "../core/errors";
+import { DocumentLanguage } from "../core/ospec-lite-types";
+import { InitIncompleteError, OSpecLiteError } from "../core/ospec-lite-errors";
 
 const repo = new FileRepo();
 const scanService = new ScanService(repo);

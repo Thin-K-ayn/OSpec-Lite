@@ -1,4 +1,4 @@
-export const OSLITE_DIR = ".oslite";
+export const OSPEC_LITE_DIR = ".oslite";
 
 export const INIT_MARKERS = [
   ".oslite/config.json",

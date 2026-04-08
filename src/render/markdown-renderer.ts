@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { OSpecLiteConfig, RepositoryScanResult, RuleItem } from "../core/types";
+import { OSpecLiteConfig, RepositoryScanResult, RuleItem } from "../core/ospec-lite-types";
 
 export class MarkdownRenderer {
   private readonly templateCache = new Map<string, string>();

@@ -1,7 +1,7 @@
 import {
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START
-} from "../core/schema";
+} from "../core/ospec-lite-schema";
 import { AgentAdapter } from "./agent-target-types";
 
 export class CodexAdapter implements AgentAdapter {

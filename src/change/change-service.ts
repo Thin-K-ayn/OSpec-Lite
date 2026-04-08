@@ -1,11 +1,11 @@
 import * as path from "node:path";
-import { CHANGE_SLUG_PATTERN } from "../core/schema";
-import { ChangeRecord, ChangeStatus } from "../core/types";
+import { CHANGE_SLUG_PATTERN } from "../core/ospec-lite-schema";
+import { ChangeRecord, ChangeStatus } from "../core/ospec-lite-types";
 import {
   InvalidChangeSlugError,
   NotInitializedError,
   OSpecLiteError
-} from "../core/errors";
+} from "../core/ospec-lite-errors";
 import { FileRepo } from "../fs/file-repo";
 import { StatusService } from "../status/status-service";
 

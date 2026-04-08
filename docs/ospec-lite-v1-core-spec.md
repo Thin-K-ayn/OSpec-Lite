@@ -525,9 +525,9 @@ src/
   cli/
     index.ts
   core/
-    types.ts
-    schema.ts
-    errors.ts
+    ospec-lite-types.ts
+    ospec-lite-schema.ts
+    ospec-lite-errors.ts
   fs/
     file-repo.ts
   init/

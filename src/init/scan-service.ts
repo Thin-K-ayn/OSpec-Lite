@@ -1,12 +1,12 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { DEFAULT_RULES } from "../core/schema";
+import { DEFAULT_RULES } from "../core/ospec-lite-schema";
 import {
   DirectoryMapItem,
   EntryPointItem,
   RepositoryScanResult,
   RuleItem
-} from "../core/types";
+} from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
 
 const GENERIC_ROLE_MAP: Record<string, string> = {

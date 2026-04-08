@@ -1,4 +1,4 @@
-import { AgentTarget } from "../core/types";
+import { AgentTarget } from "../core/ospec-lite-types";
 
 export interface AgentManagedSection {
   title: string;

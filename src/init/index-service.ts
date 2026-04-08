@@ -1,4 +1,8 @@
-import { OSpecLiteConfig, OSpecLiteIndex, RepositoryScanResult } from "../core/types";
+import {
+  OSpecLiteConfig,
+  OSpecLiteIndex,
+  RepositoryScanResult
+} from "../core/ospec-lite-types";
 
 export class IndexService {
   buildIndex(scan: RepositoryScanResult, config: OSpecLiteConfig): OSpecLiteIndex {
