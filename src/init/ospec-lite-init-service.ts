@@ -16,9 +16,9 @@ import { FileRepo } from "../fs/file-repo";
 import { AgentEntryService } from "../agents/agent-entry-service";
 import { CodexAdapter } from "../agents/codex-adapter";
 import { ClaudeCodeAdapter } from "../agents/claude-code-adapter";
-import { ScanService } from "./scan-service";
+import { ScanService } from "./ospec-lite-scan-service";
 import { MarkdownRenderer } from "../render/markdown-renderer";
-import { IndexService } from "./index-service";
+import { IndexService } from "./ospec-lite-index-service";
 
 export class InitService {
   constructor(

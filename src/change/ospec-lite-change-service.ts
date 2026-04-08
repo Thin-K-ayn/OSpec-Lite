@@ -7,7 +7,7 @@ import {
   OSpecLiteError
 } from "../core/ospec-lite-errors";
 import { FileRepo } from "../fs/file-repo";
-import { StatusService } from "../status/status-service";
+import { StatusService } from "../status/ospec-lite-status-service";
 
 export class ChangeService {
   constructor(

@@ -2,13 +2,13 @@
 
 import * as path from "node:path";
 import { FileRepo } from "../fs/file-repo";
-import { ScanService } from "../init/scan-service";
+import { ScanService } from "../init/ospec-lite-scan-service";
 import { MarkdownRenderer } from "../render/markdown-renderer";
 import { AgentEntryService } from "../agents/agent-entry-service";
-import { IndexService } from "../init/index-service";
-import { InitService } from "../init/init-service";
-import { StatusService } from "../status/status-service";
-import { ChangeService } from "../change/change-service";
+import { IndexService } from "../init/ospec-lite-index-service";
+import { InitService } from "../init/ospec-lite-init-service";
+import { StatusService } from "../status/ospec-lite-status-service";
+import { ChangeService } from "../change/ospec-lite-change-service";
 import { DocumentLanguage } from "../core/ospec-lite-types";
 import { InitIncompleteError, OSpecLiteError } from "../core/ospec-lite-errors";
 

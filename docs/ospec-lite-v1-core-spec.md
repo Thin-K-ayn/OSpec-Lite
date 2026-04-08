@@ -531,9 +531,9 @@ src/
   fs/
     file-repo.ts
   init/
-    init-service.ts
-    scan-service.ts
-    index-service.ts
+    ospec-lite-init-service.ts
+    ospec-lite-scan-service.ts
+    ospec-lite-index-service.ts
   agents/
     agent-target-types.ts
     codex-adapter.ts
@@ -543,9 +543,11 @@ src/
     markdown-renderer.ts
     templates/
   change/
-    change-service.ts
+    ospec-lite-change-service.ts
     archive-service.ts
     verify-service.ts
+  status/
+    ospec-lite-status-service.ts
 ```
 
 ## Recommended Build Order
