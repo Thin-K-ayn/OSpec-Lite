@@ -1,10 +1,20 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const sourceDir = path.join(__dirname, "..", "src", "render", "templates");
-const targetDir = path.join(__dirname, "..", "dist", "render", "templates");
+const templateRoots = [
+  {
+    source: path.join(__dirname, "..", "src", "render", "templates"),
+    target: path.join(__dirname, "..", "dist", "render", "templates")
+  },
+  {
+    source: path.join(__dirname, "..", "src", "change", "templates"),
+    target: path.join(__dirname, "..", "dist", "change", "templates")
+  }
+];
 
-copyDirectory(sourceDir, targetDir);
+for (const root of templateRoots) {
+  copyDirectory(root.source, root.target);
+}
 
 function copyDirectory(source, target) {
   if (!fs.existsSync(source)) {

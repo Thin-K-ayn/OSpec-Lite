@@ -544,6 +544,8 @@ src/
     templates/
   change/
     ospec-lite-change-service.ts
+    ospec-lite-change-template-service.ts
+    templates/
     archive-service.ts
     verify-service.ts
   status/

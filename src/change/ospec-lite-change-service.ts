@@ -8,11 +8,13 @@ import {
 } from "../core/ospec-lite-errors";
 import { FileRepo } from "../fs/file-repo";
 import { StatusService } from "../status/ospec-lite-status-service";
+import { ChangeTemplateService } from "./ospec-lite-change-template-service";
 
 export class ChangeService {
   constructor(
     private readonly repo: FileRepo,
-    private readonly statusService: StatusService
+    private readonly statusService: StatusService,
+    private readonly templates = new ChangeTemplateService()
   ) {}
 
   async newChange(rootDir: string, slug: string): Promise<string> {
@@ -42,10 +44,10 @@ export class ChangeService {
 
     await this.repo.ensureDir(changeDir);
     await this.repo.writeJson(path.join(changeDir, "change.json"), record);
-    await this.repo.writeText(path.join(changeDir, "request.md"), this.renderRequest(slug));
-    await this.repo.writeText(path.join(changeDir, "plan.md"), this.renderPlan(slug));
-    await this.repo.writeText(path.join(changeDir, "apply.md"), this.renderApply(slug));
-    await this.repo.writeText(path.join(changeDir, "verify.md"), this.renderVerify(slug));
+    await this.repo.writeText(path.join(changeDir, "request.md"), this.templates.renderRequest(slug));
+    await this.repo.writeText(path.join(changeDir, "plan.md"), this.templates.renderPlan(slug));
+    await this.repo.writeText(path.join(changeDir, "apply.md"), this.templates.renderApply(slug));
+    await this.repo.writeText(path.join(changeDir, "verify.md"), this.templates.renderVerify(slug));
 
     return changeDir;
   }
@@ -113,77 +115,5 @@ export class ChangeService {
     if (status.state !== "initialized") {
       throw new NotInitializedError(rootDir);
     }
-  }
-
-  private renderRequest(slug: string): string {
-    return `# Request
-
-## Request
-
-- Change: \`${slug}\`
-- Describe the request here.
-
-## Scope
-
-- Add the intended scope here.
-
-## Acceptance Notes
-
-- Add acceptance notes here.
-`;
-  }
-
-  private renderPlan(slug: string): string {
-    return `# Plan
-
-## Implementation Plan
-
-- Change: \`${slug}\`
-- Describe the intended implementation path.
-
-## Files Or Modules Expected To Change
-
-- Add expected files or modules here.
-
-## Risks
-
-- Add implementation risks here.
-`;
-  }
-
-  private renderApply(slug: string): string {
-    return `# Apply
-
-## Applied Changes
-
-- Change: \`${slug}\`
-- Record what was actually changed.
-
-## Files Touched
-
-- Add touched files here.
-
-## Deviations From Plan
-
-- Add deviations here if any.
-`;
-  }
-
-  private renderVerify(slug: string): string {
-    return `# Verify
-
-## Checks Performed
-
-- Change: \`${slug}\`
-- Record automated or manual checks here.
-
-## Manual Validation
-
-- Add manual validation notes here.
-
-## Remaining Risks
-
-- Add any unresolved risks here.
-`;
   }
 }

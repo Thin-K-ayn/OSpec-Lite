@@ -105,7 +105,20 @@ test("change workflow advances from draft through archive", async (t) => {
   await initService.init(rootDir, "en-US");
 
   const changeDir = await changeService.newChange(rootDir, "add-tests");
+  const request = await repo.readText(path.join(changeDir, "request.md"));
+  const plan = await repo.readText(path.join(changeDir, "plan.md"));
+  const apply = await repo.readText(path.join(changeDir, "apply.md"));
+  const verify = await repo.readText(path.join(changeDir, "verify.md"));
   let record = await repo.readJson(path.join(changeDir, "change.json"));
+
+  assert.match(request, /^# Request/m);
+  assert.match(plan, /^# Plan/m);
+  assert.match(apply, /^# Apply/m);
+  assert.match(verify, /^# Verify/m);
+  assert.match(request, /Change: `add-tests`/);
+  assert.match(plan, /Change: `add-tests`/);
+  assert.match(apply, /Change: `add-tests`/);
+  assert.match(verify, /Change: `add-tests`/);
   assert.equal(record.status, "draft");
 
   await changeService.markApplied(changeDir);
