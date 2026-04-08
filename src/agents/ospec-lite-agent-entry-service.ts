@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import { FileRepo } from "../fs/file-repo";
-import { AgentAdapter } from "./agent-target-types";
+import { AgentAdapter } from "./ospec-lite-agent-target-types";
 
 export class AgentEntryService {
   constructor(private readonly repo: FileRepo) {}

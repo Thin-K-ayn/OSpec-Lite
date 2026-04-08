@@ -13,11 +13,11 @@ import {
   OSpecLiteConfig
 } from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
-import { AgentEntryService } from "../agents/agent-entry-service";
-import { CodexAdapter } from "../agents/codex-adapter";
-import { ClaudeCodeAdapter } from "../agents/claude-code-adapter";
+import { AgentEntryService } from "../agents/ospec-lite-agent-entry-service";
+import { CodexAdapter } from "../agents/ospec-lite-codex-adapter";
+import { ClaudeCodeAdapter } from "../agents/ospec-lite-claude-code-adapter";
 import { ScanService } from "./ospec-lite-scan-service";
-import { MarkdownRenderer } from "../render/markdown-renderer";
+import { MarkdownRenderer } from "../render/ospec-lite-markdown-renderer";
 import { IndexService } from "./ospec-lite-index-service";
 
 export class InitService {

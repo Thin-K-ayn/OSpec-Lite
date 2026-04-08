@@ -2,7 +2,7 @@ import {
   CLAUDE_MANAGED_END,
   CLAUDE_MANAGED_START
 } from "../core/ospec-lite-schema";
-import { AgentAdapter } from "./agent-target-types";
+import { AgentAdapter } from "./ospec-lite-agent-target-types";
 
 export class ClaudeCodeAdapter implements AgentAdapter {
   public readonly target = "claude-code" as const;

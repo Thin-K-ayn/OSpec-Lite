@@ -535,12 +535,12 @@ src/
     ospec-lite-scan-service.ts
     ospec-lite-index-service.ts
   agents/
-    agent-target-types.ts
-    codex-adapter.ts
-    claude-code-adapter.ts
-    agent-entry-service.ts
+    ospec-lite-agent-target-types.ts
+    ospec-lite-codex-adapter.ts
+    ospec-lite-claude-code-adapter.ts
+    ospec-lite-agent-entry-service.ts
   render/
-    markdown-renderer.ts
+    ospec-lite-markdown-renderer.ts
     templates/
   change/
     ospec-lite-change-service.ts

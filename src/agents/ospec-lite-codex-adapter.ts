@@ -2,7 +2,7 @@ import {
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START
 } from "../core/ospec-lite-schema";
-import { AgentAdapter } from "./agent-target-types";
+import { AgentAdapter } from "./ospec-lite-agent-target-types";
 
 export class CodexAdapter implements AgentAdapter {
   public readonly target = "codex" as const;

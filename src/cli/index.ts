@@ -3,8 +3,8 @@
 import * as path from "node:path";
 import { FileRepo } from "../fs/file-repo";
 import { ScanService } from "../init/ospec-lite-scan-service";
-import { MarkdownRenderer } from "../render/markdown-renderer";
-import { AgentEntryService } from "../agents/agent-entry-service";
+import { MarkdownRenderer } from "../render/ospec-lite-markdown-renderer";
+import { AgentEntryService } from "../agents/ospec-lite-agent-entry-service";
 import { IndexService } from "../init/ospec-lite-index-service";
 import { InitService } from "../init/ospec-lite-init-service";
 import { StatusService } from "../status/ospec-lite-status-service";
