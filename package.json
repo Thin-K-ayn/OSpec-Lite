@@ -1,0 +1,33 @@
+{
+  "name": "ospec-lite",
+  "version": "0.1.0",
+  "description": "Minimal agent-first repository bootstrap for Codex and Claude Code.",
+  "license": "MIT",
+  "type": "commonjs",
+  "bin": {
+    "oslite": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "agents",
+    "claude-code",
+    "codex",
+    "developer-tools",
+    "documentation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaynGameDev/OSpec-Lite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KaynGameDev/OSpec-Lite/issues"
+  },
+  "homepage": "https://github.com/KaynGameDev/OSpec-Lite#readme",
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.3"
+  }
+}
