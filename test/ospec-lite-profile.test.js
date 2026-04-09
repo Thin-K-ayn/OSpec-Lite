@@ -242,15 +242,24 @@ test("profile assets preserve literal Chinese guidance", async () => {
 
   assert.match(agents, /先完成 `\{\{authoringPackRoot}}\/evidence-map\.md`/);
   assert.match(agents, /用 unity-tolua-game profile 初始化/);
+  assert.match(agents, /向用户确认/);
   assert.match(contract, /文档编写合同/);
   assert.match(checklist, /Script\/MJGame\.lua/);
   assert.match(brief, /项目名称：`\{\{projectName\}\}`/);
   assert.match(brief, /Bootstrap Agent：`\{\{bootstrapAgent\}\}`/);
+  const profileReadme = await fs.readFile(
+    path.join(PROFILE_ROOT, "README.md"),
+    "utf8"
+  );
+  assert.match(profileReadme, /推断项目名并向我确认/);
+  assert.match(profileReadme, /帮我用 unity-tolua-game 的 profile 去 init ospec-lite/);
   assert.match(codexWrapper, /oslite init --profile unity-tolua-game/);
+  assert.match(codexWrapper, /ask the user to confirm/i);
   assert.match(codexWrapper, /--bootstrap-agent codex/);
   assert.match(codexWrapper, /\{\{authoringPackRoot}}\/evidence-map\.md/);
   assert.match(codexWrapper, /oslite docs verify \./);
   assert.match(claudeWrapper, /oslite init --profile unity-tolua-game/);
+  assert.match(claudeWrapper, /ask the user to confirm/i);
   assert.match(claudeWrapper, /--bootstrap-agent claude-code/);
   assert.match(claudeWrapper, /\{\{authoringPackRoot}}\/evidence-map\.md/);
   assert.match(claudeWrapper, /\$ARGUMENTS/);

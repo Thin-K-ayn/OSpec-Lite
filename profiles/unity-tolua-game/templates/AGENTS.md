@@ -6,7 +6,7 @@
 - Profile: `{{profileId}}`
 - 这是 Unity + ToLua 游戏仓库的读库与文档工作流入口。
 - 对本 profile，默认把 `Script/MJGame.lua` 作为主入口起点。
-- 如果用户要求“用 unity-tolua-game profile 初始化”，但仓库还没有 `.oslite/config.json`，先推断项目名并运行 `oslite init --profile unity-tolua-game --project-name "<项目名>" --bootstrap-agent <当前环境或 none> .`。
+- 如果用户要求“用 unity-tolua-game profile 初始化”，但仓库还没有 `.oslite/config.json`，先推断项目名并向用户确认，再运行 `oslite init --profile unity-tolua-game --project-name "<项目名>" --bootstrap-agent <当前环境或 none> .`。
 - 先完成 `{{authoringPackRoot}}/evidence-map.md`，再回填正式项目文档。
 
 ## Hard Rules
