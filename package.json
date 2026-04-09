@@ -7,8 +7,15 @@
   "bin": {
     "oslite": "dist/cli/index.js"
   },
+  "files": [
+    "dist",
+    "profiles",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node ./scripts/copy-templates.js",
+    "prepack": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test ./test/*.test.js"
   },
