@@ -91,6 +91,7 @@ node ./dist/cli/index.js change new example-change ..
   - an evidence map workflow
   - thin Codex / Claude Code wrappers that point to the shared workflow
   - checklist-driven verification
+  - natural-language-friendly guidance so an agent can infer init parameters and continue the workflow
 
 ## Notes
 

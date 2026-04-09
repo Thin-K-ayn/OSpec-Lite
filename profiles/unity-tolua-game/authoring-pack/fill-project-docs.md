@@ -1,4 +1,12 @@
-# 填写项目文档
+﻿# 填写项目文档
+
+## 如果用户只是说“用 `unity-tolua-game` profile 去 init ospec-lite”
+1. 先判断仓库是否已经完成 `unity-tolua-game` 初始化。
+2. 如果还没有初始化：
+   - 先从仓库目录名、现有 README、明显的产品命名中推断项目名。
+   - 如果用户没有明确指定 bootstrap agent，则默认使用当前 agent 环境；如果当前环境不明确，则使用 `none`。
+   - 运行：`oslite init --profile unity-tolua-game --project-name "<项目名>" --bootstrap-agent <codex|claude-code|none> .`
+3. 如果已经初始化，不要重复运行 `init`，直接继续下面的读库流程。
 
 ## 阶段一：先读仓库并填写证据地图
 1. 先阅读 `project-brief.md`，确认 repo 特有提示与排除目录。
@@ -27,3 +35,4 @@
 - 资源从哪里加载
 - 哪些文件改动风险最高
 - 应该按什么顺序读代码
+
