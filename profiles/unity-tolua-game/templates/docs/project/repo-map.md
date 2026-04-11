@@ -31,7 +31,7 @@
 - 待补充：补充“如果要改 X，先看 Y”的导航规则，帮助后续 agent 快速收敛阅读范围。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -44,7 +44,7 @@
 - 待补充：列出应明确排除出核心项目文档范围的目录，并只用一句话说明原因。
 
 证据文件：
-- `docs/agents/authoring/project-brief.md`
+- `.oslite/docs/agents/authoring/project-brief.md`
 
 确认状态：
 - 待确认

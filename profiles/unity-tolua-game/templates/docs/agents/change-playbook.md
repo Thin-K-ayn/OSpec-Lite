@@ -1,8 +1,8 @@
 # 变更行动手册
 
 ## 开始前
-- 先更新 `docs/agents/authoring/project-brief.md` 中的 repo 特有信息。
-- 先读 `docs/agents/authoring/repo-reading-checklist.md`，再补齐 `docs/agents/authoring/evidence-map.md`。
+- 先更新 `.oslite/docs/agents/authoring/project-brief.md` 中的 repo 特有信息。
+- 先读 `.oslite/docs/agents/authoring/repo-reading-checklist.md`，再补齐 `.oslite/docs/agents/authoring/evidence-map.md`。
 - 没有证据文件时，不要把结论写成“确认”。
 
 ## 何时必须同步更新文档
@@ -18,6 +18,6 @@
 - `Editor/` 等明确排除目录的内部实现
 
 ## 完成前自查
-- `docs/agents/authoring/evidence-map.md` 已补齐关键章节。
-- `docs/project/*` 与 `docs/agents/*` 已按证据回填。
+- `.oslite/docs/agents/authoring/evidence-map.md` 已补齐关键章节。
+- `.oslite/docs/project/*` 与 `.oslite/docs/agents/*` 已按证据回填。
 - 已运行 `oslite docs verify .` 并清完所有失败项。

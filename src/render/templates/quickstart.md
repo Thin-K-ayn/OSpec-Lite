@@ -21,5 +21,5 @@
 ## What To Double-Check Before Editing
 
 - Relevant project rules in `{{projectDocsRoot}}/coding-rules.md`
-- Active change scope in `changes/active/<change>/plan.md`
+- Active change scope in `.oslite/changes/active/<change>/plan.md`
 - Whether the target file is a high-risk central file

@@ -108,10 +108,10 @@ export class InitService {
     const summary = this.buildSummary(scan);
 
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR));
-    await this.repo.ensureDir(path.join(rootDir, "docs", "project"));
-    await this.repo.ensureDir(path.join(rootDir, "docs", "agents"));
-    await this.repo.ensureDir(path.join(rootDir, "changes", "active"));
-    await this.repo.ensureDir(path.join(rootDir, "changes", "archived"));
+    await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "docs", "project"));
+    await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "docs", "agents"));
+    await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "changes", "active"));
+    await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "changes", "archived"));
     if (config.authoringPackRoot) {
       await this.repo.ensureDir(path.join(rootDir, config.authoringPackRoot));
     }
@@ -163,9 +163,9 @@ export class InitService {
       agentWrapperFiles: profile?.agentWrapperFiles,
       projectName,
       bootstrapAgent,
-      projectDocsRoot: "docs/project",
-      agentDocsRoot: "docs/agents",
-      changeRoot: "changes",
+      projectDocsRoot: ".oslite/docs/project",
+      agentDocsRoot: ".oslite/docs/agents",
+      changeRoot: ".oslite/changes",
       archiveLayout: "date-slug",
       profileId: profile?.id,
       authoringPackRoot: profile?.authoringPackRoot,
@@ -223,35 +223,35 @@ export class InitService {
     summary: string
   ): Promise<void> {
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "project", "overview.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "overview.md"),
       this.renderer.renderOverview(scan, config)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "project", "architecture.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "architecture.md"),
       this.renderer.renderArchitecture(scan)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "project", "repo-map.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "repo-map.md"),
       this.renderer.renderRepoMap(scan)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "project", "coding-rules.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "coding-rules.md"),
       this.renderer.renderCodingRules(scan)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "project", "glossary.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "glossary.md"),
       this.renderer.renderGlossary(scan)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "project", "entrypoints.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "entrypoints.md"),
       this.renderer.renderEntrypoints(scan)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "agents", "quickstart.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "agents", "quickstart.md"),
       this.renderer.renderQuickstart(scan, config)
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, "docs", "agents", "change-playbook.md"),
+      path.join(rootDir, OSPEC_LITE_DIR, "docs", "agents", "change-playbook.md"),
       this.renderer.renderChangePlaybook()
     );
 
@@ -259,8 +259,8 @@ export class InitService {
     const codexSection = codexAdapter.buildSection({
       projectName: scan.projectName,
       summary,
-      docsRoot: "docs/project",
-      agentDocsRoot: "docs/agents",
+      docsRoot: ".oslite/docs/project",
+      agentDocsRoot: ".oslite/docs/agents",
       rules: scan.rules.map((rule) => rule.text),
       importantFiles: scan.importantFiles
     });
@@ -276,8 +276,8 @@ export class InitService {
     const claudeSection = claudeAdapter.buildSection({
       projectName: scan.projectName,
       summary,
-      docsRoot: "docs/project",
-      agentDocsRoot: "docs/agents",
+      docsRoot: ".oslite/docs/project",
+      agentDocsRoot: ".oslite/docs/agents",
       rules: scan.rules.map((rule) => rule.text),
       importantFiles: scan.importantFiles
     });

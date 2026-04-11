@@ -44,7 +44,7 @@
 - 待补充：说明首次进入该仓库时，推荐按什么顺序阅读代码与文档。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认

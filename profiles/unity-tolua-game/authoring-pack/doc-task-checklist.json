@@ -34,8 +34,8 @@
         "## Read Next"
       ],
       "requiredSnippets": [
-        "docs/agents/authoring/fill-project-docs.md",
-        "docs/agents/authoring/evidence-map.md",
+        ".oslite/docs/agents/authoring/fill-project-docs.md",
+        ".oslite/docs/agents/authoring/evidence-map.md",
         "Script/MJGame.lua"
       ]
     },
@@ -47,12 +47,12 @@
       ],
       "requiredSnippets": [
         "@AGENTS.md",
-        "@docs/agents/authoring/fill-project-docs.md",
+        "@.oslite/docs/agents/authoring/fill-project-docs.md",
         "@docs/agents/authoring/evidence-map.md"
       ]
     },
     {
-      "path": "docs/project/overview.md",
+      "path": ".oslite/docs/project/overview.md",
       "requiredHeadings": [
         "## 项目是什么",
         "## 正式主区",
@@ -67,7 +67,7 @@
       ]
     },
     {
-      "path": "docs/project/architecture.md",
+      "path": ".oslite/docs/project/architecture.md",
       "requiredHeadings": [
         "## 启动链",
         "## 进入 / 登录 / 加载链",
@@ -84,7 +84,7 @@
       ]
     },
     {
-      "path": "docs/project/repo-map.md",
+      "path": ".oslite/docs/project/repo-map.md",
       "requiredHeadings": [
         "## 主代码目录",
         "## 目录职责导航",
@@ -99,7 +99,7 @@
       ]
     },
     {
-      "path": "docs/project/entrypoints.md",
+      "path": ".oslite/docs/project/entrypoints.md",
       "requiredHeadings": [
         "## 启动入口",
         "## 主流程入口",
@@ -126,7 +126,7 @@
       ]
     },
     {
-      "path": "docs/project/glossary.md",
+      "path": ".oslite/docs/project/glossary.md",
       "requiredHeadings": [
         "## 业务术语",
         "## 工程术语",
@@ -141,7 +141,7 @@
       ]
     },
     {
-      "path": "docs/project/coding-rules.md",
+      "path": ".oslite/docs/project/coding-rules.md",
       "requiredHeadings": [
         "## 命名与注释",
         "## 模块边界",
@@ -158,7 +158,7 @@
       ]
     },
     {
-      "path": "docs/agents/quickstart.md",
+      "path": ".oslite/docs/agents/quickstart.md",
       "requiredHeadings": [
         "## 推荐阅读顺序",
         "## 推荐检索关键词",
@@ -171,7 +171,7 @@
       ]
     },
     {
-      "path": "docs/agents/change-playbook.md",
+      "path": ".oslite/docs/agents/change-playbook.md",
       "requiredHeadings": [
         "## 开始前",
         "## 何时必须同步更新文档",
@@ -184,7 +184,7 @@
       ]
     },
     {
-      "path": "docs/agents/authoring/doc-contract.md",
+      "path": ".oslite/docs/agents/authoring/doc-contract.md",
       "requiredHeadings": [
         "## 目标",
         "## 文档范围",
@@ -200,7 +200,7 @@
       "skipPlaceholderCheck": true
     },
     {
-      "path": "docs/agents/authoring/project-brief.md",
+      "path": ".oslite/docs/agents/authoring/project-brief.md",
       "requiredHeadings": [
         "## 基础信息",
         "## 主代码目录候选",
@@ -214,7 +214,7 @@
       "skipPlaceholderCheck": true
     },
     {
-      "path": "docs/agents/authoring/repo-reading-checklist.md",
+      "path": ".oslite/docs/agents/authoring/repo-reading-checklist.md",
       "requiredHeadings": [
         "## 顶层结构",
         "## 入口与流程",
@@ -230,7 +230,7 @@
       "skipPlaceholderCheck": true
     },
     {
-      "path": "docs/agents/authoring/evidence-map.md",
+      "path": ".oslite/docs/agents/authoring/evidence-map.md",
       "requiredHeadings": [
         "## 顶层主区判断",
         "## 主入口与启动链",
@@ -261,7 +261,7 @@
       ]
     },
     {
-      "path": "docs/agents/authoring/fill-project-docs.md",
+      "path": ".oslite/docs/agents/authoring/fill-project-docs.md",
       "requiredHeadings": [
         "## 阶段一：先读仓库并填写证据地图",
         "## 阶段二：根据证据回填正式文档",
@@ -276,7 +276,7 @@
       "skipPlaceholderCheck": true
     },
     {
-      "path": "docs/agents/authoring/doc-task-checklist.json",
+      "path": ".oslite/docs/agents/authoring/doc-task-checklist.json",
       "requiredPatterns": [
         "\"profileId\"\\s*:\\s*\"unity-tolua-game\"",
         "\"sectionRules\"",

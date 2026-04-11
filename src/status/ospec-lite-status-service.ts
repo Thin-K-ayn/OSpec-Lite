@@ -41,8 +41,8 @@ export class StatusService {
       state,
       missingMarkers,
       config,
-      activeChanges: await this.listChangeNames(path.join(rootDir, "changes", "active")),
-      archivedChanges: await this.listArchivedChangeNames(path.join(rootDir, "changes", "archived"))
+      activeChanges: await this.listChangeNames(path.join(rootDir, OSPEC_LITE_DIR, "changes", "active")),
+      archivedChanges: await this.listArchivedChangeNames(path.join(rootDir, OSPEC_LITE_DIR, "changes", "archived"))
     };
   }
 

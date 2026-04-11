@@ -16,7 +16,7 @@
 4. 对本 profile，默认从 `Script/MJGame.lua` 开始建立主入口认知。
 
 ## 阶段二：根据证据回填正式文档
-1. 再回填 `AGENTS.md`、`CLAUDE.md`、`docs/project/*`、`docs/agents/*`。
+1. 再回填 `AGENTS.md`、`CLAUDE.md`、`.oslite/docs/project/*`、`.oslite/docs/agents/*`。
 2. 对关键章节统一使用：`结论 / 证据文件 / 确认状态 / 未确认点`。
 3. 没有证据文件时，不得把结论写成“确认”。
 4. 不要把临时目录、辅助目录、一次性工具目录扩写进核心项目文档。

@@ -5,16 +5,16 @@ export const INIT_MARKERS = [
   ".oslite/index.json",
   "AGENTS.md",
   "CLAUDE.md",
-  "docs/project/overview.md",
-  "docs/project/architecture.md",
-  "docs/project/repo-map.md",
-  "docs/project/coding-rules.md",
-  "docs/project/glossary.md",
-  "docs/project/entrypoints.md",
-  "docs/agents/quickstart.md",
-  "docs/agents/change-playbook.md",
-  "changes/active",
-  "changes/archived"
+  ".oslite/docs/project/overview.md",
+  ".oslite/docs/project/architecture.md",
+  ".oslite/docs/project/repo-map.md",
+  ".oslite/docs/project/coding-rules.md",
+  ".oslite/docs/project/glossary.md",
+  ".oslite/docs/project/entrypoints.md",
+  ".oslite/docs/agents/quickstart.md",
+  ".oslite/docs/agents/change-playbook.md",
+  ".oslite/changes/active",
+  ".oslite/changes/archived"
 ] as const;
 
 export const AUTHORING_PACK_FILES = [
@@ -27,7 +27,7 @@ export const AUTHORING_PACK_FILES = [
 ] as const;
 
 export const DEFAULT_DOCUMENT_LANGUAGE = "en-US" as const;
-export const DEFAULT_AUTHORING_PACK_ROOT = "docs/agents/authoring" as const;
+export const DEFAULT_AUTHORING_PACK_ROOT = ".oslite/docs/agents/authoring" as const;
 
 export const AGENTS_FILE = "AGENTS.md";
 export const CLAUDE_FILE = "CLAUDE.md";

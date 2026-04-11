@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { CHANGE_SLUG_PATTERN } from "../core/ospec-lite-schema";
+import { CHANGE_SLUG_PATTERN, OSPEC_LITE_DIR } from "../core/ospec-lite-schema";
 import { ChangeRecord, ChangeStatus } from "../core/ospec-lite-types";
 import {
   InvalidChangeSlugError,
@@ -21,7 +21,7 @@ export class ChangeService {
     this.ensureSlug(slug);
     await this.ensureInitialized(rootDir);
 
-    const changeDir = path.join(rootDir, "changes", "active", slug);
+    const changeDir = path.join(rootDir, OSPEC_LITE_DIR, "changes", "active", slug);
     if (await this.repo.exists(changeDir)) {
       throw new OSpecLiteError(`Change already exists: ${slug}`);
     }
@@ -66,11 +66,11 @@ export class ChangeService {
       throw new OSpecLiteError("Only verified changes can be archived.");
     }
 
-    const rootDir = path.resolve(changePath, "..", "..", "..");
+    const rootDir = await this.findRootDir(changePath);
     const now = new Date();
     const month = now.toISOString().slice(0, 7);
     const day = now.toISOString().slice(0, 10);
-    const archiveDir = path.join(rootDir, "changes", "archived", month, day, record.slug);
+    const archiveDir = path.join(rootDir, OSPEC_LITE_DIR, "changes", "archived", month, day, record.slug);
 
     record.status = "archived";
     record.updatedAt = now.toISOString();
@@ -115,5 +115,17 @@ export class ChangeService {
     if (status.state !== "initialized") {
       throw new NotInitializedError(rootDir);
     }
+  }
+
+  private async findRootDir(changePath: string): Promise<string> {
+    let candidate = path.resolve(changePath);
+    const root = path.parse(candidate).root;
+    while (candidate !== root) {
+      candidate = path.dirname(candidate);
+      if (await this.repo.exists(path.join(candidate, OSPEC_LITE_DIR, "config.json"))) {
+        return candidate;
+      }
+    }
+    throw new OSpecLiteError(`Cannot find project root from change path: ${changePath}`);
   }
 }

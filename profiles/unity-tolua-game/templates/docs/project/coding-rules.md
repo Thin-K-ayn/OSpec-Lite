@@ -18,7 +18,7 @@
 - 待补充：说明 View、Manager、Controller、Network、Resource 等模块边界如何划分。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -31,7 +31,7 @@
 - 待补充：说明 Init / Start / Enter / Exit / Release 以及事件、定时器、Action 的收口方式。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -44,7 +44,7 @@
 - 待补充：说明配置修改、资源映射、资源加载路径变更时要额外检查哪些地方。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -57,7 +57,7 @@
 - 待补充：总结最常见的 review 风险，例如生命周期未收口、资源映射遗漏、状态残留、接口边界误判等。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认

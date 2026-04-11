@@ -2,19 +2,19 @@
 
 ## 目标
 - 为刚完成 OSpec Lite 初始化的仓库生成“可直接用于未来读库与 code review”的项目文档。
-- 让后续任何 LLM / 新同事仅通过 `AGENTS.md`、`docs/project/*`、`docs/agents/*` 就能在 10 分钟内建立正确心智模型。
+- 让后续任何 LLM / 新同事仅通过 `AGENTS.md`、`.oslite/docs/project/*`、`.oslite/docs/agents/*` 就能在 10 分钟内建立正确心智模型。
 
 ## 文档范围
 - `AGENTS.md`
 - `CLAUDE.md`
-- `docs/project/overview.md`
-- `docs/project/architecture.md`
-- `docs/project/repo-map.md`
-- `docs/project/entrypoints.md`
-- `docs/project/glossary.md`
-- `docs/project/coding-rules.md`
-- `docs/agents/quickstart.md`
-- `docs/agents/change-playbook.md`
+- `.oslite/docs/project/overview.md`
+- `.oslite/docs/project/architecture.md`
+- `.oslite/docs/project/repo-map.md`
+- `.oslite/docs/project/entrypoints.md`
+- `.oslite/docs/project/glossary.md`
+- `.oslite/docs/project/coding-rules.md`
+- `.oslite/docs/agents/quickstart.md`
+- `.oslite/docs/agents/change-playbook.md`
 
 ## 工作方式
 - 先读仓库，再写文档；不要直接沿用默认扫描文案。

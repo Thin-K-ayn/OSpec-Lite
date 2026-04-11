@@ -1,11 +1,11 @@
 # 快速读库
 
 ## 推荐阅读顺序
-1. 先看 `docs/agents/authoring/fill-project-docs.md`
-2. 再看 `docs/agents/authoring/project-brief.md`
-3. 再看 `docs/agents/authoring/repo-reading-checklist.md`
+1. 先看 `.oslite/docs/agents/authoring/fill-project-docs.md`
+2. 再看 `.oslite/docs/agents/authoring/project-brief.md`
+3. 再看 `.oslite/docs/agents/authoring/repo-reading-checklist.md`
 4. 从 `Script/MJGame.lua` 开始建立入口链认知
-5. 写完 `docs/agents/authoring/evidence-map.md` 后，再读 `docs/project/*`
+5. 写完 `.oslite/docs/agents/authoring/evidence-map.md` 后，再读 `.oslite/docs/project/*`
 
 ## 推荐检索关键词
 - `MJGame`

@@ -5,7 +5,7 @@
 - 待补充：整理从代码、配置、协议或界面中能确认的业务术语，并给出简短解释。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -18,7 +18,7 @@
 - 待补充：整理该仓库内部约定的工程术语、模块简称和生命周期词汇。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -31,7 +31,7 @@
 - 待补充：整理 Unity、ToLua、AssetBundle、protobuf、桥接层或插件框架相关术语。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认
@@ -44,7 +44,7 @@
 - 待补充：列出还不能确认含义、但后续 agent 读库时需要特别留意的术语。
 
 证据文件：
-- `docs/agents/authoring/evidence-map.md`
+- `.oslite/docs/agents/authoring/evidence-map.md`
 
 确认状态：
 - 待确认

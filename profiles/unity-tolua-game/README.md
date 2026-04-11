@@ -65,17 +65,17 @@ npm.cmd install --save-dev ospec-lite@0.1.0
    - 从仓库目录名、README、显眼的产品命名中推断项目名。
    - 先向用户确认这个项目名；如果用户没有继续纠正，才把它作为 `--project-name` 传给 `oslite init`。
    - 结合当前环境选择 `--bootstrap-agent`，不明确时使用 `none`。
-3. 初始化完成后，先填写 `docs/agents/authoring/evidence-map.md`。
-4. 再回填 `AGENTS.md`、`CLAUDE.md`、`docs/project/*`、`docs/agents/*`。
+3. 初始化完成后，先填写 `.oslite/docs/agents/authoring/evidence-map.md`。
+4. 再回填 `AGENTS.md`、`CLAUDE.md`、`.oslite/docs/project/*`、`.oslite/docs/agents/*`。
 5. 最后运行 `oslite docs verify .`。
 
 ## 这个 profile 会生成什么
 
 - `AGENTS.md`
 - `CLAUDE.md`
-- `docs/project/*`
-- `docs/agents/*`
-- `docs/agents/authoring/*`
+- `.oslite/docs/project/*`
+- `.oslite/docs/agents/*`
+- `.oslite/docs/agents/authoring/*`
 - `.codex/skills/oslite-fill-project-docs/SKILL.md`
 - `.claude/commands/oslite-fill-project-docs.md`
 

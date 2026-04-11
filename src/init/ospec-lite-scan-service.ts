@@ -275,7 +275,7 @@ export class ScanService {
       "package.json",
       "AGENTS.md",
       "CLAUDE.md",
-      "docs/project/overview.md"
+      ".oslite/docs/project/overview.md"
     ]);
 
     for (const item of directoryMap) {
