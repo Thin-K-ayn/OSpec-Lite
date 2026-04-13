@@ -8,7 +8,7 @@ Minimal agent-first repository bootstrap for Codex and Claude Code.
 
 V1 intentionally keeps the surface area small: one-time bootstrap, optional profiles, deterministic profile-backed doc verification, and simple change tracking.
 
-[Why OSpec Lite](#why-ospec-lite) | [What It Creates](#what-it-creates) | [Install](#install) | [Usage](#usage) | [Profiles](#profiles) | [Development](#development)
+[Why OSpec Lite](#why-ospec-lite) | [What It Creates](#what-it-creates) | [Install](#install) | [Usage](#usage) | [Profiles](#profiles) | [Codex Plugin](#codex-plugin) | [Development](#development)
 
 ## Why OSpec Lite
 
@@ -18,6 +18,7 @@ V1 intentionally keeps the surface area small: one-time bootstrap, optional prof
 - Supports content-only profiles that add authoring packs and thin agent wrappers without introducing a plugin runtime.
 - Tracks lightweight changes in `.oslite/changes/active/*` and archives them when verified.
 - Verifies profile-driven documentation deterministically with `oslite docs verify`.
+- Ships a repo-local Codex companion plugin so Codex can discover and follow the `ospec-lite` workflow.
 
 ## What It Creates
 
@@ -144,6 +145,23 @@ Profile docs:
 - [profiles/README.md](./profiles/README.md)
 - [profiles/unity-tolua-game/README.md](./profiles/unity-tolua-game/README.md)
 - [profiles/unity-tolua-hall/README.md](./profiles/unity-tolua-hall/README.md)
+
+## Codex Plugin
+
+This repository now ships a repo-local Codex companion plugin under [`plugins/ospec-lite-codex/`](./plugins/ospec-lite-codex).
+
+- Plugin manifest: [`plugins/ospec-lite-codex/.codex-plugin/plugin.json`](./plugins/ospec-lite-codex/.codex-plugin/plugin.json)
+- Repo marketplace entry: [`.agents/plugins/marketplace.json`](./.agents/plugins/marketplace.json)
+- Primary skill: `$ospec-lite-workflow`
+
+Open this repository in Codex and let it discover the repo-local marketplace. The plugin does not replace `oslite`; it teaches Codex when to use the CLI and how to follow profile-backed OSpec Lite workflows consistently.
+
+Example prompts:
+
+- `Initialize this repo with OSpec Lite.`
+- `Check OSpec Lite status and explain the missing markers.`
+- `Continue the profile docs and run oslite docs verify.`
+- `Create an OSpec Lite change for add-login-flow.`
 
 ## Command Summary
 

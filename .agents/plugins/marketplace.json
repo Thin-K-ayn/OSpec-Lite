@@ -1,0 +1,20 @@
+{
+  "name": "ospec-lite-repo",
+  "interface": {
+    "displayName": "OSpec Lite Repo Plugins"
+  },
+  "plugins": [
+    {
+      "name": "ospec-lite-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ospec-lite-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "ospec-lite",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Minimal agent-first repository bootstrap for Codex and Claude Code.",
   "license": "MIT",
   "type": "commonjs",
@@ -9,8 +9,11 @@
   },
   "files": [
     "dist",
+    ".agents",
+    "plugins",
     "profiles",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE"
   ],
   "scripts": {

@@ -1,0 +1,37 @@
+{
+  "name": "ospec-lite-codex",
+  "version": "1.0.3",
+  "description": "Codex companion plugin for repositories that use OSpec Lite.",
+  "author": {
+    "name": "KaynGameDev",
+    "url": "https://github.com/KaynGameDev"
+  },
+  "homepage": "https://github.com/KaynGameDev/OSpec-Lite#readme",
+  "repository": "https://github.com/KaynGameDev/OSpec-Lite",
+  "license": "MIT",
+  "keywords": [
+    "ospec-lite",
+    "codex",
+    "workflow",
+    "documentation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "OSpec Lite",
+    "shortDescription": "Guide Codex through the ospec-lite workflow.",
+    "longDescription": "Repo-local Codex companion plugin for OSpec Lite. It teaches Codex when to initialize a repository, how to follow profile-backed authoring packs, and how to use OSpec Lite's lightweight change workflow without replacing the oslite CLI.",
+    "developerName": "KaynGameDev",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/KaynGameDev/OSpec-Lite",
+    "defaultPrompt": [
+      "Initialize this repo with OSpec Lite.",
+      "Check OSpec Lite status and missing markers.",
+      "Continue the profile docs and run oslite docs verify."
+    ],
+    "brandColor": "#157A6E"
+  }
+}
