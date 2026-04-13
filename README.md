@@ -1,104 +1,171 @@
 # OSpec Lite
 
-Minimal agent-first repository bootstrap for:
+[English](./README.md) | [简体中文](./README.zh-CN.md)
 
-- `oslite init`
-- `oslite status`
-- `oslite docs verify`
-- `oslite change new`
-- `oslite change apply`
-- `oslite change verify`
-- `oslite change archive`
+Minimal agent-first repository bootstrap for Codex and Claude Code.
 
-V1 intentionally focuses on generic repo understanding plus first-class support for:
+`ospec-lite` helps a repository become easier for coding agents to understand, easier for humans to review, and safer to change. It bootstraps repo-local instructions, a machine-readable index, a small project knowledge layer, and a lightweight change workflow under `.oslite/`.
 
-- `AGENTS.md`
-- `CLAUDE.md`
-- repo-local Codex and Claude Code wrappers
+V1 intentionally keeps the surface area small: one-time bootstrap, optional profiles, deterministic profile-backed doc verification, and simple change tracking.
 
-## Why It Exists
+[Why OSpec Lite](#why-ospec-lite) | [What It Creates](#what-it-creates) | [Install](#install) | [Usage](#usage) | [Profiles](#profiles) | [Development](#development)
 
-`ospec-lite` is a smaller rewrite direction inspired by OSpec, but focused on one immediate outcome:
+## Why OSpec Lite
 
-- after `init`, a repository should become easier for coding agents like Codex and Claude Code to understand and change safely
+- Bootstraps `AGENTS.md` and `CLAUDE.md` so Codex and Claude Code get repo-local guidance immediately.
+- Generates `.oslite/index.json` as a machine-readable summary of the repository.
+- Creates `.oslite/docs/project/*` and `.oslite/docs/agents/*` so repo knowledge lives next to the code.
+- Supports content-only profiles that add authoring packs and thin agent wrappers without introducing a plugin runtime.
+- Tracks lightweight changes in `.oslite/changes/active/*` and archives them when verified.
+- Verifies profile-driven documentation deterministically with `oslite docs verify`.
 
-Instead of trying to solve every workflow problem up front, V1 keeps the surface small:
+## What It Creates
 
-- one-time repo bootstrap
-- machine-readable repo index
-- agent-oriented docs
-- repo-local authoring packs for profile-driven repository reading
-- deterministic documentation verification
-- lightweight change tracking
+`oslite init` is a one-time bootstrap. On a fresh repository, generic init creates:
 
-## Current V1 Scope
+```text
+.oslite/
+  config.json
+  index.json
+  docs/
+    project/
+      overview.md
+      architecture.md
+      repo-map.md
+      coding-rules.md
+      glossary.md
+      entrypoints.md
+    agents/
+      quickstart.md
+      change-playbook.md
+  changes/
+    active/
+    archived/
 
-- one-time `init`
-- generic repo scan
-- optional asset-based profiles
-- `AGENTS.md` generation
-- `CLAUDE.md` generation
-- `.oslite/index.json`
-- shared prompt packs under `docs/agents/authoring/`
-- thin repo-local wrappers that point agents at the shared authoring pack
-- `oslite docs verify`
-- minimal `change -> apply -> verify -> archive`
+AGENTS.md
+CLAUDE.md
+```
+
+When a profile is selected, it can also add:
+
+```text
+.oslite/docs/agents/authoring/*
+.codex/skills/oslite-fill-project-docs/SKILL.md
+.claude/commands/oslite-fill-project-docs.md
+```
+
+If the repo is already initialized, `oslite init` reports the current state and exits instead of rewriting the knowledge layer.
 
 ## Install
 
+Use `ospec-lite` in a target repository:
+
+```sh
+npm install --save-dev ospec-lite
+npx oslite init .
+```
+
+If you are developing this package locally:
+
 ```sh
 npm install
-```
-
-## Build
-
-```sh
 npm run build
-```
-
-## Test
-
-```sh
 npm test
 ```
 
+When running from this cloned repository instead of an installed package, use `node ./dist/cli/index.js ...`.
+
 ## Usage
 
-Run from this package directory:
+### Initialize a repository
 
 ```sh
-node ./dist/cli/index.js init ..
-node ./dist/cli/index.js init --document-language zh-CN ..
-node ./dist/cli/index.js init --profile unity-tolua-game ..
-node ./dist/cli/index.js init --profile unity-tolua-game --project-name "BuYuDaLuanDou" --bootstrap-agent codex ..
-node ./dist/cli/index.js init --profile unity-tolua-hall ..
-node ./dist/cli/index.js init --profile unity-tolua-hall --project-name "NeoHall" --bootstrap-agent codex ..
-node ./dist/cli/index.js status ..
-node ./dist/cli/index.js docs verify ..
-node ./dist/cli/index.js change new example-change ..
+npx oslite init .
+npx oslite init . --document-language zh-CN
+npx oslite init . --profile unity-tolua-game --project-name "BuYuDaLuanDou" --bootstrap-agent codex
+npx oslite init . --profile unity-tolua-hall --project-name "NeoHall" --bootstrap-agent codex
+```
+
+Notes:
+
+- Supported document languages are `en-US` and `zh-CN`.
+- In non-interactive environments, the shipped profiles require both `--project-name` and `--bootstrap-agent`.
+- `--bootstrap-agent` accepts `codex`, `claude-code`, or `none`.
+
+### Inspect bootstrap state
+
+```sh
+npx oslite status .
+```
+
+`status` reports whether the repo is initialized, which profile is active, where docs live, and how many active and archived changes exist.
+
+### Verify profile-driven docs
+
+```sh
+npx oslite docs verify .
+```
+
+`docs verify` is only available for repositories initialized with a profile, because it validates the active profile's authoring pack and checklist.
+
+### Track a lightweight change
+
+```sh
+npx oslite change new improve-readme .
+# edit files and update the change notes
+npx oslite change apply .oslite/changes/active/improve-readme
+npx oslite change verify .oslite/changes/active/improve-readme
+npx oslite change archive .oslite/changes/active/improve-readme
+```
+
+## Typical Profile Workflow
+
+1. Run `oslite init` with the right profile.
+2. Fill `.oslite/docs/agents/authoring/evidence-map.md` before the final docs.
+3. Complete `AGENTS.md`, `CLAUDE.md`, `.oslite/docs/project/*`, and `.oslite/docs/agents/*`.
+4. Finish with `oslite docs verify .`.
+
+## Profiles
+
+| Profile | Target repository | Required repo anchors | Output language |
+| --- | --- | --- | --- |
+| `unity-tolua-game` | Unity + ToLua sub-game repos | `Script/MJGame.lua` | `zh-CN` |
+| `unity-tolua-hall` | Unity + ToLua hall / lobby repos | `Assets/_GameCenter/...` startup files | `zh-CN` |
+
+Both shipped profiles:
+
+- are content-only asset packs, not executable plugins
+- add `.oslite/docs/agents/authoring/*`
+- can generate repo-local Codex and Claude Code wrappers
+- require `projectName` and `bootstrapAgent` during init
+
+Profile docs:
+
+- [profiles/README.md](./profiles/README.md)
+- [profiles/unity-tolua-game/README.md](./profiles/unity-tolua-game/README.md)
+- [profiles/unity-tolua-hall/README.md](./profiles/unity-tolua-hall/README.md)
+
+## Command Summary
+
+```text
+oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
+oslite status [path]
+oslite docs verify [path]
+oslite change new <slug> [path]
+oslite change apply <change-path>
+oslite change verify <change-path>
+oslite change archive <change-path>
 ```
 
 ## Docs
 
-- [V1 core spec](./docs/ospec-lite-v1-core-spec.md)
+- [docs/ospec-lite-v1-core-spec.md](./docs/ospec-lite-v1-core-spec.md)
 
-## Profiles
+## Development
 
-- profiles live under [`profiles/`](./profiles)
-- the first content-only profile is [`unity-tolua-game`](./profiles/unity-tolua-game/profile.json)
-- a hall-oriented companion profile is [`unity-tolua-hall`](./profiles/unity-tolua-hall/profile.json)
-- profiles do not execute code or call hosted models
-- profiles provide:
-  - neutral doc skeletons
-  - repo-local reading instructions
-  - an evidence map workflow
-  - thin Codex / Claude Code wrappers that point to the shared workflow
-  - checklist-driven verification
-  - natural-language-friendly guidance so an agent can infer init parameters and continue the workflow
-
-## Notes
-
-- V1 `init` is intentionally one-shot. If the repo is already initialized, it logs that state and exits.
-- V1 stays provider-agnostic. It prepares repo-local instructions for Codex and Claude Code, but does not orchestrate model calls directly.
-- The `unity-tolua-game` profile only hard-codes one project rule: `Script/MJGame.lua` is the main entry anchor.
-- `unity-tolua-game` and `unity-tolua-hall` can ask for `projectName` and `bootstrapAgent` during `init`; in non-interactive environments, pass `--project-name` and `--bootstrap-agent` explicitly.
+```sh
+npm install
+npm run build
+npm run typecheck
+npm test
+```
