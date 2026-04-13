@@ -1,96 +1,96 @@
-# Coding Rules
+# 编码与 Review 规则
 
-## Naming And Annotation
-Conclusion:
-- TBD: Summarize naming patterns, view / controller naming, and comment / annotation expectations in this hall repo.
-Evidence Files:
+## 命名与注解
+结论：
+- 待补充：总结该大厅仓库真实存在的命名习惯、view / controller 命名、注释要求，以及 EmmyLua / ToLua 相关规则。
+证据文件：
 - `Assets/_GameCenter/ClientLua/CC.lua`
 - `Assets/_GameCenter/ClientLua/View`
 - `Assets/_GameCenter/ClientLua/Model`
-Status:
-- Pending
-Open Questions:
-- TBD: Are there additional directory-level naming constraints?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：是否还存在目录级、模块级的命名约束？
 
-## Runtime C# Change Policy
-Conclusion:
-- TBD: Explain the team's rule that packaged runtime C# changes should only happen with explicit user approval, while Unity Editor scripts are the main exception.
-Evidence Files:
+## 运行时 C# 修改策略
+结论：
+- 待补充：说明团队对运行时 C# 的规则，即默认只有在用户明确许可后才能改动打包内 C#，而 Unity Editor 脚本是主要例外。
+证据文件：
 - `Assets/_GameCenter/FrameWork`
 - `Assets/_GameCenter/LuaFramework/Scripts`
 - `Assets/Editor`
-Status:
-- Pending
-Open Questions:
-- TBD: Which directories count as safely editor-only in this repo's current structure?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：当前仓库里哪些目录可以稳定视为 Editor-only？
 
-## Payment Change Policy
-Conclusion:
-- TBD: Explain the team's rule that real-money payment, order, receipt-validation, payout, cashier, and billing changes must be double-checked with the user before editing.
-Evidence Files:
+## 支付改动策略
+结论：
+- 待补充：说明真钱支付、订单、票据校验、出入款、收银台、渠道计费等改动必须先与用户二次确认。
+证据文件：
 - `Assets/_GameCenter/ClientLua`
 - `Assets/_GameCenter/FrameWork`
 - `Channel`
 - `UnityInterface`
-Status:
-- Pending
-Open Questions:
-- TBD: Which payment-related directories, modules, and SDK bridges are considered approval-sensitive in this repo?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：仓库当前有哪些支付相关目录、模块、SDK 桥接属于确认敏感区？
 
-## Module Wiring And Require Conventions
-Conclusion:
-- TBD: Explain the `CC.Init()` / `CC.SetFileRequire()` conventions and how Manager / Define / DataMgr modules are wired.
-Evidence Files:
+## 模块装配与 require 约定
+结论：
+- 待补充：说明 `CC.Init()` / `CC.SetFileRequire()` 的约定，以及 Manager / Define / DataMgr 模块如何装配。
+证据文件：
 - `Assets/_GameCenter/ClientLua/CC.lua`
 - `Assets/_GameCenter/ClientLua/Main.lua`
-Status:
-- Pending
-Open Questions:
-- TBD: Which modules must be accessed through `CC` and which are expected to be required directly?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：哪些模块必须通过 `CC` 访问，哪些允许直接 `require`？
 
-## View And Controller Boundaries
-Conclusion:
-- TBD: Explain how View, controller, and ViewManager responsibilities are split.
-Evidence Files:
+## 视图与控制边界
+结论：
+- 待补充：说明 View、controller、ViewManager 之间的职责分界。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`
 - `Assets/_GameCenter/ClientLua/View`
-Status:
-- Pending
-Open Questions:
-- TBD: Which views are special cases that do not follow the usual ViewManager path?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：哪些 view 属于特殊情况，不遵循常规 ViewManager 路径？
 
-## Lifecycle And Notification Cleanup
-Conclusion:
-- TBD: Explain how pause / resume / back, notification cleanup, timers, and view teardown are supposed to be handled.
-Evidence Files:
+## 生命周期与通知清理
+结论：
+- 待补充：说明 pause / resume / back、通知清理、timer、view teardown 的处理方式。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/HallCenter.lua`
 - `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`
 - `Assets/_GameCenter/ClientLua/Common`
-Status:
-- Pending
-Open Questions:
-- TBD: Is there a shared unregister / dispose pattern that should be called out?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：是否存在共享的 unregister / dispose 模式需要特别写明？
 
-## Resource, Hot-Update, And Scene Risk
-Conclusion:
-- TBD: Summarize the risky rules around hot update, downloads, AssetBundle reload, scene switches, and subgame entry.
-Evidence Files:
+## 资源、热更与切场景风险
+结论：
+- 待补充：总结热更、下载、AssetBundle 重载、切场景、进入子游戏时最容易出问题的规则。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua`
 - `Assets/_GameCenter/LuaFramework/Scripts/Manager/NEO_PARTY_GAMES_GameManager.cs`
 - `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`
-Status:
-- Pending
-Open Questions:
-- TBD: Which changes are most likely to break both the hall and subgames at once?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：哪些改动最容易同时影响大厅与子游戏？
 
-## Common Review Traps
-Conclusion:
-- TBD: Summarize the most common regression traps such as global-state side effects, reconnect state drift, auto-enter side effects, and missed cleanup.
-Evidence Files:
+## 常见 Review 坑位
+结论：
+- 待补充：总结常见回归点，例如全局状态副作用、重连状态漂移、自动进入副作用、清理遗漏等。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Main.lua`
 - `Assets/_GameCenter/ClientLua/Model/Network/Network.lua`
 - `Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua`
-Status:
-- Pending
-Open Questions:
-- TBD: Which project-specific traps still need to be added?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：是否还有大厅仓库特有的高频坑位需要加进来？

@@ -28,6 +28,12 @@
 帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。
 ```
 
+如果你想把项目名先填好，可以直接发这一句：
+
+```text
+帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
+```
+
 如果是英文环境，可以说：
 
 ```text
@@ -46,6 +52,12 @@ npm.cmd install --save-dev ospec-lite@0.1.0
 
 ```text
 帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。
+```
+
+如果已经知道项目名，也可以直接用这句：
+
+```text
+帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
 ```
 
 默认预期是 agent 自己完成这些步骤：

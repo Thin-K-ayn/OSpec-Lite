@@ -3,19 +3,25 @@ name: oslite-fill-project-docs
 description: Initialize or continue OSpec Lite project documentation for a Unity + ToLua hall repository. Use when Codex should adopt the unity-tolua-hall profile, confirm the inferred project name with the user, run oslite init when needed, then fill evidence-first docs and finish with docs verification.
 ---
 
-# OSpec Lite Project Docs
+# OSpec Lite 项目文档
 
-Follow the repo-local authoring pack instead of inventing a new workflow.
+遵循仓库内置的 authoring pack，而不是自行发明一套新流程。
 
-1. If the repo is not initialized for `unity-tolua-hall`, infer the project name from the repo and ask the user to confirm it before running `oslite init`.
-2. Once the project name is confirmed, default the bootstrap agent to `codex` and run `oslite init --profile unity-tolua-hall --project-name "<project-name>" --bootstrap-agent codex .`.
-3. If the repo is already initialized, do not rerun `init`.
-4. Read `{{authoringPackRoot}}/fill-project-docs.md` first.
-5. Read `{{authoringPackRoot}}/project-brief.md` and `{{authoringPackRoot}}/repo-reading-checklist.md`.
-6. Fill `{{authoringPackRoot}}/evidence-map.md` before editing the final docs.
-7. Use `{{authoringPackRoot}}/doc-contract.md` as the output contract.
-8. Update `AGENTS.md`, `CLAUDE.md`, `{{docsRoot}}/*`, and `{{agentDocsRoot}}/*` from evidence, not from guesses.
-9. Mark uncertain conclusions as `Inferred` or `Pending`.
-10. If the task moves into subgame logic, switch into `Assets/_GameModule/<game>/` and read that game repo's `AGENTS.md` or `CLAUDE.md` before documenting or changing it.
-11. Keep `Assets/Editor/`, `Assets/_GameWrap/Generate/`, test scenes, and one-off helper directories out of the core hall narrative unless the repo clearly treats them as first-class architecture.
-12. Run `oslite docs verify .` before stopping when the command is available in the environment.
+1. 如果仓库还没有按 `unity-tolua-hall` 初始化，先根据仓库内容推断项目名，并向用户确认后再运行 `oslite init`。
+2. 项目名确认后，默认把 bootstrap agent 设为 `codex`，并运行 `oslite init --profile unity-tolua-hall --project-name "<project-name>" --bootstrap-agent codex .`。
+3. 如果仓库已经初始化，不要重复运行 `init`。
+4. 先读 `{{authoringPackRoot}}/fill-project-docs.md`。
+5. 再读 `{{authoringPackRoot}}/project-brief.md` 与 `{{authoringPackRoot}}/repo-reading-checklist.md`。
+6. 在动正式文档前，先补 `{{authoringPackRoot}}/evidence-map.md`。
+7. 以 `{{authoringPackRoot}}/doc-contract.md` 作为输出契约。
+8. 根据证据回填 `AGENTS.md`、`CLAUDE.md`、`{{docsRoot}}/*`、`{{agentDocsRoot}}/*`，不要凭模板臆测。
+9. 所有不能从代码确认的结论，标记为 `推断` 或 `待确认`。
+10. 如果任务进入子游戏逻辑，先切到 `Assets/_GameModule/<game>/`，再读该子游戏仓库自己的 `AGENTS.md` 或 `CLAUDE.md`。
+11. 不要把 `Assets/Editor/`、`Assets/_GameWrap/Generate/`、测试场景、一次性工具目录写进大厅核心叙事，除非仓库明确把它们视为一等架构。
+12. 在停止前运行 `oslite docs verify .`，前提是环境里有这个命令。
+
+如果用户已经知道项目名，也可以用下面这句直接触发：
+
+```text
+帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
+```

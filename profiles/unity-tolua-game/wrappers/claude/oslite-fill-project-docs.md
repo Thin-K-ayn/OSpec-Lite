@@ -1,4 +1,4 @@
-﻿Use the repo-local OSpec Lite authoring pack to initialize or fill project documentation.
+Use the repo-local OSpec Lite authoring pack to initialize or fill project documentation.
 
 1. If the repo is not initialized for `unity-tolua-game`, infer the project name from the repo and ask the user to confirm it before running `oslite init`.
 2. Once the project name is confirmed, default the bootstrap agent to `claude-code` and run `oslite init --profile unity-tolua-game --project-name "<project-name>" --bootstrap-agent claude-code .`.
@@ -10,3 +10,9 @@
 8. Mark uncertain conclusions as `推断` or `待确认`.
 9. If `$ARGUMENTS` is provided, treat it as the priority area to inspect first, but still keep the final docs globally consistent.
 10. Run `oslite docs verify .` before stopping when the command is available in the environment.
+
+If the user already knows the project name, they can trigger this profile with:
+
+```text
+帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
+```

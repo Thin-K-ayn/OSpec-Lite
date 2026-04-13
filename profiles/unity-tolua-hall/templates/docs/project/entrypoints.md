@@ -1,72 +1,72 @@
-# Entrypoints
+# 入口总览
 
-## Host Startup Entry
-Conclusion:
-- TBD: Explain the host-side startup anchor and why it is the beginning of the hall startup chain.
-Evidence Files:
+## 宿主启动入口
+结论：
+- 待补充：说明宿主侧启动锚点是什么，以及为什么它是大厅启动链的起点。
+证据文件：
 - `Assets/_GameCenter/Root/root.unity`
 - `Assets/_GameCenter/FrameWork/Behaviours/Launch.cs`
 - `Assets/_GameCenter/LuaFramework/Scripts/Main.cs`
 - `Assets/_GameCenter/ClientLua/Main.lua`
-Status:
-- Pending
-Open Questions:
-- TBD: If anything runs before `root.unity`, document it here.
+确认状态：
+- 待确认
+未确认点：
+- 待补充：如果还有比 `root.unity` 更早的入口，请在这里补充。
 
-## Lua Startup Entry
-Conclusion:
-- TBD: Explain how `Main.lua` enters `GameInit / GameStart` and how `CC.Init()` assembles hall runtime modules.
-Evidence Files:
+## Lua 启动入口
+结论：
+- 待补充：说明 `Main.lua` 如何进入 `GameInit / GameStart`，以及 `CC.Init()` 如何装配大厅运行模块。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Main.lua`
 - `Assets/_GameCenter/ClientLua/CC.lua`
-Status:
-- Pending
-Open Questions:
-- TBD: Is there any extra Lua bootstrap or hot-reload entry that belongs here?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：是否还存在额外 Lua bootstrap、热更入口或平台注入入口？
 
-## Hall Main Flow Entry
-Conclusion:
-- TBD: Explain where login, hall main-scene entry, and primary hall view startup really begin.
-Evidence Files:
+## 大厅主流程入口
+结论：
+- 待补充：说明登录、大厅主场景进入、主视图启动真正从哪里开始。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/HallCenter.lua`
 - `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`
 - `Assets/_GameCenter/_Resources/HallScene/main.unity`
-Status:
-- Pending
-Open Questions:
-- TBD: Which views are true flow entries and which are later feature pages?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：哪些 view 是真正流程入口，哪些只是后续功能页？
 
-## Network Entry
-Conclusion:
-- TBD: Explain the unified entry for socket lifecycle, requests, push dispatch, and reconnect.
-Evidence Files:
+## 网络入口
+结论：
+- 待补充：说明长连生命周期、请求发送、推送分发、重连路径的统一入口。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/Network/Network.lua`
 - `Assets/_GameCenter/FrameWork/IO/NEO_PARTY_GAMES_Launcher.cs`
-Status:
-- Pending
-Open Questions:
-- TBD: Are there parallel HTTP or platform-network entries that also need coverage?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：是否还有并行 HTTP、平台网络或支付网络入口需要补充？
 
-## Resource And Hot-Update Entry
-Conclusion:
-- TBD: Explain the entry points for hall hot update, resource download, AssetBundle reload, and path baselines.
-Evidence Files:
+## 资源与热更入口
+结论：
+- 待补充：说明大厅热更、资源下载、AssetBundle 重载、路径基线的入口。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua`
 - `Assets/_GameCenter/LuaFramework/Scripts/Manager/NEO_PARTY_GAMES_GameManager.cs`
 - `Assets/_GameCenter/LuaFramework/Scripts/Common/NEO_PARTY_GAMES_AppConst.cs`
-Status:
-- Pending
-Open Questions:
-- TBD: What evidence is still missing for the hall-vs-subgame asset boundary?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：大厅资源与子游戏资源之间的边界还有哪些证据缺口？
 
-## Enter Subgame And Return To Hall Entry
-Conclusion:
-- TBD: Explain the key entry points for `EnterGame`, scene changes, return-to-hall, and resource reset, including when to hand off to a subgame repo.
-Evidence Files:
+## 进入子游戏与回大厅入口
+结论：
+- 待补充：说明 `EnterGame`、切场景、回大厅、资源重置的关键入口，以及何时应转交子游戏仓库说明。
+证据文件：
 - `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`
 - `Assets/_GameCenter/LuaFramework/Scripts/Manager/NEO_PARTY_GAMES_GameManager.cs`
 - `Assets/_GameModule`
-Status:
-- Pending
-Open Questions:
-- TBD: Which subgame-entry details are hall-owned, and which should be documented from the target game repo's `AGENTS.md` or `CLAUDE.md`?
+确认状态：
+- 待确认
+未确认点：
+- 待补充：哪些子游戏入口细节仍由大厅仓库负责，哪些应来自目标子游戏仓库的 `AGENTS.md` 或 `CLAUDE.md`？

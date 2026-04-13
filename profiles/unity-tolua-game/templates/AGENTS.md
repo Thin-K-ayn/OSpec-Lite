@@ -8,6 +8,7 @@
 - 对本 profile，默认把 `Script/MJGame.lua` 作为主入口起点。
 - 如果用户要求“用 unity-tolua-game profile 初始化”，但仓库还没有 `.oslite/config.json`，先推断项目名并向用户确认，再运行 `oslite init --profile unity-tolua-game --project-name "<项目名>" --bootstrap-agent <当前环境或 none> .`。
 - 先完成 `{{authoringPackRoot}}/evidence-map.md`，再回填正式项目文档。
+- 如果用户已经知道项目名，也可以直接这样触发：`帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。`
 
 ## Hard Rules
 

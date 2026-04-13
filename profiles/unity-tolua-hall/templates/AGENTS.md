@@ -4,34 +4,35 @@
 ## What This Repo Is
 
 - Profile: `{{profileId}}`
-- This is the reading and documentation workflow entry for a Unity + ToLua hall repository.
-- This profile describes the hall repo itself. Individual subgame modules are expected to live under `Assets/_GameModule/<game>/`.
-- Start the startup-chain model from `Assets/_GameCenter/FrameWork/Behaviours/Launch.cs`, `Assets/_GameCenter/LuaFramework/Scripts/Main.cs`, and `Assets/_GameCenter/ClientLua/Main.lua`.
-- If the user asks to initialize with the `unity-tolua-hall` profile and `.oslite/config.json` is missing, infer the project name, ask the user to confirm it, and then run `oslite init --profile unity-tolua-hall --project-name "<project-name>" --bootstrap-agent <current-host-or-none> .`.
-- Fill `{{authoringPackRoot}}/evidence-map.md` before final docs.
+- 这是 Unity + ToLua 大厅仓库的读库与文档工作流入口。
+- 这个 profile 描述的是大厅仓库本体；单独子游戏模块默认位于 `Assets/_GameModule/<game>/`。
+- 对本 profile，默认从 `Assets/_GameCenter/FrameWork/Behaviours/Launch.cs`、`Assets/_GameCenter/LuaFramework/Scripts/Main.cs`、`Assets/_GameCenter/ClientLua/Main.lua` 建立启动链认知。
+- 如果用户要求“用 unity-tolua-hall profile 初始化”，但仓库还没有 `.oslite/config.json`，先推断项目名并向用户确认，再运行 `oslite init --profile unity-tolua-hall --project-name "<项目名>" --bootstrap-agent <当前环境或 none> .`。
+- 先完成 `{{authoringPackRoot}}/evidence-map.md`，再回填正式项目文档。
+- 如果用户已经知道项目名，也可以直接这样触发：`帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。`
 
 ## Hard Rules
 
-- Read the repo before you write docs. Do not copy placeholders into final conclusions.
-- Mark any conclusion that is not code-confirmed as `Inferred` or `Pending`.
-- Treat `Assets/_GameCenter/` as the default hall core.
-- If the task depends on subgame logic, look in `Assets/_GameModule/<game>/` first and read that subgame repo's `AGENTS.md` or `CLAUDE.md` before drawing conclusions.
-- Treat runtime C# edits as opt-in. Before changing non-Editor C# scripts, ask the user for explicit permission because those changes usually require republishing the APK.
-- You may skip that extra permission only when the user explicitly asks for C# changes or the target is a Unity Editor script in an editor-only scope such as `Assets/Editor/`.
-- Treat real-money payment code as approval-sensitive. If a change touches payment, order creation, receipt validation, payout, cashier, or channel billing flows, pause and double-check the intended modification with the user before editing.
-- Expand `_GameWrap`, `Channel`, `UnityInterface`, and `Tools` only when the code proves they are part of the current task.
-- Keep generated wrappers, editor-only directories, and test scenes out of the core hall narrative unless the task directly depends on them.
+- 先读仓库，再写文档；不要照抄初始化模板或扫描结果。
+- 所有不能从代码确认的结论，必须标记为 `推断` 或 `待确认`。
+- 默认把 `Assets/_GameCenter/` 视为大厅核心区。
+- 如果任务依赖子游戏逻辑，优先进入 `Assets/_GameModule/<game>/`，并先读该子游戏仓库自己的 `AGENTS.md` 或 `CLAUDE.md`。
+- 非 Editor 的运行时 C# 修改默认需要先征求用户明确许可，因为这类改动通常需要重新发 APK。
+- 只有在用户明确要求改 C#，或者目标文件明确属于 `Assets/Editor/` 这类 Editor-only 范围时，才可以跳过这一步额外确认。
+- 只要改动触及支付、订单、票据校验、出入款、收银台或渠道计费等真钱流程，就必须先和用户二次确认改动意图。
+- `_GameWrap`、`Channel`、`UnityInterface`、`Tools` 这类边界目录，只有在代码证明它们属于当前任务时才展开。
+- 不要把生成代码、Editor-only 目录、测试场景、一次性工具目录写进大厅核心叙事，除非任务确实依赖它们。
 
 ## High-Risk Areas
 
-- `Assets/_GameCenter/ClientLua/Main.lua`: hall Lua entry and `GameInit / GameStart`.
-- `Assets/_GameCenter/ClientLua/Model/HallCenter.lua`: startup orchestration and host-to-Lua notifications.
-- `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`: login, hall, subgame entry, and return-to-hall coordination.
-- `Assets/_GameCenter/ClientLua/Model/Network/Network.lua`: hall socket lifecycle, reconnect, and request routing.
-- `Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua`: hall hot-update and asset reload flow.
-- Payment, cashier, order, receipt-validation, and channel billing paths: treat these as user-confirmation-sensitive even when the code surface looks routine.
-- `{{authoringPackRoot}}/project-brief.md`: repo-specific assumptions and exclusions.
-- `{{authoringPackRoot}}/evidence-map.md`: evidence-first scratchpad that final docs must follow.
+- `Assets/_GameCenter/ClientLua/Main.lua`：大厅 Lua 主入口，`GameInit / GameStart` 从这里起。
+- `Assets/_GameCenter/ClientLua/Model/HallCenter.lua`：大厅启动编排、宿主到 Lua 的通知桥接。
+- `Assets/_GameCenter/ClientLua/Model/Manager/ViewManager.lua`：登录、大厅进入、子游戏进入、回大厅的流程协调点。
+- `Assets/_GameCenter/ClientLua/Model/Network/Network.lua`：大厅长连、重连、请求分发。
+- `Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua`：大厅热更、下载、资源重载。
+- 支付、收银台、订单、票据校验、渠道计费相关链路：即使表面看起来只是小改动，也要先和用户确认。
+- `{{authoringPackRoot}}/project-brief.md`：仓库特有上下文，写文档前先核对。
+- `{{authoringPackRoot}}/evidence-map.md`：正式文档的证据底稿，先写这里再写最终文档。
 
 ## Read Next
 

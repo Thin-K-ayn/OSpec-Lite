@@ -2,6 +2,8 @@
   "version": 1,
   "profileId": "unity-tolua-hall",
   "placeholderPatterns": [
+    "待补充",
+    "TODO",
     "TBD",
     "(?m)^-\\s*$"
   ],
@@ -12,15 +14,15 @@
     "(?m)^###\\s*Editor/"
   ],
   "requiredEvidenceLabels": [
-    "Conclusion",
-    "Evidence Files",
-    "Status",
-    "Open Questions"
+    "结论",
+    "证据文件",
+    "确认状态",
+    "未确认点"
   ],
   "allowedStatuses": [
-    "Confirmed",
-    "Inferred",
-    "Pending"
+    "确认",
+    "推断",
+    "待确认"
   ],
   "files": [
     {
@@ -52,78 +54,78 @@
     {
       "path": ".oslite/docs/project/overview.md",
       "requiredHeadings": [
-        "## What This Project Is",
-        "## Core Areas",
-        "## Main Flow",
-        "## First Read Recommendation"
+        "## 项目是什么",
+        "## 正式主区",
+        "## 主流程",
+        "## 首次读库建议"
       ],
       "evidenceSections": [
-        "What This Project Is",
-        "Core Areas",
-        "Main Flow",
-        "First Read Recommendation"
+        "项目是什么",
+        "正式主区",
+        "主流程",
+        "首次读库建议"
       ]
     },
     {
       "path": ".oslite/docs/project/architecture.md",
       "requiredHeadings": [
-        "## Host Startup Chain",
-        "## Lua Init And Hall Entry Chain",
-        "## Hall Runtime Chain",
-        "## Enter Subgame And Return To Hall Chain",
-        "## Layers And Boundaries"
+        "## 宿主启动链",
+        "## Lua 初始化与大厅进入链",
+        "## 大厅运行链",
+        "## 进入子游戏与回大厅链",
+        "## 层级与边界"
       ],
       "evidenceSections": [
-        "Host Startup Chain",
-        "Lua Init And Hall Entry Chain",
-        "Hall Runtime Chain",
-        "Enter Subgame And Return To Hall Chain",
-        "Layers And Boundaries"
+        "宿主启动链",
+        "Lua 初始化与大厅进入链",
+        "大厅运行链",
+        "进入子游戏与回大厅链",
+        "层级与边界"
       ]
     },
     {
       "path": ".oslite/docs/project/repo-map.md",
       "requiredHeadings": [
-        "## Main Code Directories",
-        "## Responsibility Guide",
-        "## Change Navigation",
-        "## Non-Core Areas"
+        "## 主代码目录",
+        "## 目录职责导航",
+        "## 改动导航",
+        "## 非核心区域"
       ],
       "evidenceSections": [
-        "Main Code Directories",
-        "Responsibility Guide",
-        "Change Navigation",
-        "Non-Core Areas"
+        "主代码目录",
+        "目录职责导航",
+        "改动导航",
+        "非核心区域"
       ]
     },
     {
       "path": ".oslite/docs/project/entrypoints.md",
       "requiredHeadings": [
-        "## Host Startup Entry",
-        "## Lua Startup Entry",
-        "## Hall Main Flow Entry",
-        "## Network Entry",
-        "## Resource And Hot-Update Entry",
-        "## Enter Subgame And Return To Hall Entry"
+        "## 宿主启动入口",
+        "## Lua 启动入口",
+        "## 大厅主流程入口",
+        "## 网络入口",
+        "## 资源与热更入口",
+        "## 进入子游戏与回大厅入口"
       ],
       "evidenceSections": [
-        "Host Startup Entry",
-        "Lua Startup Entry",
-        "Hall Main Flow Entry",
-        "Network Entry",
-        "Resource And Hot-Update Entry",
-        "Enter Subgame And Return To Hall Entry"
+        "宿主启动入口",
+        "Lua 启动入口",
+        "大厅主流程入口",
+        "网络入口",
+        "资源与热更入口",
+        "进入子游戏与回大厅入口"
       ],
       "sectionRules": [
         {
-          "heading": "Host Startup Entry",
+          "heading": "宿主启动入口",
           "requiredSnippets": [
             "Assets/_GameCenter/FrameWork/Behaviours/Launch.cs",
             "Assets/_GameCenter/ClientLua/Main.lua"
           ]
         },
         {
-          "heading": "Resource And Hot-Update Entry",
+          "heading": "资源与热更入口",
           "requiredSnippets": [
             "Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua"
           ]
@@ -133,44 +135,48 @@
     {
       "path": ".oslite/docs/project/glossary.md",
       "requiredHeadings": [
-        "## Business Terms",
-        "## Engineering Terms",
-        "## Framework Terms",
-        "## Unconfirmed Terms"
+        "## 业务术语",
+        "## 工程术语",
+        "## 框架术语",
+        "## 待确认术语"
       ],
       "evidenceSections": [
-        "Business Terms",
-        "Engineering Terms",
-        "Framework Terms",
-        "Unconfirmed Terms"
+        "业务术语",
+        "工程术语",
+        "框架术语",
+        "待确认术语"
       ]
     },
     {
       "path": ".oslite/docs/project/coding-rules.md",
       "requiredHeadings": [
-        "## Naming And Annotation",
-        "## Module Wiring And Require Conventions",
-        "## View And Controller Boundaries",
-        "## Lifecycle And Notification Cleanup",
-        "## Resource, Hot-Update, And Scene Risk",
-        "## Common Review Traps"
+        "## 命名与注解",
+        "## 运行时 C# 修改策略",
+        "## 支付改动策略",
+        "## 模块装配与 require 约定",
+        "## 视图与控制边界",
+        "## 生命周期与通知清理",
+        "## 资源、热更与切场景风险",
+        "## 常见 Review 坑位"
       ],
       "evidenceSections": [
-        "Naming And Annotation",
-        "Module Wiring And Require Conventions",
-        "View And Controller Boundaries",
-        "Lifecycle And Notification Cleanup",
-        "Resource, Hot-Update, And Scene Risk",
-        "Common Review Traps"
+        "命名与注解",
+        "运行时 C# 修改策略",
+        "支付改动策略",
+        "模块装配与 require 约定",
+        "视图与控制边界",
+        "生命周期与通知清理",
+        "资源、热更与切场景风险",
+        "常见 Review 坑位"
       ]
     },
     {
       "path": ".oslite/docs/agents/quickstart.md",
       "requiredHeadings": [
-        "## Suggested Read Order",
-        "## Suggested Search Keywords",
-        "## Review Priorities",
-        "## Time Sinks To Avoid"
+        "## 推荐阅读顺序",
+        "## 推荐搜索关键词",
+        "## Review 优先检查项",
+        "## 不要浪费时间的区域"
       ],
       "requiredSnippets": [
         "Assets/_GameCenter/ClientLua/Main.lua",
@@ -181,10 +187,10 @@
     {
       "path": ".oslite/docs/agents/change-playbook.md",
       "requiredHeadings": [
-        "## Before You Start",
-        "## When You Must Update Docs",
-        "## When Not To Expand Core Project Docs",
-        "## Final Checks"
+        "## 开始前",
+        "## 何时必须同步更新文档",
+        "## 何时不要写进核心项目文档",
+        "## 完成前自查"
       ],
       "requiredSnippets": [
         "oslite docs verify .",
@@ -196,41 +202,42 @@
     {
       "path": ".oslite/docs/agents/authoring/doc-contract.md",
       "requiredHeadings": [
-        "## Goal",
-        "## Doc Scope",
-        "## Working Method",
-        "## Key Writing Rules",
-        "## Exclusions"
+        "## 目标",
+        "## 文档范围",
+        "## 工作方式",
+        "## 关键写作规则",
+        "## 排除范围"
       ],
       "requiredSnippets": [
         "Assets/_GameCenter/ClientLua/Main.lua",
-        "Inferred",
-        "Pending"
+        "推断",
+        "待确认"
       ],
       "skipPlaceholderCheck": true
     },
     {
       "path": ".oslite/docs/agents/authoring/project-brief.md",
       "requiredHeadings": [
-        "## Basics",
-        "## Candidate Core Directories",
-        "## Explicitly Excluded Directories",
-        "## Known Entry Hints",
-        "## Other Repo-Specific Hints"
+        "## 基础信息",
+        "## 主代码目录候选",
+        "## 明确排除目录",
+        "## 已知入口提示",
+        "## 其他项目提示"
       ],
       "requiredSnippets": [
-        "Assets/_GameCenter/ClientLua/Main.lua"
+        "Assets/_GameCenter/ClientLua/Main.lua",
+        "Assets/_GameModule"
       ],
       "skipPlaceholderCheck": true
     },
     {
       "path": ".oslite/docs/agents/authoring/repo-reading-checklist.md",
       "requiredHeadings": [
-        "## Top-Level Structure",
-        "## Startup And Flow",
-        "## Resources And Network",
-        "## Lifecycle",
-        "## Boundaries And Stack"
+        "## 顶层结构",
+        "## 启动与流程",
+        "## 资源与网络",
+        "## 生命周期",
+        "## 边界与技术栈"
       ],
       "requiredSnippets": [
         "Assets/_GameCenter/ClientLua/Main.lua",
@@ -242,48 +249,72 @@
     {
       "path": ".oslite/docs/agents/authoring/evidence-map.md",
       "requiredHeadings": [
-        "## Core Area Decision",
-        "## Host Startup Chain",
-        "## Lua Init And Hall Entry Chain",
-        "## Hall Flow And View Switching",
-        "## Network Entry",
-        "## Resource And Hot-Update Entry",
-        "## Enter Subgame And Return To Hall",
-        "## External Boundaries And Plugins",
-        "## Stack Signals"
+        "## 核心区域判断",
+        "## 宿主启动链",
+        "## Lua 初始化与大厅进入链",
+        "## 大厅流程与视图切换",
+        "## 网络入口",
+        "## 资源与热更入口",
+        "## 进入子游戏与回大厅",
+        "## 外部边界与插件",
+        "## 技术栈特征"
       ],
       "evidenceSections": [
-        "Core Area Decision",
-        "Host Startup Chain",
-        "Lua Init And Hall Entry Chain",
-        "Hall Flow And View Switching",
-        "Network Entry",
-        "Resource And Hot-Update Entry",
-        "Enter Subgame And Return To Hall",
-        "External Boundaries And Plugins",
-        "Stack Signals"
+        "核心区域判断",
+        "宿主启动链",
+        "Lua 初始化与大厅进入链",
+        "大厅流程与视图切换",
+        "网络入口",
+        "资源与热更入口",
+        "进入子游戏与回大厅",
+        "外部边界与插件",
+        "技术栈特征"
       ],
       "sectionRules": [
         {
-          "heading": "Host Startup Chain",
+          "heading": "宿主启动链",
           "requiredSnippets": [
             "Assets/_GameCenter/FrameWork/Behaviours/Launch.cs",
             "Assets/_GameCenter/ClientLua/Main.lua"
           ]
         },
         {
-          "heading": "Network Entry",
+          "heading": "网络入口",
           "requiredSnippets": [
             "Assets/_GameCenter/ClientLua/Model/Network/Network.lua"
           ]
         },
         {
-          "heading": "Resource And Hot-Update Entry",
+          "heading": "资源与热更入口",
           "requiredSnippets": [
             "Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua"
           ]
         }
       ]
+    },
+    {
+      "path": ".oslite/docs/agents/authoring/fill-project-docs.md",
+      "requiredHeadings": [
+        "## 当用户只说“用 unity-tolua-hall profile 去 init ospec-lite”时",
+        "## 阶段一：先读仓库并填写证据地图",
+        "## 阶段二：根据证据回填正式文档",
+        "## 停止前自查"
+      ],
+      "requiredSnippets": [
+        "Assets/_GameCenter/ClientLua/Main.lua",
+        "oslite docs verify .",
+        "evidence-map.md"
+      ],
+      "skipPlaceholderCheck": true
+    },
+    {
+      "path": ".oslite/docs/agents/authoring/doc-task-checklist.json",
+      "requiredPatterns": [
+        "\"profileId\"\\s*:\\s*\"unity-tolua-hall\"",
+        "\"sectionRules\"",
+        "\"requiredEvidenceLabels\""
+      ],
+      "skipPlaceholderCheck": true
     }
   ]
 }

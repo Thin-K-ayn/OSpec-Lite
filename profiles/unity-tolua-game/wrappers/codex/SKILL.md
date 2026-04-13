@@ -1,4 +1,4 @@
-﻿---
+---
 name: oslite-fill-project-docs
 description: Initialize or continue OSpec Lite project documentation for a Unity + ToLua repository. Use when Codex should adopt the unity-tolua-game profile, confirm the inferred project name with the user, run oslite init when needed, then fill evidence-first docs and finish with docs verification.
 ---
@@ -18,3 +18,9 @@ Follow the repo-local authoring pack instead of inventing a new workflow.
 9. Mark uncertain conclusions as `推断` or `待确认`.
 10. Keep temporary or helper directories out of the core project narrative unless the repo clearly treats them as first-class architecture.
 11. Run `oslite docs verify .` before stopping when the command is available in the environment.
+
+If the user already knows the project name, they can trigger this profile with:
+
+```text
+帮我用 unity-tolua-game 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
+```

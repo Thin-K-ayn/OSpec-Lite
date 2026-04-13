@@ -3,7 +3,7 @@
   "id": "unity-tolua-hall",
   "displayName": "Unity + ToLua Hall",
   "description": "Repo-local reading workflow and authoring pack for Unity + ToLua hall repositories.",
-  "documentLanguage": "en-US",
+  "documentLanguage": "zh-CN",
   "authoringPackRoot": ".oslite/docs/agents/authoring",
   "requiredInitFields": [
     "projectName",

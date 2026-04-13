@@ -1,6 +1,6 @@
-# Quickstart
+# 快速上手
 
-## Suggested Read Order
+## 推荐阅读顺序
 1. `Assets/_GameCenter/FrameWork/Behaviours/Launch.cs`
 2. `Assets/_GameCenter/LuaFramework/Scripts/Main.cs`
 3. `Assets/_GameCenter/ClientLua/Main.lua`
@@ -10,7 +10,7 @@
 7. `Assets/_GameCenter/ClientLua/Model/Network/Network.lua`
 8. `Assets/_GameCenter/ClientLua/Model/ResDownload/ResDownloadManager.lua`
 
-## Suggested Search Keywords
+## 推荐搜索关键词
 - `GameInit`
 - `InitBeforeLogin`
 - `CommonEnterMainScene`
@@ -20,17 +20,17 @@
 - `NotificationToLua`
 - `EmmyLua`
 
-## Review Priorities
-- Check whether the startup chain `Launch.cs` -> `Main.cs` -> `Main.lua` still holds.
-- Check whether hall flow ownership still lives in `HallCenter.lua` and `ViewManager.lua`.
-- Check whether `Network.lua` still handles connect / reconnect / disconnect transitions safely.
-- Check whether `ResDownloadManager.lua` and `NEO_PARTY_GAMES_GameManager.cs` still keep update / reload side effects under control.
-- Check that new Lua classes and complex functions include EmmyLua annotations when needed.
-- Pause for explicit permission before changing packaged runtime C# scripts; Editor-only scripts are the main exception.
-- Pause to double-check with the user before changing real-money payment, order, receipt, payout, cashier, or billing flows.
+## Review 优先检查项
+- 先检查启动链 `Launch.cs` -> `Main.cs` -> `Main.lua` 是否仍然成立。
+- 检查大厅主流程职责是否仍然集中在 `HallCenter.lua` 与 `ViewManager.lua`。
+- 检查 `Network.lua` 是否仍然正确处理 connect / reconnect / disconnect。
+- 检查 `ResDownloadManager.lua` 与 `NEO_PARTY_GAMES_GameManager.cs` 是否仍然控制好更新 / 重载副作用。
+- 检查新增 Lua 类、复杂 Lua 函数、参数语义不清的函数是否补了 EmmyLua 注解。
+- 改打包内运行时 C# 前先征求用户明确许可；Editor-only 脚本是主要例外。
+- 只要改动触及真钱支付、订单、票据校验、出入款、收银台、渠道计费，就先与用户二次确认。
 
-## Time Sinks To Avoid
+## 不要浪费时间的区域
 - `Assets/Editor/`
 - `Assets/_GameWrap/Generate/`
 - `Assets/Common/Unity-Logs-Viewer/Reporter/Test/`
-- deep third-party plugin internals unless the task explicitly depends on them
+- 与当前任务无关的第三方插件内部实现

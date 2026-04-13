@@ -25,7 +25,7 @@ test("hall profile init succeeds non-interactively when project name and bootstr
   const config = JSON.parse(
     await fs.readFile(path.join(rootDir, ".oslite", "config.json"), "utf8")
   );
-  assert.equal(config.documentLanguage, "en-US");
+  assert.equal(config.documentLanguage, "zh-CN");
   assert.equal(config.profileId, "unity-tolua-hall");
   assert.equal(config.projectName, "NeoHall");
   assert.equal(config.bootstrapAgent, "none");
@@ -37,6 +37,7 @@ test("hall profile init succeeds non-interactively when project name and bootstr
   assert.match(brief, /NeoHall/);
   assert.match(brief, /Assets\/_GameCenter\/ClientLua\/Main\.lua/);
   assert.match(brief, /Assets\/_GameModule/);
+  assert.match(brief, /项目简报/);
 });
 
 test("hall profile init fails clearly when the required hall anchors are missing", async (t) => {
@@ -97,30 +98,30 @@ test("hall profile assets preserve hall-specific guidance", async () => {
   );
 
   assert.match(agents, /unity-tolua-hall/);
-  assert.match(agents, /hall repo itself/);
+  assert.match(agents, /大厅仓库/);
   assert.match(agents, /Assets\/_GameCenter\/ClientLua\/Main\.lua/);
   assert.match(agents, /Assets\/_GameModule/);
   assert.match(agents, /AGENTS\.md/);
-  assert.match(agents, /ask the user for explicit permission/i);
+  assert.match(agents, /先征求用户明确许可/);
   assert.match(agents, /Assets\/Editor\//);
-  assert.match(agents, /real-money payment code as approval-sensitive/i);
+  assert.match(agents, /真钱流程/);
   assert.match(checklist, /Launch\.cs/);
   assert.match(checklist, /ResDownloadManager\.lua/);
   assert.match(checklist, /Assets\/_GameModule/);
-  assert.match(codingRules, /Runtime C# Change Policy/);
-  assert.match(codingRules, /explicit user approval/i);
-  assert.match(codingRules, /Payment Change Policy/);
-  assert.match(codingRules, /double-checked with the user/i);
-  assert.match(quickstart, /Pause for explicit permission before changing packaged runtime C# scripts/i);
-  assert.match(quickstart, /double-check with the user before changing real-money payment/i);
+  assert.match(codingRules, /运行时 C# 修改策略/);
+  assert.match(codingRules, /用户明确许可/);
+  assert.match(codingRules, /支付改动策略/);
+  assert.match(codingRules, /二次确认/);
+  assert.match(quickstart, /改打包内运行时 C# 前先征求用户明确许可/);
+  assert.match(quickstart, /先与用户二次确认/);
   assert.match(codexWrapper, /oslite init --profile unity-tolua-hall/);
   assert.match(codexWrapper, /--bootstrap-agent codex/);
   assert.match(codexWrapper, /Assets\/_GameModule/);
   assert.match(profileReadme, /unity-tolua-hall/);
   assert.match(profileReadme, /oslite docs verify/);
   assert.match(profileReadme, /Assets\/_GameModule/);
-  assert.match(profileReadme, /ask for permission before changing non-Editor C# scripts/i);
-  assert.match(profileReadme, /double-check any real-money payment-related change with the user/i);
+  assert.match(profileReadme, /非 Editor 的运行时 C# 修改默认需要先征求用户许可/);
+  assert.match(profileReadme, /必须先与用户二次确认再改/);
 });
 
 async function createTempRepo(t, prefix) {
@@ -196,7 +197,7 @@ async function makeHallProfileDocsCompliant(rootDir) {
 
   for (const relativePath of docPaths) {
     await rewriteFile(rootDir, relativePath, (content) =>
-      content.replaceAll("TBD", "Done")
+      content.replaceAll("待补充", "已补充").replaceAll("TBD", "Done")
     );
   }
 }
