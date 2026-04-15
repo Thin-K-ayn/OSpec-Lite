@@ -1,5 +1,29 @@
 # 变更行动手册
 
+## change 是什么
+
+- 一个 change 对应一个非琐碎任务的仓库内工作记录。
+- 它不是 git branch，也不是 commit。
+- 它的作用是把“需求、计划、实际改动、验证结果”拆开记录，方便 review、交接和追溯。
+
+## change 目录里有什么
+
+每个 active change 都在 `.oslite/changes/active/<slug>/` 下，通常包括：
+
+- `request.md`：需求和范围
+- `plan.md`：计划、预期影响文件、风险
+- `apply.md`：实际做了什么
+- `verify.md`：怎么验证、还剩什么风险
+- `change.json`：状态和元数据
+
+## 推荐节奏
+
+1. 先用 `oslite change new <slug> .` 建 change。
+2. 大改前先补 `request.md` 和 `plan.md`。
+3. 改完后补 `apply.md`，再标记 `applied`。
+4. 验证后补 `verify.md`，再标记 `verified`。
+5. 确认结束后再归档。
+
 ## 开始前
 - 先更新 `.oslite/docs/agents/authoring/project-brief.md` 中的 repo 特有信息。
 - 先读 `.oslite/docs/agents/authoring/repo-reading-checklist.md`，再补齐 `.oslite/docs/agents/authoring/evidence-map.md`。

@@ -111,9 +111,52 @@ npx oslite docs verify .
 
 ### Track a lightweight change
 
+A change is a repo-local work record for one non-trivial task. It is not a git branch and not a commit. Think of it as the smallest reviewable unit of intent, plan, implementation notes, and verification that lives next to the code.
+
+Why it helps:
+
+- gives humans and agents one shared place to capture scope before edits start
+- makes handoff and review easier because request, plan, applied work, and verification are separated
+- leaves an archived trail of why a change happened and how it was validated
+
+Use a change when the task is more than a tiny typo, especially if it:
+
+- touches multiple files
+- changes behavior, interfaces, rules, or architecture
+- needs explicit review notes or verification steps
+- may outlive one chat session or one coding pass
+
+What `oslite change new <slug> .` creates:
+
+```text
+.oslite/changes/active/<slug>/
+  change.json
+  request.md
+  plan.md
+  apply.md
+  verify.md
+```
+
+File roles:
+
+- `request.md`: what was asked for, intended scope, and acceptance notes
+- `plan.md`: intended approach, expected files, and risks before editing
+- `apply.md`: what actually changed and where implementation deviated from plan
+- `verify.md`: checks performed, manual validation, and remaining risks
+- `change.json`: machine-readable status and metadata
+
+Typical flow:
+
+1. Create the change folder.
+2. Write `request.md` and `plan.md` before broad edits.
+3. Implement the change.
+4. Record the real work in `apply.md`, then mark it applied.
+5. Record validation in `verify.md`, then mark it verified.
+6. Archive it once the work is done and verified.
+
 ```sh
 npx oslite change new improve-readme .
-# edit files and update the change notes
+# fill request.md and plan.md, then edit files
 npx oslite change apply .oslite/changes/active/improve-readme
 npx oslite change verify .oslite/changes/active/improve-readme
 npx oslite change archive .oslite/changes/active/improve-readme

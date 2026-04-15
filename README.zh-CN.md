@@ -111,9 +111,52 @@ npx oslite docs verify .
 
 ### 跟踪一个轻量 change
 
+一个 change 是围绕单个非琐碎任务的仓库内工作记录。它不是 git branch，也不是 commit。你可以把它理解成“最小可审阅工作单元”：把需求、计划、实际改动和验证记录放在代码旁边。
+
+它的价值主要在于：
+
+- 让人和 agent 在动手前先对范围达成一致
+- 把需求、计划、实施、验证拆开记录，方便交接和 review
+- 在归档后保留“为什么改、怎么改、怎么验”的历史线索
+
+什么时候值得开一个 change：
+
+- 会改多个文件
+- 会改变行为、接口、规则或架构认知
+- 需要明确的 review 说明或验证步骤
+- 这项工作可能跨多个会话、多个提交，甚至需要中途交接
+
+`oslite change new <slug> .` 会创建：
+
+```text
+.oslite/changes/active/<slug>/
+  change.json
+  request.md
+  plan.md
+  apply.md
+  verify.md
+```
+
+各文件职责：
+
+- `request.md`：记录用户请求、范围和验收说明
+- `plan.md`：记录动手前的实现思路、预计影响文件和风险
+- `apply.md`：记录实际改了什么，以及和计划不一致的地方
+- `verify.md`：记录跑过的检查、人工验证和剩余风险
+- `change.json`：机器可读的状态和元数据
+
+推荐流程：
+
+1. 先创建 change 目录。
+2. 在大改之前先写 `request.md` 和 `plan.md`。
+3. 再开始实现。
+4. 实现完成后补 `apply.md`，再标记为 applied。
+5. 验证完成后补 `verify.md`，再标记为 verified。
+6. 确认完成后再归档。
+
 ```sh
 npx oslite change new improve-readme .
-# 修改文件并补充 change 记录
+# 先补 request.md 和 plan.md，再开始改文件
 npx oslite change apply .oslite/changes/active/improve-readme
 npx oslite change verify .oslite/changes/active/improve-readme
 npx oslite change archive .oslite/changes/active/improve-readme

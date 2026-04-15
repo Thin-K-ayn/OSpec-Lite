@@ -538,6 +538,16 @@ Rules:
 
 ## Minimal Change Flow
 
+A V1 change is a lightweight, repo-local work record for one non-trivial task.
+
+It is intentionally not:
+
+- a replacement for git branches
+- a replacement for commits
+- a heavyweight issue tracker
+
+Its job is to keep request, plan, implementation notes, and verification close to the code so both humans and coding agents can review or resume work safely.
+
 Each active change lives under:
 
 ```text
@@ -548,6 +558,21 @@ changes/active/<slug>/
   apply.md
   verify.md
 ```
+
+Recommended semantics:
+
+- `request.md`: what was asked for, the intended scope, and acceptance notes
+- `plan.md`: intended approach, expected files/modules, and known risks before editing
+- `apply.md`: what was actually changed and how it differed from plan
+- `verify.md`: automated checks, manual validation, and remaining risks
+- `change.json`: machine-readable state and metadata for tooling
+
+Recommended use cases:
+
+- changes that touch multiple files
+- changes that alter behavior, interfaces, or architectural understanding
+- changes that need explicit validation notes
+- changes likely to span multiple sessions or require handoff
 
 Allowed statuses:
 
