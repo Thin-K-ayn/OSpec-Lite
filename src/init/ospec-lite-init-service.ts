@@ -5,9 +5,9 @@ import {
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START,
   AUTHORING_PACK_FILES,
+  BUG_ACTIVE_BUGS_PATH,
   BUG_MEMORY_DIR,
   BUG_MEMORY_PATH,
-  BUG_QUEUE_PATH,
   CLAUDE_FILE,
   CLAUDE_MANAGED_END,
   CLAUDE_MANAGED_START,
@@ -135,7 +135,7 @@ export class InitService {
 
     await this.writeHumanDocSuggestionsIfMissing(rootDir, artifacts.humanDocSuggestions);
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, BUG_QUEUE_PATH),
+      path.join(rootDir, BUG_ACTIVE_BUGS_PATH),
       this.bugTemplates.renderQueue()
     );
     await this.repo.writeTextIfMissing(

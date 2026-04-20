@@ -9,7 +9,7 @@ export class BugTemplateService {
   ) {}
 
   renderQueue(): string {
-    return this.renderTemplate("bug-queue.md", {});
+    return this.renderTemplate("active-bugs.md", {});
   }
 
   renderPlaybook(): string {

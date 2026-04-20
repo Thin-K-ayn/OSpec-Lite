@@ -287,7 +287,7 @@ async function handleBug(args: string[]): Promise<void> {
       const targetDir = path.resolve(rest[1] ?? ".");
       const bugId = await bugService.newBug(targetDir, title);
       console.log(`Created bug: ${bugId}`);
-      console.log("Queue: .oslite/bugs/queue.md");
+      console.log("Active bugs: .oslite/bugs/active-bugs.md");
       return;
     }
     case "fix": {

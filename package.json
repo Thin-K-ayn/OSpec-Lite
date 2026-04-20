@@ -1,6 +1,6 @@
 {
   "name": "ospec-lite",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Minimal agent-first repository bootstrap for Codex and Claude Code.",
   "license": "MIT",
   "type": "commonjs",
@@ -17,7 +17,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && node ./scripts/copy-templates.js",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.json && node ./scripts/copy-templates.js",
     "prepack": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "npm run build && node --test ./test/*.test.js"

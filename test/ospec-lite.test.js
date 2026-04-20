@@ -19,10 +19,10 @@ const { BugService } = require("../dist/bug/ospec-lite-bug-service.js");
 const { ProfileLoader } = require("../dist/profile/ospec-lite-profile-loader.js");
 const {
   BUG_INDEX_PATH,
+  BUG_ACTIVE_BUGS_PATH,
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START,
   BUG_MEMORY_PATH,
-  BUG_QUEUE_PATH,
   CLAUDE_MANAGED_END,
   CLAUDE_MANAGED_START,
   INIT_MARKERS
@@ -65,7 +65,7 @@ test("init bootstraps the repository knowledge layer", async (t) => {
     true
   );
   assert.equal(await repo.exists(path.join(rootDir, BUG_MEMORY_PATH)), true);
-  assert.equal(await repo.exists(path.join(rootDir, BUG_QUEUE_PATH)), true);
+  assert.equal(await repo.exists(path.join(rootDir, BUG_ACTIVE_BUGS_PATH)), true);
 
   const status = await statusService.getStatus(rootDir);
   assert.equal(status.state, "initialized");
@@ -512,7 +512,7 @@ test("bug workflow advances from reported through apply and remembers lessons", 
   await initService.init(rootDir, { documentLanguage: "en-US" });
 
   const bugId = await bugService.newBug(rootDir, "Startup ordering blocks cold boot");
-  let queue = await repo.readText(path.join(rootDir, BUG_QUEUE_PATH));
+  let queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
   let index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
 
   assert.match(queue, new RegExp(`## ${escapeRegex(bugId)}: Startup ordering blocks cold boot`));
@@ -543,13 +543,13 @@ test("bug workflow advances from reported through apply and remembers lessons", 
   });
 
   await bugService.markFixed(rootDir, bugId);
-  queue = await repo.readText(path.join(rootDir, BUG_QUEUE_PATH));
+  queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
   index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
   assert.match(queue, new RegExp(`## ${escapeRegex(bugId)}:[\\s\\S]*- Status: fixed`));
   assert.equal(index.items[0].status, "fixed");
 
   const memoryFilePath = await bugService.apply(rootDir, bugId);
-  queue = await repo.readText(path.join(rootDir, BUG_QUEUE_PATH));
+  queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
   index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
   const memoryIndex = await repo.readText(path.join(rootDir, BUG_MEMORY_PATH));
   const memoryFile = await repo.readText(memoryFilePath);
@@ -1447,7 +1447,7 @@ async function populateChangeForVerify(changeDir, options = {}) {
 }
 
 async function populateBugQueueEntry(rootDir, bugId, options = {}) {
-  const queuePath = path.join(rootDir, BUG_QUEUE_PATH);
+  const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
   let queue = await fs.readFile(queuePath, "utf8");
 
   const replacements = {
@@ -1484,7 +1484,7 @@ function replaceBugQueueField(queue, bugId, label, value) {
   );
   const section = queue.match(sectionRegex)?.[0];
   if (!section) {
-    throw new Error(`Missing bug queue section: ${bugId}`);
+    throw new Error(`Missing active bug section: ${bugId}`);
   }
 
   const labelRegex = new RegExp(`(^- ${escapeRegex(label)}:\\s*).+$`, "m");
