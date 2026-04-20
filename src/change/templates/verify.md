@@ -1,14 +1,15 @@
 # Verify
 
-## Checks Performed
+## Automated Checks
 
 - Change: `{{slug}}`
-- Record automated or manual checks here.
+- Command: [TODO: replace with the command you ran]
+- Result: [TODO: replace with the outcome and key evidence]
 
 ## Manual Validation
 
-- Add manual validation notes here.
+- Validation: [TODO: describe the manual validation or explain why it was not needed]
 
 ## Remaining Risks
 
-- Add any unresolved risks here.
+- Risk: none

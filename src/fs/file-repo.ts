@@ -41,6 +41,14 @@ export class FileRepo {
     await this.writeText(targetPath, `${JSON.stringify(value, null, 2)}\n`);
   }
 
+  async copyDir(fromPath: string, toPath: string): Promise<void> {
+    await this.ensureDir(path.dirname(toPath));
+    await fs.cp(fromPath, toPath, {
+      recursive: true,
+      force: true
+    });
+  }
+
   async listDirEntries(targetPath: string): Promise<string[]> {
     const entries = await fs.readdir(targetPath);
     return entries.sort((left, right) => left.localeCompare(right));
@@ -54,5 +62,9 @@ export class FileRepo {
   async move(fromPath: string, toPath: string): Promise<void> {
     await this.ensureDir(path.dirname(toPath));
     await fs.rename(fromPath, toPath);
+  }
+
+  async remove(targetPath: string): Promise<void> {
+    await fs.rm(targetPath, { recursive: true, force: true });
   }
 }

@@ -17,7 +17,7 @@ Each active change lives under `.oslite/changes/active/<slug>/`.
 - `request.md`: what was asked for and what is in scope
 - `plan.md`: intended approach, expected files, and known risks
 - `apply.md`: what actually changed
-- `verify.md`: checks performed and remaining risks
+- `verify.md`: commands, results, manual validation, and remaining risks
 - `change.json`: machine-readable status and metadata
 
 ## Start A Change
@@ -33,12 +33,14 @@ Each active change lives under `.oslite/changes/active/<slug>/`.
 
 ## Record Applied Work
 
-- Update `apply.md` with the files you changed and any deviation from plan.
+- Fill `change.json.affects` with the files, modules, or areas the change touches.
+- Update `apply.md` with a real summary, the files you changed, and any deviation from plan.
 - Move the change status to `applied` when the implementation is complete locally.
 
 ## Record Verification
 
-- Add checks, manual validation notes, and remaining risks to `verify.md`.
+- Add at least one real command and one real result to `verify.md`.
+- Record manual validation notes and remaining risks in `verify.md`.
 - Move the change status to `verified` after validation.
 
 ## Archive When Done

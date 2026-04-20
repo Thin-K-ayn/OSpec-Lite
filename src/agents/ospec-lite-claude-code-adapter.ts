@@ -17,6 +17,10 @@ export class ClaudeCodeAdapter implements AgentAdapter {
     agentDocsRoot: string;
     rules: string[];
     importantFiles: string[];
+    preferredCommands: string[];
+    verificationCommands: string[];
+    generatedFiles: string[];
+    askBeforeEditAreas: string[];
   }) {
     const content = this.templates.renderTemplate("claude.md", {
       managedStart: CLAUDE_MANAGED_START,

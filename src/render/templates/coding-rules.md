@@ -18,4 +18,6 @@
 ## Documentation Expectations
 
 - Update project guidance when repo structure or conventions materially change.
-- Record checks and remaining risks in `verify.md`.
+- Read `.oslite/docs/project/bug-memory.md` and its linked segment files before fixing a repeat bug or risky logic path.
+- Keep `change.json.affects` accurate before marking work as applied.
+- Record commands, results, and remaining risks in `verify.md`.

@@ -1,7 +1,12 @@
 import * as path from "node:path";
 import { CHANGE_SLUG_PATTERN, OSPEC_LITE_DIR } from "../core/ospec-lite-schema";
-import { ChangeRecord, ChangeStatus } from "../core/ospec-lite-types";
 import {
+  ChangeRecord,
+  ChangeStatus,
+  ChangeValidationPhase
+} from "../core/ospec-lite-types";
+import {
+  ChangeValidationError,
   InvalidChangeSlugError,
   NotInitializedError,
   OSpecLiteError
@@ -9,6 +14,22 @@ import {
 import { FileRepo } from "../fs/file-repo";
 import { StatusService } from "../status/ospec-lite-status-service";
 import { ChangeTemplateService } from "./ospec-lite-change-template-service";
+
+const TEMPLATE_PLACEHOLDER_PATTERNS = [
+  /\[TODO:[^\]]+\]/,
+  /\bDescribe the request here\./,
+  /\bAdd the intended scope here\./,
+  /\bAdd acceptance notes here\./,
+  /\bDescribe the intended implementation path\./,
+  /\bAdd expected files or modules here\./,
+  /\bAdd implementation risks here\./,
+  /\bRecord what was actually changed\./,
+  /\bAdd touched files here\./,
+  /\bAdd deviations here if any\./,
+  /\bRecord automated or manual checks here\./,
+  /\bAdd manual validation notes here\./,
+  /\bAdd any unresolved risks here\./
+];
 
 export class ChangeService {
   constructor(
@@ -53,11 +74,15 @@ export class ChangeService {
   }
 
   async markApplied(changePath: string): Promise<void> {
-    await this.transition(changePath, "applied", ["draft", "active"]);
+    this.ensureAllowedCurrentStatus(await this.readChangeRecord(changePath), ["draft", "active"], "applied");
+    await this.validateTransitionRequirements(changePath, "apply");
+    await this.transition(changePath, "applied");
   }
 
   async markVerified(changePath: string): Promise<void> {
-    await this.transition(changePath, "verified", ["applied", "active"]);
+    this.ensureAllowedCurrentStatus(await this.readChangeRecord(changePath), ["applied", "active"], "verified");
+    await this.validateTransitionRequirements(changePath, "verify");
+    await this.transition(changePath, "verified");
   }
 
   async archive(changePath: string): Promise<string> {
@@ -77,26 +102,73 @@ export class ChangeService {
       updatedAt: now.toISOString()
     };
 
-    await this.repo.move(changePath, archiveDir);
-    await this.repo.writeJson(path.join(archiveDir, "change.json"), archivedRecord);
+    await this.repo.writeJson(path.join(changePath, "change.json"), archivedRecord);
+    try {
+      await this.repo.move(changePath, archiveDir);
+    } catch (error) {
+      await this.repo.writeJson(path.join(changePath, "change.json"), record);
+      throw error;
+    }
     return archiveDir;
   }
 
-  private async transition(
-    changePath: string,
-    nextStatus: ChangeStatus,
-    allowedCurrent: ChangeStatus[]
-  ): Promise<void> {
+  private async transition(changePath: string, nextStatus: ChangeStatus): Promise<void> {
     const record = await this.readChangeRecord(changePath);
-    if (!allowedCurrent.includes(record.status)) {
-      throw new OSpecLiteError(
-        `Cannot move change from ${record.status} to ${nextStatus}.`
-      );
-    }
-
     record.status = nextStatus;
     record.updatedAt = new Date().toISOString();
     await this.repo.writeJson(path.join(changePath, "change.json"), record);
+  }
+
+  private async validateTransitionRequirements(
+    changePath: string,
+    phase: ChangeValidationPhase
+  ): Promise<void> {
+    const record = await this.readChangeRecord(changePath);
+    const request = await this.readRequiredText(changePath, "request.md");
+    const plan = await this.readRequiredText(changePath, "plan.md");
+    const apply = await this.readRequiredText(changePath, "apply.md");
+    const issues: string[] = [];
+
+    if (!this.hasFilledAffects(record.affects)) {
+      issues.push("change.json must list at least one affected area in `affects`.");
+    }
+
+    for (const [fileName, content] of [
+      ["request.md", request],
+      ["plan.md", plan],
+      ["apply.md", apply]
+    ] as const) {
+      if (this.containsTemplatePlaceholders(content)) {
+        issues.push(`${fileName} still contains template placeholders.`);
+      }
+    }
+
+    if (!this.hasMeaningfulEntries(this.extractLabeledValues(apply, "Summary"), true)) {
+      issues.push("apply.md must include a real `Summary` entry.");
+    }
+
+    if (!this.hasMeaningfulEntries(this.extractLabeledValues(apply, "File"), true)) {
+      issues.push("apply.md must include at least one real `File` entry.");
+    }
+
+    if (phase === "verify") {
+      const verify = await this.readRequiredText(changePath, "verify.md");
+      if (this.containsTemplatePlaceholders(verify)) {
+        issues.push("verify.md still contains template placeholders.");
+      }
+
+      if (!this.hasMeaningfulEntries(this.extractLabeledValues(verify, "Command"), true)) {
+        issues.push("verify.md must include at least one real `Command` entry.");
+      }
+
+      if (!this.hasMeaningfulEntries(this.extractLabeledValues(verify, "Result"), true)) {
+        issues.push("verify.md must include at least one real `Result` entry.");
+      }
+    }
+
+    if (issues.length > 0) {
+      throw new ChangeValidationError(changePath, phase, issues);
+    }
   }
 
   private async readChangeRecord(changePath: string): Promise<ChangeRecord> {
@@ -105,6 +177,57 @@ export class ChangeService {
       throw new OSpecLiteError(`Missing change.json: ${changePath}`);
     }
     return this.repo.readJson<ChangeRecord>(changeJsonPath);
+  }
+
+  private async readRequiredText(changePath: string, fileName: string): Promise<string> {
+    const filePath = path.join(changePath, fileName);
+    if (!(await this.repo.exists(filePath))) {
+      throw new OSpecLiteError(`Missing ${fileName}: ${changePath}`);
+    }
+
+    return this.repo.readText(filePath);
+  }
+
+  private hasFilledAffects(affects: string[]): boolean {
+    return affects.some((item) => item.trim().length > 0);
+  }
+
+  private extractLabeledValues(content: string, label: string): string[] {
+    const regex = new RegExp(`^- ${this.escapeRegex(label)}:\\s*(.+)$`, "gm");
+    const values: string[] = [];
+    let match: RegExpExecArray | null = regex.exec(content);
+
+    while (match) {
+      values.push(match[1].trim());
+      match = regex.exec(content);
+    }
+
+    return values;
+  }
+
+  private hasMeaningfulEntries(values: string[], rejectBarePlaceholders = false): boolean {
+    return values.some((value) => this.isMeaningfulValue(value, rejectBarePlaceholders));
+  }
+
+  private isMeaningfulValue(value: string, rejectBarePlaceholders: boolean): boolean {
+    const trimmed = value.trim();
+    if (trimmed.length === 0 || this.containsTemplatePlaceholders(trimmed)) {
+      return false;
+    }
+
+    if (!rejectBarePlaceholders) {
+      return true;
+    }
+
+    return !/^(?:none|n\/a|na)$/i.test(trimmed);
+  }
+
+  private escapeRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  private containsTemplatePlaceholders(content: string): boolean {
+    return TEMPLATE_PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(content));
   }
 
   private ensureSlug(slug: string): void {
@@ -130,5 +253,15 @@ export class ChangeService {
       }
     }
     throw new OSpecLiteError(`Cannot find project root from change path: ${changePath}`);
+  }
+
+  private ensureAllowedCurrentStatus(
+    record: ChangeRecord,
+    allowedCurrent: ChangeStatus[],
+    nextStatus: ChangeStatus
+  ): void {
+    if (!allowedCurrent.includes(record.status)) {
+      throw new OSpecLiteError(`Cannot move change from ${record.status} to ${nextStatus}.`);
+    }
   }
 }

@@ -3,12 +3,12 @@
 ## Implementation Plan
 
 - Change: `{{slug}}`
-- Describe the intended implementation path.
+- Summary: [TODO: describe the intended implementation path]
 
 ## Files Or Modules Expected To Change
 
-- Add expected files or modules here.
+- Target: [TODO: list the expected files or modules]
 
 ## Risks
 
-- Add implementation risks here.
+- Risk: [TODO: list known implementation risks]

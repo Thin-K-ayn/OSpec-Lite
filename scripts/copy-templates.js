@@ -13,6 +13,10 @@ const templateRoots = [
   {
     source: path.join(__dirname, "..", "src", "agents", "templates"),
     target: path.join(__dirname, "..", "dist", "agents", "templates")
+  },
+  {
+    source: path.join(__dirname, "..", "src", "bug", "templates"),
+    target: path.join(__dirname, "..", "dist", "bug", "templates")
   }
 ];
 
