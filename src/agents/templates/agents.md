@@ -16,6 +16,22 @@
 
 {{highRiskAreas}}
 
+### Preferred Commands
+
+{{preferredCommands}}
+
+### How To Verify
+
+{{verificationCommands}}
+
+### Generated Files
+
+{{generatedFiles}}
+
+### Ask-Before-Edit Areas
+
+{{askBeforeEditAreas}}
+
 ### Read Next
 
 - `{{docsRoot}}/overview.md`
@@ -23,4 +39,5 @@
 - `{{docsRoot}}/repo-map.md`
 - `{{docsRoot}}/coding-rules.md`
 - `{{agentDocsRoot}}/change-playbook.md`
+- `{{agentDocsRoot}}/bug-playbook.md`
 {{managedEnd}}

@@ -1,10 +1,11 @@
 import * as path from "node:path";
 import {
   AUTHORING_PACK_FILES,
+  BUG_INDEX_PATH,
   INIT_MARKERS,
   OSPEC_LITE_DIR
 } from "../core/ospec-lite-schema";
-import { OSpecLiteConfig, StatusReport } from "../core/ospec-lite-types";
+import { BugIndex, OSpecLiteConfig, StatusReport } from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
 
 export class StatusService {
@@ -37,18 +38,40 @@ export class StatusService {
           ? "initialized"
           : "incomplete";
 
+    const bugIndex = await this.tryReadBugIndex(path.join(rootDir, BUG_INDEX_PATH));
+
     return {
       state,
       missingMarkers,
       config,
       activeChanges: await this.listChangeNames(path.join(rootDir, OSPEC_LITE_DIR, "changes", "active")),
-      archivedChanges: await this.listArchivedChangeNames(path.join(rootDir, OSPEC_LITE_DIR, "changes", "archived"))
+      archivedChanges: await this.listArchivedChangeNames(path.join(rootDir, OSPEC_LITE_DIR, "changes", "archived")),
+      activeBugs: (bugIndex?.items ?? [])
+        .filter((item) => item.status !== "applied")
+        .map((item) => item.id)
+        .sort((left, right) => left.localeCompare(right)),
+      appliedBugs: (bugIndex?.items ?? [])
+        .filter((item) => item.status === "applied")
+        .map((item) => item.id)
+        .sort((left, right) => left.localeCompare(right))
     };
   }
 
   private async tryReadConfig(configPath: string): Promise<OSpecLiteConfig | null> {
     try {
       return await this.repo.readJson<OSpecLiteConfig>(configPath);
+    } catch {
+      return null;
+    }
+  }
+
+  private async tryReadBugIndex(indexPath: string): Promise<BugIndex | null> {
+    if (!(await this.repo.exists(indexPath))) {
+      return null;
+    }
+
+    try {
+      return await this.repo.readJson<BugIndex>(indexPath);
     } catch {
       return null;
     }
@@ -77,7 +100,6 @@ export class StatusService {
     const entries = await this.repo.listDirents(dirPath);
     return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
   }
-
   private async listArchivedChangeNames(dirPath: string): Promise<string[]> {
     if (!(await this.repo.exists(dirPath))) {
       return [];

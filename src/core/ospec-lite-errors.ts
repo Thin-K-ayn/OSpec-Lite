@@ -63,3 +63,63 @@ export class DocVerificationError extends OSpecLiteError {
     );
   }
 }
+
+export class InvalidPluginNameError extends OSpecLiteError {
+  constructor(pluginName: string) {
+    super(`Invalid plugin name: ${pluginName}`);
+  }
+}
+
+export class UnknownBundledPluginError extends OSpecLiteError {
+  constructor(pluginName: string) {
+    super(`Unknown bundled plugin: ${pluginName}`);
+  }
+}
+
+export class PluginAlreadyExistsError extends OSpecLiteError {
+  constructor(pluginName: string, pluginPath: string) {
+    super(`Plugin already exists: ${pluginName} at ${pluginPath}`);
+  }
+}
+
+export class InvalidPluginSourceError extends OSpecLiteError {
+  constructor(sourcePath: string) {
+    super(
+      `Plugin source is missing a valid .codex-plugin/plugin.json manifest: ${sourcePath}`
+    );
+  }
+}
+
+export class RefreshStateError extends OSpecLiteError {
+  constructor(
+    public readonly rootDir: string,
+    public readonly state: "uninitialized" | "incomplete",
+    public readonly missingMarkers: string[]
+  ) {
+    super(`Cannot refresh repository in state ${state}: ${rootDir}`);
+  }
+}
+
+export class ChangeValidationError extends OSpecLiteError {
+  constructor(
+    public readonly changePath: string,
+    public readonly phase: "apply" | "verify",
+    public readonly issues: string[]
+  ) {
+    super(
+      `Cannot mark change as ${phase === "apply" ? "applied" : "verified"}: ${issues.join(" ")}`
+    );
+  }
+}
+
+export class BugValidationError extends OSpecLiteError {
+  constructor(
+    public readonly bugId: string,
+    public readonly phase: "fix" | "apply",
+    public readonly issues: string[]
+  ) {
+    super(
+      `Cannot mark bug ${bugId} as ${phase === "fix" ? "fixed" : "applied"}: ${issues.join(" ")}`
+    );
+  }
+}

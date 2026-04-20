@@ -22,4 +22,6 @@
 
 - Relevant project rules in `{{projectDocsRoot}}/coding-rules.md`
 - Active change scope in `.oslite/changes/active/<change>/plan.md`
+- Relevant lessons in `.oslite/docs/project/bug-memory.md` and its linked segment files before repeating a bug investigation
 - Whether the target file is a high-risk central file
+- Whether `oslite refresh .` reports any human-owned docs that need review

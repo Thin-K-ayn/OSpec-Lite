@@ -31,12 +31,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KaynGameDev/OSpec-Lite.git"
+    "url": "git+https://github.com/Thin-K-ayn/OSpec-Lite.git"
   },
   "bugs": {
-    "url": "https://github.com/KaynGameDev/OSpec-Lite/issues"
+    "url": "https://github.com/Thin-K-ayn/OSpec-Lite/issues"
   },
-  "homepage": "https://github.com/KaynGameDev/OSpec-Lite#readme",
+  "homepage": "https://github.com/Thin-K-ayn/OSpec-Lite#readme",
   "devDependencies": {
     "@types/node": "^24.0.0",
     "typescript": "^5.8.3"

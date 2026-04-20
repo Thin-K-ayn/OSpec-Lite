@@ -1,9 +1,13 @@
+import { createHash } from "node:crypto";
 import * as path from "node:path";
 import {
   AGENTS_FILE,
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START,
   AUTHORING_PACK_FILES,
+  BUG_MEMORY_DIR,
+  BUG_MEMORY_PATH,
+  BUG_QUEUE_PATH,
   CLAUDE_FILE,
   CLAUDE_MANAGED_END,
   CLAUDE_MANAGED_START,
@@ -21,8 +25,7 @@ import {
   InitState,
   LoadedOSpecLiteProfile,
   OSpecLiteConfig,
-  ProfileTemplateValues,
-  RepositoryScanResult
+  ProfileTemplateValues
 } from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
 import { AgentEntryService } from "../agents/ospec-lite-agent-entry-service";
@@ -33,21 +36,27 @@ import { MarkdownRenderer } from "../render/ospec-lite-markdown-renderer";
 import { IndexService } from "./ospec-lite-index-service";
 import { ProfileLoader } from "../profile/ospec-lite-profile-loader";
 import { ProfilePreconditionError } from "../core/ospec-lite-errors";
+import { KnowledgeTemplateService } from "./ospec-lite-knowledge-template-service";
+import { BugTemplateService } from "../bug/ospec-lite-bug-template-service";
 
 export class InitService {
   private static readonly bootstrapCommands: Record<Exclude<BootstrapAgent, "none">, string> = {
     codex: "Use $oslite-fill-project-docs to fill the project docs for this repo.",
     "claude-code": "/oslite-fill-project-docs"
   };
+  private readonly knowledge: KnowledgeTemplateService;
+  private readonly bugTemplates = new BugTemplateService();
 
   constructor(
     private readonly repo: FileRepo,
     private readonly scanner: ScanService,
-    private readonly renderer: MarkdownRenderer,
+    renderer: MarkdownRenderer,
     private readonly agentEntries: AgentEntryService,
     private readonly indexService: IndexService,
     private readonly profiles: ProfileLoader
-  ) {}
+  ) {
+    this.knowledge = new KnowledgeTemplateService(renderer, profiles);
+  }
 
   async getInitState(rootDir: string): Promise<InitResult> {
     const configPath = path.join(rootDir, OSPEC_LITE_DIR, "config.json");
@@ -105,11 +114,13 @@ export class InitService {
       profile ? projectName : undefined,
       profile ? options.bootstrapAgent : undefined
     );
-    const summary = this.buildSummary(scan);
+    const artifacts = this.knowledge.buildArtifacts(scan, config, profile);
 
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR));
+    await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "bugs"));
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "docs", "project"));
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "docs", "agents"));
+    await this.repo.ensureDir(path.join(rootDir, BUG_MEMORY_DIR));
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "changes", "active"));
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "changes", "archived"));
     if (config.authoringPackRoot) {
@@ -119,24 +130,30 @@ export class InitService {
     await this.repo.writeJson(path.join(rootDir, OSPEC_LITE_DIR, "config.json"), config);
     await this.repo.writeJson(
       path.join(rootDir, OSPEC_LITE_DIR, "index.json"),
-      this.indexService.buildIndex(scan, config)
+      this.indexService.buildIndex(scan, config, this.hashSuggestions(artifacts.humanDocSuggestions))
     );
 
-    if (profile) {
-      await this.applyProfileAssets(rootDir, profile, {
-        projectName,
-        summary,
-        documentLanguage: config.documentLanguage,
-        bootstrapAgent: config.bootstrapAgent ?? "none",
-        docsRoot: config.projectDocsRoot,
-        agentDocsRoot: config.agentDocsRoot,
-        authoringPackRoot: config.authoringPackRoot ?? "",
-        profileId: profile.id,
-        managedStart: "",
-        managedEnd: ""
-      });
-    } else {
-      await this.writeGenericKnowledgeLayer(rootDir, scan, config, summary);
+    await this.writeHumanDocSuggestionsIfMissing(rootDir, artifacts.humanDocSuggestions);
+    await this.repo.writeTextIfMissing(
+      path.join(rootDir, BUG_QUEUE_PATH),
+      this.bugTemplates.renderQueue()
+    );
+    await this.repo.writeTextIfMissing(
+      path.join(rootDir, BUG_MEMORY_PATH),
+      this.bugTemplates.renderMemoryIndex(null, [])
+    );
+    await this.writeManagedSections(
+      rootDir,
+      artifacts.codexSection.content,
+      artifacts.claudeSection.content
+    );
+    if (profile && artifacts.profileTemplateValues) {
+      await this.applyProfileSupportAssets(
+        rootDir,
+        profile,
+        artifacts.profileTemplateValues,
+        new Set(Object.keys(artifacts.humanDocSuggestions))
+      );
     }
 
     const result = await this.getInitState(rootDir);
@@ -173,25 +190,6 @@ export class InitService {
     };
   }
 
-  private buildSummary(scan: {
-    signals: Record<string, boolean>;
-    directoryMap: { path: string; kind: string }[];
-  }): string {
-    const workingAreas = scan.directoryMap
-      .filter((item) => item.kind === "directory")
-      .slice(0, 3)
-      .map((item) => item.path);
-
-    const summaryParts: string[] = ["A repository initialized for agent-guided development."];
-    if (scan.signals.hasPackageJson) {
-      summaryParts.push("It includes a Node or JavaScript toolchain signal.");
-    }
-    if (workingAreas.length > 0) {
-      summaryParts.push(`Main working areas include ${workingAreas.join(", ")}.`);
-    }
-    return summaryParts.join(" ");
-  }
-
   private async tryReadConfig(configPath: string): Promise<OSpecLiteConfig | null> {
     try {
       return await this.repo.readJson<OSpecLiteConfig>(configPath);
@@ -216,126 +214,66 @@ export class InitService {
     return [...markers];
   }
 
-  private async writeGenericKnowledgeLayer(
+  private async writeHumanDocSuggestionsIfMissing(
     rootDir: string,
-    scan: RepositoryScanResult,
-    config: OSpecLiteConfig,
-    summary: string
+    suggestions: Record<string, string>
   ): Promise<void> {
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "overview.md"),
-      this.renderer.renderOverview(scan, config)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "architecture.md"),
-      this.renderer.renderArchitecture(scan)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "repo-map.md"),
-      this.renderer.renderRepoMap(scan)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "coding-rules.md"),
-      this.renderer.renderCodingRules(scan)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "glossary.md"),
-      this.renderer.renderGlossary(scan)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "project", "entrypoints.md"),
-      this.renderer.renderEntrypoints(scan)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "agents", "quickstart.md"),
-      this.renderer.renderQuickstart(scan, config)
-    );
-    await this.repo.writeTextIfMissing(
-      path.join(rootDir, OSPEC_LITE_DIR, "docs", "agents", "change-playbook.md"),
-      this.renderer.renderChangePlaybook()
-    );
+    for (const [relativePath, content] of Object.entries(suggestions)) {
+      await this.repo.writeTextIfMissing(path.join(rootDir, relativePath), content);
+    }
+  }
 
+  private async writeManagedSections(
+    rootDir: string,
+    codexContent: string,
+    claudeContent: string
+  ): Promise<void> {
     const codexAdapter = new CodexAdapter();
-    const codexSection = codexAdapter.buildSection({
-      projectName: scan.projectName,
-      summary,
-      docsRoot: ".oslite/docs/project",
-      agentDocsRoot: ".oslite/docs/agents",
-      rules: scan.rules.map((rule) => rule.text),
-      importantFiles: scan.importantFiles
-    });
     await this.agentEntries.ensureManagedSection(
       rootDir,
       codexAdapter,
-      codexSection.content,
-      codexSection.managedStart,
-      codexSection.managedEnd
+      codexContent,
+      AGENTS_MANAGED_START,
+      AGENTS_MANAGED_END
     );
 
     const claudeAdapter = new ClaudeCodeAdapter();
-    const claudeSection = claudeAdapter.buildSection({
-      projectName: scan.projectName,
-      summary,
-      docsRoot: ".oslite/docs/project",
-      agentDocsRoot: ".oslite/docs/agents",
-      rules: scan.rules.map((rule) => rule.text),
-      importantFiles: scan.importantFiles
-    });
     await this.agentEntries.ensureManagedSection(
       rootDir,
       claudeAdapter,
-      claudeSection.content,
-      claudeSection.managedStart,
-      claudeSection.managedEnd
+      claudeContent,
+      CLAUDE_MANAGED_START,
+      CLAUDE_MANAGED_END
     );
   }
 
-  private async applyProfileAssets(
+  private async applyProfileSupportAssets(
     rootDir: string,
     profile: LoadedOSpecLiteProfile,
-    values: ProfileTemplateValues
+    values: ProfileTemplateValues,
+    humanDocTargets: Set<string>
   ): Promise<void> {
     for (const asset of profile.assets) {
-      switch (asset.mode) {
-        case "managed-codex-section": {
-          const content = this.profiles.renderAsset(profile, asset, {
-            ...values,
-            managedStart: AGENTS_MANAGED_START,
-            managedEnd: AGENTS_MANAGED_END
-          });
-          const adapter = new CodexAdapter();
-          await this.agentEntries.ensureManagedSection(
-            rootDir,
-            adapter,
-            content,
-            AGENTS_MANAGED_START,
-            AGENTS_MANAGED_END
-          );
-          break;
-        }
-        case "managed-claude-section": {
-          const content = this.profiles.renderAsset(profile, asset, {
-            ...values,
-            managedStart: CLAUDE_MANAGED_START,
-            managedEnd: CLAUDE_MANAGED_END
-          });
-          const adapter = new ClaudeCodeAdapter();
-          await this.agentEntries.ensureManagedSection(
-            rootDir,
-            adapter,
-            content,
-            CLAUDE_MANAGED_START,
-            CLAUDE_MANAGED_END
-          );
-          break;
-        }
-        default: {
-          const content = this.profiles.renderAsset(profile, asset, values);
-          await this.repo.writeTextIfMissing(path.join(rootDir, asset.target), content);
-          break;
-        }
+      if (asset.mode || humanDocTargets.has(asset.target)) {
+        continue;
       }
+
+      const content = this.profiles.renderAsset(profile, asset, values);
+      await this.repo.writeTextIfMissing(path.join(rootDir, asset.target), content);
     }
+  }
+
+  private hashSuggestions(suggestions: Record<string, string>): Record<string, string> {
+    return Object.fromEntries(
+      Object.entries(suggestions).map(([filePath, content]) => [
+        filePath,
+        this.hashContent(content)
+      ])
+    );
+  }
+
+  private hashContent(content: string): string {
+    return createHash("sha256").update(content).digest("hex");
   }
 
   private async ensureProfileRequirements(

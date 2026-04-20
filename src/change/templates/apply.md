@@ -3,12 +3,12 @@
 ## Applied Changes
 
 - Change: `{{slug}}`
-- Record what was actually changed.
+- Summary: [TODO: summarize what was actually changed]
 
 ## Files Touched
 
-- Add touched files here.
+- File: [TODO: path/to/file.ext - explain why it changed]
 
 ## Deviations From Plan
 
-- Add deviations here if any.
+- Deviation: none

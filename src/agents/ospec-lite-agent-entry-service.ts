@@ -11,11 +11,11 @@ export class AgentEntryService {
     sectionContent: string,
     managedStart: string,
     managedEnd: string
-  ): Promise<void> {
+  ): Promise<boolean> {
     const targetPath = path.join(rootDir, adapter.fileName);
     if (!(await this.repo.exists(targetPath))) {
       await this.repo.writeText(targetPath, sectionContent);
-      return;
+      return true;
     }
 
     const existing = await this.repo.readText(targetPath);
@@ -25,7 +25,11 @@ export class AgentEntryService {
       managedStart,
       managedEnd
     );
+    if (updated === existing) {
+      return false;
+    }
     await this.repo.writeText(targetPath, updated);
+    return true;
   }
 
   private upsertManagedSection(

@@ -5,7 +5,11 @@ import {
 } from "../core/ospec-lite-types";
 
 export class IndexService {
-  buildIndex(scan: RepositoryScanResult, config: OSpecLiteConfig): OSpecLiteIndex {
+  buildIndex(
+    scan: RepositoryScanResult,
+    config: OSpecLiteConfig,
+    docSuggestionHashes: Record<string, string> = {}
+  ): OSpecLiteIndex {
     return {
       version: 1,
       generatedAt: new Date().toISOString(),
@@ -23,7 +27,13 @@ export class IndexService {
       rules: scan.rules,
       importantFiles: scan.importantFiles,
       glossarySeeds: scan.glossarySeeds,
-      signals: scan.signals
+      signals: scan.signals,
+      tooling: scan.tooling,
+      primaryLanguages: scan.primaryLanguages,
+      generatedDirectories: scan.generatedDirectories,
+      riskyPaths: scan.riskyPaths,
+      askFirstAreas: scan.askFirstAreas,
+      docSuggestionHashes
     };
   }
 }

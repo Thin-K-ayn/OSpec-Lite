@@ -17,6 +17,10 @@ export class CodexAdapter implements AgentAdapter {
     agentDocsRoot: string;
     rules: string[];
     importantFiles: string[];
+    preferredCommands: string[];
+    verificationCommands: string[];
+    generatedFiles: string[];
+    askBeforeEditAreas: string[];
   }) {
     const hardRules = input.rules.map((rule) => `- ${rule}`).join("\n");
     const highRiskAreas = input.importantFiles
@@ -31,7 +35,23 @@ export class CodexAdapter implements AgentAdapter {
       docsRoot: input.docsRoot,
       agentDocsRoot: input.agentDocsRoot,
       hardRules,
-      highRiskAreas: highRiskAreas || "- Review the project docs first."
+      highRiskAreas: highRiskAreas || "- Review the project docs first.",
+      preferredCommands: this.renderBullets(
+        input.preferredCommands,
+        "No preferred commands detected yet. Inspect local tooling before running broad commands."
+      ),
+      verificationCommands: this.renderBullets(
+        input.verificationCommands,
+        "No verification commands detected yet. Add the checks you trust for this repo."
+      ),
+      generatedFiles: this.renderBullets(
+        input.generatedFiles.map((filePath) => `\`${filePath}\``),
+        "No generated directories detected yet."
+      ),
+      askBeforeEditAreas: this.renderBullets(
+        input.askBeforeEditAreas,
+        "No explicit ask-before-edit areas detected yet, but still confirm risky changes."
+      )
     });
 
     return {
@@ -40,5 +60,13 @@ export class CodexAdapter implements AgentAdapter {
       managedStart: AGENTS_MANAGED_START,
       managedEnd: AGENTS_MANAGED_END
     };
+  }
+
+  private renderBullets(items: string[], fallback: string): string {
+    if (items.length === 0) {
+      return `- ${fallback}`;
+    }
+
+    return items.map((item) => (item.startsWith("- ") ? item : `- ${item}`)).join("\n");
   }
 }

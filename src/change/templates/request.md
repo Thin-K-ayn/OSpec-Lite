@@ -3,12 +3,13 @@
 ## Request
 
 - Change: `{{slug}}`
-- Describe the request here.
+- Summary: [TODO: describe the request in one or two sentences]
 
 ## Scope
 
-- Add the intended scope here.
+- In Scope: [TODO: list the intended scope]
+- Out Of Scope: [TODO: list any explicit exclusions]
 
 ## Acceptance Notes
 
-- Add acceptance notes here.
+- Acceptance: [TODO: record the acceptance notes or success criteria]

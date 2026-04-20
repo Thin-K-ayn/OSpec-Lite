@@ -39,6 +39,12 @@ export const CLAUDE_MANAGED_END = "<!-- oslite:claude:end -->";
 
 export const CHANGE_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+export const BUG_PLAYBOOK_PATH = ".oslite/docs/agents/bug-playbook.md";
+export const BUG_MEMORY_PATH = ".oslite/docs/project/bug-memory.md";
+export const BUG_MEMORY_DIR = ".oslite/docs/project/bug-memory";
+export const BUG_QUEUE_PATH = ".oslite/bugs/queue.md";
+export const BUG_INDEX_PATH = ".oslite/bugs/index.json";
+
 export const DEFAULT_RULES = [
   "Preserve public interfaces unless the change explicitly allows a breaking update.",
   "Prefer small, scoped edits over broad rewrites.",

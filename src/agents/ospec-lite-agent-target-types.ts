@@ -17,5 +17,9 @@ export interface AgentAdapter {
     agentDocsRoot: string;
     rules: string[];
     importantFiles: string[];
+    preferredCommands: string[];
+    verificationCommands: string[];
+    generatedFiles: string[];
+    askBeforeEditAreas: string[];
   }): AgentManagedSection;
 }
