@@ -3,7 +3,7 @@
 ## 当用户只说“用 unity-tolua-hall profile 去 init ospec-lite”时
 1. 先判断仓库是否已经完成 `unity-tolua-hall` 初始化。
 2. 如果还没有初始化：
-   - 如果用户已经给了工程路径，记为 `<repo-root>`；如果当前工作目录已经是目标工程根目录，才把 `<repo-root>` 视为 `.`
+   - 如果用户已经给了明确的工程路径，记为 `<repo-root>`；否则默认当前工作目录就是目标工程根目录，也就是 `<repo-root>`
    - 根据仓库目录名、README、显眼的产品命名推断项目名
    - 先向用户确认这个项目名
    - 如果用户没有指定 bootstrap agent，默认取当前宿主；仍不明确时用 `none`

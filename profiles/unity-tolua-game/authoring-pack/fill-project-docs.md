@@ -3,7 +3,7 @@
 ## 如果用户只是说“用 `unity-tolua-game` profile 去 init ospec-lite”
 1. 先判断仓库是否已经完成 `unity-tolua-game` 初始化。
 2. 如果还没有初始化：
-   - 如果用户已经给了工程路径，记为 `<repo-root>`；如果当前工作目录已经是目标工程根目录，才把 `<repo-root>` 视为 `.`
+   - 如果用户已经给了明确的工程路径，记为 `<repo-root>`；否则默认当前工作目录就是目标工程根目录，也就是 `<repo-root>`
    - 先从仓库目录名、现有 README、明显的产品命名中推断项目名。
    - 向用户确认这个项目名；如果用户没有纠正，再把它作为 `--project-name` 使用。
    - 如果用户没有明确指定 bootstrap agent，则默认使用当前 agent 环境；如果当前环境不明确，则使用 `none`。

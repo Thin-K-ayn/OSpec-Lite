@@ -252,12 +252,14 @@ test("profile assets preserve literal Chinese guidance", async () => {
     "utf8"
   );
   assert.match(profileReadme, /推断项目名并向我确认/);
-  assert.match(profileReadme, /工程路径是 XXXX/);
+  assert.match(profileReadme, /安装并阅读 npm package ospec-lite/);
+  assert.match(profileReadme, /当前仓库还没用 oslite init 过/);
   assert.match(profileReadme, /<repo-root>/);
   assert.match(codexWrapper, /oslite init --profile unity-tolua-game/);
   assert.match(codexWrapper, /ask the user to confirm/i);
   assert.match(codexWrapper, /--bootstrap-agent codex/);
   assert.match(codexWrapper, /"<repo-root>"/);
+  assert.match(codexWrapper, /安装并阅读 npm package ospec-lite/);
   assert.match(codexWrapper, /\{\{authoringPackRoot}}\/evidence-map\.md/);
   assert.match(codexWrapper, /oslite docs verify "<repo-root>"/);
   assert.match(claudeWrapper, /oslite init --profile unity-tolua-game/);

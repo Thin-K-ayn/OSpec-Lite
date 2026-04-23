@@ -7,9 +7,9 @@
 - 这是 Unity + ToLua 大厅仓库的读库与文档工作流入口。
 - 这个 profile 描述的是大厅仓库本体；单独子游戏模块默认位于 `Assets/_GameModule/<game>/`。
 - 对本 profile，默认从 `Assets/_GameCenter/FrameWork/Behaviours/Launch.cs`、`Assets/_GameCenter/LuaFramework/Scripts/Main.cs`、`Assets/_GameCenter/ClientLua/Main.lua` 建立启动链认知。
-- 如果用户要求“用 unity-tolua-hall profile 初始化”，但仓库还没有 `.oslite/config.json`，先推断项目名并向用户确认；如果用户给了工程路径，就在该 `<repo-root>` 上运行 `oslite init --profile unity-tolua-hall --project-name "<项目名>" --bootstrap-agent <当前环境或 none> "<repo-root>"`；只有当前工作目录已经是目标工程根目录且用户没有给路径时，才用 `.`。
+- 如果用户要求“用 unity-tolua-hall profile 初始化”，但仓库还没有 `.oslite/config.json`，先推断项目名并向用户确认；如果用户给了明确的工程路径，就在该 `<repo-root>` 上运行 `oslite init --profile unity-tolua-hall --project-name "<项目名>" --bootstrap-agent <当前环境或 none> "<repo-root>"`；否则默认当前工作目录就是目标工程根目录。
 - 先完成 `{{authoringPackRoot}}/evidence-map.md`，再回填正式项目文档。
-- 如果用户已经知道项目名，也可以直接这样触发：`工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。`
+- 如果用户已经知道项目名，也可以直接这样触发：`安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。`
 
 ## Hard Rules
 

@@ -117,11 +117,12 @@ test("hall profile assets preserve hall-specific guidance", async () => {
   assert.match(codexWrapper, /oslite init --profile unity-tolua-hall/);
   assert.match(codexWrapper, /--bootstrap-agent codex/);
   assert.match(codexWrapper, /"<repo-root>"/);
-  assert.match(codexWrapper, /工程路径是 XXXX/);
+  assert.match(codexWrapper, /安装并阅读 npm package ospec-lite/);
   assert.match(codexWrapper, /Assets\/_GameModule/);
   assert.match(profileReadme, /unity-tolua-hall/);
   assert.match(profileReadme, /oslite docs verify/);
-  assert.match(profileReadme, /工程路径是 XXXX/);
+  assert.match(profileReadme, /安装并阅读 npm package ospec-lite/);
+  assert.match(profileReadme, /当前仓库还没用 oslite init 过/);
   assert.match(profileReadme, /<repo-root>/);
   assert.match(profileReadme, /Assets\/_GameModule/);
   assert.match(profileReadme, /非 Editor 的运行时 C# 修改默认需要先征求用户许可/);

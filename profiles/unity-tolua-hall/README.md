@@ -27,19 +27,19 @@
 最推荐直接对 agent 说：
 
 ```text
-工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。
+安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。
 ```
 
 如果你想把项目名先填好，可以直接发这一句：
 
 ```text
-工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。
+安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。
 ```
 
 如果是英文环境，可以说：
 
 ```text
-Project path is XXXX (prefer an absolute path). Help me use the unity-tolua-hall profile to init ospec-lite in that repo. If the repo is not initialized yet, infer the project name and ask me to confirm it first. Then fill evidence-map before the final docs, and finish with oslite docs verify XXXX.
+Install and read the ospec-lite npm package. If the current repo has not been initialized with `oslite init` yet, help me init ospec-lite with the unity-tolua-hall profile. If the repo is not initialized yet, infer the project name and ask me to confirm it first. Then fill evidence-map before the final docs, and finish with oslite docs verify.
 ```
 
 ## 在 Codex / Claude Code 中怎么用
@@ -50,16 +50,16 @@ Project path is XXXX (prefer an absolute path). Help me use the unity-tolua-hall
 npm.cmd install --save-dev ospec-lite@latest
 ```
 
-安装完成后，大厅项目组成员不需要手动拆命令，直接在 Codex 或 Claude Code 里说下面这句即可：
+安装完成后，大厅项目组成员不需要记 GitHub repo 地址或本机绝对路径，直接按下面这句触发即可：
 
 ```text
-工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。
+安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。
 ```
 
 如果已经知道项目名，也可以直接用这句：
 
 ```text
-工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。
+安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。
 ```
 
 默认预期是 agent 自己完成这些步骤：
@@ -78,7 +78,7 @@ npm.cmd install --save-dev ospec-lite@latest
 2. 如果没有初始化：
    - 从仓库目录名、README、显眼的产品命名中推断项目名。
    - 先向用户确认这个项目名；如果用户没有继续纠正，才把它作为 `--project-name` 传给 `oslite init`。
-   - 如果用户已经给了工程路径，优先在那个 `<repo-root>` 上执行命令；只有当前工作目录已经是目标工程根目录且用户没有给路径时，才用 `.`
+   - 如果用户已经给了明确的工程路径，优先在那个 `<repo-root>` 上执行命令；否则默认当前工作目录就是目标工程根目录。
    - 结合当前环境选择 `--bootstrap-agent`，不明确时使用 `none`。
 3. 初始化完成后，先填写 `.oslite/docs/agents/authoring/evidence-map.md`。
 4. 再回填 `AGENTS.md`、`CLAUDE.md`、`.oslite/docs/project/*`、`.oslite/docs/agents/*`。
