@@ -49,6 +49,13 @@ Pick the command runner that matches the current workspace:
    - `oslite change archive <change-path>`
 4. Prefer small, scoped edits and record risks or assumptions in the change files instead of burying them in chat.
 
+## Periodic reporting
+
+1. For a one-off daily or weekly summary, run `oslite report . --cadence daily|weekly`.
+2. Treat `oslite report` as non-destructive; do not replace it with `oslite refresh` when the user only asked for a report.
+3. Report from OSpec Lite data first: open changes, recently archived changes, open bugs, recently applied bugs, and docs needing review.
+4. If the user asks for recurring reports in Codex, prefer a thread automation that revisits this repo and runs the same `oslite report` cadence on schedule.
+
 ## Editing guardrails
 
 1. Preserve human-authored content outside the managed OSpec Lite sections in `AGENTS.md` and `CLAUDE.md`.

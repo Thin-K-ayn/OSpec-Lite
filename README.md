@@ -19,6 +19,7 @@ V1 intentionally keeps the surface area small: one-time bootstrap, non-destructi
 - Tracks lightweight changes in `.oslite/changes/active/*` and archives them when verified.
 - Tracks active bugs in `.oslite/bugs/active-bugs.md`, persists reusable lessons into rotating bug-memory files, and compacts stale knowledge when the memory grows too large.
 - Verifies profile-driven documentation deterministically with `oslite docs verify`.
+- Generates non-destructive daily or weekly work reports with `oslite report`.
 - Ships repo-local Codex companion plugins and a plugin module for scaffolding or installing more.
 
 ## What It Creates
@@ -109,6 +110,17 @@ npx oslite refresh .
 
 `status` reports whether the repo is initialized, which profile is active, where docs live, and how many active and archived changes and bugs exist.
 `refresh` updates `.oslite/index.json` plus the managed sections in `AGENTS.md` and `CLAUDE.md`, then reports human-owned docs that need review without overwriting them.
+
+### Generate a daily or weekly work report
+
+```sh
+npx oslite report .
+npx oslite report . --cadence daily
+npx oslite report . --cadence weekly
+```
+
+`report` is non-destructive. It summarizes open changes, completed changes in the selected window, open bugs, recently applied bug fixes, and project docs whose generated suggestions have drifted.
+For Codex automations, this is the preferred reporting entrypoint for OSpec Lite repositories.
 
 ### Verify profile-driven docs
 
@@ -250,6 +262,7 @@ Example prompts:
 - `Check OSpec Lite status and explain the missing markers.`
 - `Continue the profile docs and run oslite docs verify.`
 - `Create an OSpec Lite change for add-login-flow.`
+- `Set up a weekly OSpec Lite report automation for this repo.`
 
 ## Plugins
 
@@ -274,6 +287,7 @@ npx oslite plugins create my-plugin . --with-skills --with-hooks
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
 oslite status [path]
 oslite refresh [path]
+oslite report [path] [--cadence daily|weekly]
 oslite bug new <title> [path]
 oslite bug fix <bug-id> [path]
 oslite bug apply <bug-id> [path]

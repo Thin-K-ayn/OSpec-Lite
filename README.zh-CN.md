@@ -19,6 +19,7 @@ V1 刻意保持小而稳的能力边界：一次性 bootstrap、非破坏式 ref
 - 在 `.oslite/changes/active/*` 下跟踪轻量变更，并在验证完成后归档。
 - 在 `.oslite/bugs/active-bugs.md` 里跟踪活跃 bug，把可复用经验写进滚动的 bug-memory 文件，并在记忆过大时自动 compact 失效知识。
 - 通过 `oslite docs verify` 对 profile 驱动的文档进行确定性校验。
+- 通过 `oslite report` 生成非破坏式的日报或周报。
 - 自带一组 repo-local 的 Codex companion plugins，并提供插件模块来继续安装或脚手架更多插件。
 
 ## 会生成什么
@@ -109,6 +110,17 @@ npx oslite refresh .
 
 `status` 会汇报仓库是否已初始化、当前使用的 profile、文档所在位置，以及 active / archived change 和 active / applied bug 的数量。
 `refresh` 会更新 `.oslite/index.json` 与 `AGENTS.md` / `CLAUDE.md` 里的 managed section，同时报告哪些 human-owned 文档的建议内容已经漂移，但不会覆盖这些文档。
+
+### 生成日报或周报
+
+```sh
+npx oslite report .
+npx oslite report . --cadence daily
+npx oslite report . --cadence weekly
+```
+
+`report` 是非破坏式的。它会汇总当前未完成的 change、所选时间窗内已归档的 change、当前活跃 bug、最近已 apply 的 bug，以及哪些项目文档的生成建议已经漂移。
+如果要给 Codex 做定时汇报 automation，优先用这个命令作为统一入口。
 
 ### 校验 profile 驱动的文档
 
@@ -249,6 +261,7 @@ Profile 文档：
 - `检查 OSpec Lite 状态，并解释缺失的 markers。`
 - `继续补 profile 文档，并运行 oslite docs verify。`
 - `为 add-login-flow 创建一个 OSpec Lite change。`
+- `为这个仓库设置一个每周 OSpec Lite 汇报 automation。`
 
 ## Plugins 模块
 
@@ -273,6 +286,7 @@ npx oslite plugins create my-plugin . --with-skills --with-hooks
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
 oslite status [path]
 oslite refresh [path]
+oslite report [path] [--cadence daily|weekly]
 oslite bug new <title> [path]
 oslite bug fix <bug-id> [path]
 oslite bug apply <bug-id> [path]

@@ -15,7 +15,9 @@ import { RefreshService } from "../refresh/ospec-lite-refresh-service";
 import {
   BootstrapAgent,
   DocumentLanguage,
-  HostAgent
+  HostAgent,
+  OSpecLiteWorkReport,
+  ReportCadence
 } from "../core/ospec-lite-types";
 import {
   BugValidationError,
@@ -24,12 +26,14 @@ import {
   InitIncompleteError,
   OSpecLiteError,
   ProfileInitAnswersRequiredError,
+  ReportStateError,
   RefreshStateError
 } from "../core/ospec-lite-errors";
 import { ProfileLoader } from "../profile/ospec-lite-profile-loader";
 import { DocVerifierService } from "../docs/ospec-lite-doc-verifier-service";
 import { KnowledgeTemplateService } from "../init/ospec-lite-knowledge-template-service";
 import { PluginService } from "../plugins/ospec-lite-plugin-service";
+import { ReportService } from "../report/ospec-lite-report-service";
 import {
   PluginAuthenticationPolicy,
   PluginInstallationPolicy
@@ -64,6 +68,13 @@ const changeService = new ChangeService(repo, statusService);
 const bugService = new BugService(repo, statusService);
 const docVerifier = new DocVerifierService(repo);
 const pluginService = new PluginService(repo);
+const reportService = new ReportService(
+  repo,
+  scanService,
+  profileLoader,
+  statusService,
+  knowledgeService
+);
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -78,6 +89,9 @@ async function main(): Promise<void> {
       return;
     case "refresh":
       await handleRefresh(rest);
+      return;
+    case "report":
+      await handleReport(rest);
       return;
     case "change":
       await handleChange(rest);
@@ -238,6 +252,14 @@ async function handleRefresh(args: string[]): Promise<void> {
   if (report.baselineInitializedDocs.length > 0) {
     console.log("Future refresh runs will flag these docs when the generated suggestion changes.");
   }
+}
+
+async function handleReport(args: string[]): Promise<void> {
+  const { pathArg, cadence } = parseReportArgs(args);
+  const targetDir = path.resolve(pathArg);
+  const report = await reportService.report(targetDir, cadence);
+
+  printWorkReport(report);
 }
 
 async function handleChange(args: string[]): Promise<void> {
@@ -532,6 +554,48 @@ function parseInitArgs(args: string[]): {
   };
 }
 
+function parseReportArgs(args: string[]): {
+  pathArg: string;
+  cadence: ReportCadence;
+} {
+  let pathArg: string | undefined;
+  let cadence: ReportCadence = "weekly";
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    if (arg === "--cadence") {
+      const value = args[index + 1];
+      if (!value || value.startsWith("--")) {
+        throw new OSpecLiteError("Missing value for --cadence.");
+      }
+      cadence = parseReportCadence(value);
+      index += 1;
+      continue;
+    }
+
+    if (arg.startsWith("--cadence=")) {
+      cadence = parseReportCadence(arg.slice("--cadence=".length));
+      continue;
+    }
+
+    if (arg.startsWith("--")) {
+      throw new OSpecLiteError(`Unsupported option: ${arg}`);
+    }
+
+    if (pathArg) {
+      throw new OSpecLiteError(`Unexpected argument: ${arg}`);
+    }
+
+    pathArg = arg;
+  }
+
+  return {
+    pathArg: pathArg ?? ".",
+    cadence
+  };
+}
+
 function parseDocumentLanguage(value: string): DocumentLanguage {
   if (value === "en-US" || value === "zh-CN") {
     return value;
@@ -544,6 +608,13 @@ function parseBootstrapAgent(value: string): BootstrapAgent {
     return value;
   }
   throw new OSpecLiteError(`Unsupported bootstrap agent: ${value}`);
+}
+
+function parseReportCadence(value: string): ReportCadence {
+  if (value === "daily" || value === "weekly") {
+    return value;
+  }
+  throw new OSpecLiteError(`Unsupported report cadence: ${value}`);
 }
 
 function parsePluginInstallArgs(args: string[]): {
@@ -953,6 +1024,59 @@ function printPathList(label: string, items: string[]): void {
   }
 }
 
+function printWorkReport(report: OSpecLiteWorkReport): void {
+  console.log("OSpec Lite Work Report");
+  console.log(`Path: ${report.rootDir}`);
+  console.log(`State: ${report.state}`);
+  if (report.projectName) {
+    console.log(`Project: ${report.projectName}`);
+  }
+  if (report.profileId) {
+    console.log(`Profile: ${report.profileId}`);
+  }
+  if (report.bootstrapAgent) {
+    console.log(`Bootstrap agent: ${report.bootstrapAgent}`);
+  }
+  console.log(`Cadence: ${report.reportWindow.cadence}`);
+  console.log(`Window: last ${report.reportWindow.lookbackDays} day(s)`);
+  console.log(`Generated at: ${report.generatedAt}`);
+
+  printChangeSummary("Completed changes this period", report.recentArchivedChanges);
+  printChangeSummary("Open changes now", report.activeChanges);
+  printBugSummary("Resolved bugs this period", report.recentAppliedBugs);
+  printBugSummary("Open bugs now", report.activeBugs);
+  printPathList("Docs needing review now", report.reviewNeededDocs);
+  printPathList("Initialized doc suggestion baselines", report.baselineInitializedDocs);
+}
+
+function printChangeSummary(label: string, items: OSpecLiteWorkReport["activeChanges"]): void {
+  console.log(`${label}: ${items.length}`);
+  if (items.length === 0) {
+    console.log("- (none)");
+    return;
+  }
+
+  for (const item of items) {
+    const affects = item.affects.length > 0 ? item.affects.join(", ") : "(not recorded)";
+    console.log(`- ${item.slug} [${item.status}; ${item.updatedAt}; ${item.path}]`);
+    console.log(`  affects: ${affects}`);
+  }
+}
+
+function printBugSummary(label: string, items: OSpecLiteWorkReport["activeBugs"]): void {
+  console.log(`${label}: ${items.length}`);
+  if (items.length === 0) {
+    console.log("- (none)");
+    return;
+  }
+
+  for (const item of items) {
+    const affects = item.affects.length > 0 ? item.affects.join(", ") : "(not recorded)";
+    console.log(`- ${item.id}: ${item.title} [${item.status}; ${item.updatedAt}]`);
+    console.log(`  affects: ${affects}`);
+  }
+}
+
 function printHelp(): void {
   console.log(`oslite <command>
 
@@ -960,6 +1084,7 @@ Commands:
   oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
   oslite status [path]
   oslite refresh [path]
+  oslite report [path] [--cadence daily|weekly]
   oslite bug new <title> [path]
   oslite bug fix <bug-id> [path]
   oslite bug apply <bug-id> [path]
@@ -1003,6 +1128,18 @@ main().catch((error: unknown) => {
 
   if (error instanceof RefreshStateError) {
     console.error(`OSpec Lite refresh blocked: repository state is ${error.state}`);
+    if (error.missingMarkers.length > 0) {
+      console.error("Missing markers:");
+      for (const marker of error.missingMarkers) {
+        console.error(`- ${marker}`);
+      }
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  if (error instanceof ReportStateError) {
+    console.error(`OSpec Lite report blocked: repository state is ${error.state}`);
     if (error.missingMarkers.length > 0) {
       console.error("Missing markers:");
       for (const marker of error.missingMarkers) {
