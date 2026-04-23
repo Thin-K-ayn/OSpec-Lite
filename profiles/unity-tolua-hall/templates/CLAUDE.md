@@ -11,5 +11,5 @@
 - 先读 @{{authoringPackRoot}}/fill-project-docs.md。
 - 先补 @{{authoringPackRoot}}/evidence-map.md，再回填 `.oslite/docs/project/*` 与 `.oslite/docs/agents/*`。
 - 对本 profile，默认从 `Launch.cs`、`Main.cs`、`Main.lua` 建立大厅启动链认知。
-- 如果用户已经知道项目名，也可以直接把这句发给 agent：`安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。`
+- 如果用户已经知道项目名，也可以直接把这句发给 agent：`安装并阅读 npm package ospec-lite。如果当前仓库还没用 oslite init 过，则帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。`
 {{managedEnd}}
