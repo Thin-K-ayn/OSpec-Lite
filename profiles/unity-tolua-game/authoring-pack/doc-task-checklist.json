@@ -179,7 +179,7 @@
         "## 完成前自查"
       ],
       "requiredSnippets": [
-        "oslite docs verify .",
+        "oslite docs verify",
         "evidence-map.md"
       ]
     },
@@ -270,7 +270,7 @@
       ],
       "requiredSnippets": [
         "Script/MJGame.lua",
-        "oslite docs verify .",
+        "oslite docs verify",
         "evidence-map.md"
       ],
       "skipPlaceholderCheck": true

@@ -27,19 +27,19 @@
 最推荐直接对 agent 说：
 
 ```text
-帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。
+工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。
 ```
 
 如果你想把项目名先填好，可以直接发这一句：
 
 ```text
-帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
+工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。
 ```
 
 如果是英文环境，可以说：
 
 ```text
-Help me use the unity-tolua-hall profile to init ospec-lite. If the repo is not initialized yet, infer the project name and ask me to confirm it first. Then fill evidence-map before the final docs, and finish with oslite docs verify.
+Project path is XXXX (prefer an absolute path). Help me use the unity-tolua-hall profile to init ospec-lite in that repo. If the repo is not initialized yet, infer the project name and ask me to confirm it first. Then fill evidence-map before the final docs, and finish with oslite docs verify XXXX.
 ```
 
 ## 在 Codex / Claude Code 中怎么用
@@ -53,22 +53,22 @@ npm.cmd install --save-dev ospec-lite@latest
 安装完成后，大厅项目组成员不需要手动拆命令，直接在 Codex 或 Claude Code 里说下面这句即可：
 
 ```text
-帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。
+工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。
 ```
 
 如果已经知道项目名，也可以直接用这句：
 
 ```text
-帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify。项目名称是 XXXX（这里记得填一下，不填估计它会自己乱写）。
+工程路径是 XXXX（建议填绝对路径）。帮我用 unity-tolua-hall 的 profile 去 init ospec-lite；如果这个工程还没初始化，请先推断项目名并向我确认。然后先补 evidence-map，再补正式项目文档，最后跑 oslite docs verify XXXX。项目名称是 YYYY（这里记得填一下，不填估计它会自己乱写）。
 ```
 
 默认预期是 agent 自己完成这些步骤：
 1. 判断仓库是否已经完成 `unity-tolua-hall` 初始化
 2. 如未初始化，先推断项目名并向用户确认
-3. 运行 `oslite init --profile unity-tolua-hall ...`
+3. 在目标工程根目录 `<repo-root>` 上运行 `oslite init --profile unity-tolua-hall ... "<repo-root>"`
 4. 先补 `docs/agents/authoring/evidence-map.md`
 5. 再补 `AGENTS.md`、`CLAUDE.md`、`docs/project/*`、`docs/agents/*`
-6. 最后运行 `oslite docs verify .`
+6. 最后运行 `oslite docs verify "<repo-root>"`
 
 ## Agent 预期行为
 
@@ -78,10 +78,11 @@ npm.cmd install --save-dev ospec-lite@latest
 2. 如果没有初始化：
    - 从仓库目录名、README、显眼的产品命名中推断项目名。
    - 先向用户确认这个项目名；如果用户没有继续纠正，才把它作为 `--project-name` 传给 `oslite init`。
+   - 如果用户已经给了工程路径，优先在那个 `<repo-root>` 上执行命令；只有当前工作目录已经是目标工程根目录且用户没有给路径时，才用 `.`
    - 结合当前环境选择 `--bootstrap-agent`，不明确时使用 `none`。
 3. 初始化完成后，先填写 `.oslite/docs/agents/authoring/evidence-map.md`。
 4. 再回填 `AGENTS.md`、`CLAUDE.md`、`.oslite/docs/project/*`、`.oslite/docs/agents/*`。
-5. 最后运行 `oslite docs verify .`。
+5. 最后运行 `oslite docs verify "<repo-root>"`。
 
 ## 这个 profile 会生成什么
 

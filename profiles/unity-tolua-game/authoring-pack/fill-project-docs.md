@@ -3,10 +3,11 @@
 ## 如果用户只是说“用 `unity-tolua-game` profile 去 init ospec-lite”
 1. 先判断仓库是否已经完成 `unity-tolua-game` 初始化。
 2. 如果还没有初始化：
+   - 如果用户已经给了工程路径，记为 `<repo-root>`；如果当前工作目录已经是目标工程根目录，才把 `<repo-root>` 视为 `.`
    - 先从仓库目录名、现有 README、明显的产品命名中推断项目名。
    - 向用户确认这个项目名；如果用户没有纠正，再把它作为 `--project-name` 使用。
    - 如果用户没有明确指定 bootstrap agent，则默认使用当前 agent 环境；如果当前环境不明确，则使用 `none`。
-   - 运行：`oslite init --profile unity-tolua-game --project-name "<项目名>" --bootstrap-agent <codex|claude-code|none> .`
+   - 运行：`oslite init --profile unity-tolua-game --project-name "<项目名>" --bootstrap-agent <codex|claude-code|none> "<repo-root>"`
 3. 如果已经初始化，不要重复运行 `init`，直接继续下面的读库流程。
 
 ## 阶段一：先读仓库并填写证据地图
@@ -26,7 +27,7 @@
 - `evidence-map.md` 已补齐关键章节
 - 正式文档没有遗留 `待补充`、`TODO`、空 bullet
 - 所有证据路径真实存在
-- 已运行 `oslite docs verify .`
+- 已运行 `oslite docs verify "<repo-root>"`
 
 ## 最终文档应回答
 - 项目从哪里启动
