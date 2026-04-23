@@ -19,10 +19,10 @@ const { BugService } = require("../dist/bug/ospec-lite-bug-service.js");
 const { ProfileLoader } = require("../dist/profile/ospec-lite-profile-loader.js");
 const {
   BUG_INDEX_PATH,
+  BUG_ACTIVE_BUGS_PATH,
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START,
   BUG_MEMORY_PATH,
-  BUG_QUEUE_PATH,
   CLAUDE_MANAGED_END,
   CLAUDE_MANAGED_START,
   INIT_MARKERS
@@ -65,7 +65,7 @@ test("init bootstraps the repository knowledge layer", async (t) => {
     true
   );
   assert.equal(await repo.exists(path.join(rootDir, BUG_MEMORY_PATH)), true);
-  assert.equal(await repo.exists(path.join(rootDir, BUG_QUEUE_PATH)), true);
+  assert.equal(await repo.exists(path.join(rootDir, BUG_ACTIVE_BUGS_PATH)), true);
 
   const status = await statusService.getStatus(rootDir);
   assert.equal(status.state, "initialized");
@@ -123,6 +123,7 @@ test("cli prints help when no command is provided", () => {
   assert.match(result.stdout, /^oslite <command>/m);
   assert.match(result.stdout, /oslite status \[path]/);
   assert.match(result.stdout, /oslite refresh \[path]/);
+  assert.match(result.stdout, /oslite report \[path] \[--cadence daily\|weekly]/);
   assert.match(result.stdout, /oslite bug new <title> \[path]/);
   assert.match(result.stdout, /oslite bug fix <bug-id> \[path]/);
   assert.match(result.stdout, /oslite bug apply <bug-id> \[path]/);
@@ -229,6 +230,15 @@ test("cli refresh rejects uninitialized repositories", async (t) => {
   const result = runCli(["refresh", rootDir]);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /refresh blocked: repository state is uninitialized/i);
+});
+
+test("cli report rejects uninitialized repositories", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-report-uninitialized-");
+  await seedRepo(rootDir);
+
+  const result = runCli(["report", rootDir]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /report blocked: repository state is uninitialized/i);
 });
 
 test("cli refresh rejects incomplete repositories", async (t) => {
@@ -512,7 +522,7 @@ test("bug workflow advances from reported through apply and remembers lessons", 
   await initService.init(rootDir, { documentLanguage: "en-US" });
 
   const bugId = await bugService.newBug(rootDir, "Startup ordering blocks cold boot");
-  let queue = await repo.readText(path.join(rootDir, BUG_QUEUE_PATH));
+  let queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
   let index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
 
   assert.match(queue, new RegExp(`## ${escapeRegex(bugId)}: Startup ordering blocks cold boot`));
@@ -543,13 +553,13 @@ test("bug workflow advances from reported through apply and remembers lessons", 
   });
 
   await bugService.markFixed(rootDir, bugId);
-  queue = await repo.readText(path.join(rootDir, BUG_QUEUE_PATH));
+  queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
   index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
   assert.match(queue, new RegExp(`## ${escapeRegex(bugId)}:[\\s\\S]*- Status: fixed`));
   assert.equal(index.items[0].status, "fixed");
 
   const memoryFilePath = await bugService.apply(rootDir, bugId);
-  queue = await repo.readText(path.join(rootDir, BUG_QUEUE_PATH));
+  queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
   index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
   const memoryIndex = await repo.readText(path.join(rootDir, BUG_MEMORY_PATH));
   const memoryFile = await repo.readText(memoryFilePath);
@@ -890,6 +900,94 @@ test("cli refresh updates managed artifacts without overwriting human docs", asy
   assert.match(agentsAfter, /### Preferred Commands/);
   assert.match(agentsAfter, /Build: `npm run build`/);
   assert.ok(index.docSuggestionHashes[".oslite/docs/project/overview.md"]);
+});
+
+test("cli report summarizes daily ospec-lite work without mutating the repo", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-report-daily-");
+  await seedRepo(rootDir);
+
+  const { initService, changeService, bugService } = createServices();
+  await initService.init(rootDir, { documentLanguage: "en-US" });
+
+  await changeService.newChange(rootDir, "active-work");
+  const completedChangeDir = await changeService.newChange(rootDir, "completed-work");
+  await populateChangeForApply(completedChangeDir, {
+    affects: ["src/main.ts"],
+    summary: "Completed the scoped report fixture change.",
+    files: ["src/main.ts - finalized the report fixture change"]
+  });
+  await populateChangeForVerify(completedChangeDir, {
+    commands: ["npm test"],
+    results: ["`npm test` passed for the completed report fixture change."],
+    validation: "Automated coverage was enough for the report fixture.",
+    risk: "none"
+  });
+  await changeService.markApplied(completedChangeDir);
+  await changeService.markVerified(completedChangeDir);
+  await changeService.archive(completedChangeDir);
+
+  const activeBugId = await bugService.newBug(rootDir, "Ongoing startup bug");
+  const resolvedBugId = await bugService.newBug(rootDir, "Resolved startup bug");
+  await populateBugQueueEntry(rootDir, resolvedBugId, {
+    affects: ["src/bootstrap.ts"],
+    summary: "Startup still had one resolved fixture bug.",
+    actual: "The resolved fixture bug could still interrupt startup.",
+    expected: "The resolved fixture bug should stay fixed.",
+    repro: "Run the startup fixture flow once.",
+    investigation: "The fixture bug was isolated to the bootstrap gate.",
+    cause: "The bootstrap gate used the wrong readiness assumption.",
+    fixSummary: "Patched the resolved fixture bug.",
+    files: ["src/bootstrap.ts - patched the fixture bug"],
+    reason: "The readiness gate now matches the real startup behavior.",
+    command: "npm test",
+    result: "`npm test` passed after the resolved fixture bug was fixed.",
+    validation: "Manually confirmed the startup fixture stays healthy.",
+    risk: "none",
+    gap: "Assumed the bootstrap gate was already safe.",
+    reality: "The bootstrap gate still needed one explicit readiness check.",
+    checkFirst: "src/bootstrap.ts",
+    remember: "Review `src/bootstrap.ts` before editing the startup fixture again."
+  });
+  await bugService.markFixed(rootDir, resolvedBugId);
+  await bugService.apply(rootDir, resolvedBugId);
+
+  await fs.writeFile(
+    path.join(rootDir, "package.json"),
+    `${JSON.stringify(
+      {
+        name: "report-fixture",
+        scripts: {
+          build: "tsc -p tsconfig.json",
+          test: "node --test ./test/*.test.js"
+        }
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+
+  const result = runCli(["report", "--cadence", "daily", rootDir]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /OSpec Lite Work Report/);
+  assert.match(result.stdout, /Cadence: daily/);
+  assert.match(result.stdout, /Window: last 1 day\(s\)/);
+  assert.match(result.stdout, /Completed changes this period: 1/);
+  assert.match(result.stdout, /- completed-work \[archived;/);
+  assert.match(result.stdout, /Open changes now: 1/);
+  assert.match(result.stdout, /- active-work \[draft;/);
+  assert.match(result.stdout, /Resolved bugs this period: 1/);
+  assert.match(
+    result.stdout,
+    new RegExp(`- ${escapeRegex(resolvedBugId)}: Resolved startup bug \\[applied;`)
+  );
+  assert.match(result.stdout, /Open bugs now: 1/);
+  assert.match(
+    result.stdout,
+    new RegExp(`- ${escapeRegex(activeBugId)}: Ongoing startup bug \\[reported;`)
+  );
+  assert.match(result.stdout, /Docs needing review now:/);
+  assert.match(result.stdout, /\.oslite\/docs\/project\/overview\.md/);
 });
 
 test("cli refresh initializes doc hashes for older indexes", async (t) => {
@@ -1447,7 +1545,7 @@ async function populateChangeForVerify(changeDir, options = {}) {
 }
 
 async function populateBugQueueEntry(rootDir, bugId, options = {}) {
-  const queuePath = path.join(rootDir, BUG_QUEUE_PATH);
+  const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
   let queue = await fs.readFile(queuePath, "utf8");
 
   const replacements = {
@@ -1484,7 +1582,7 @@ function replaceBugQueueField(queue, bugId, label, value) {
   );
   const section = queue.match(sectionRegex)?.[0];
   if (!section) {
-    throw new Error(`Missing bug queue section: ${bugId}`);
+    throw new Error(`Missing active bug section: ${bugId}`);
   }
 
   const labelRegex = new RegExp(`(^- ${escapeRegex(label)}:\\s*).+$`, "m");

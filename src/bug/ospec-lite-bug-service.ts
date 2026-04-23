@@ -1,10 +1,10 @@
 import * as path from "node:path";
 import {
+  BUG_ACTIVE_BUGS_PATH,
   BUG_INDEX_PATH,
   BUG_MEMORY_DIR,
   BUG_MEMORY_PATH,
   BUG_PLAYBOOK_PATH,
-  BUG_QUEUE_PATH,
   OSPEC_LITE_DIR
 } from "../core/ospec-lite-schema";
 import {
@@ -76,7 +76,7 @@ export class BugService {
       this.templates.renderPlaybook()
     );
     await this.repo.writeTextIfMissing(
-      path.join(rootDir, BUG_QUEUE_PATH),
+      path.join(rootDir, BUG_ACTIVE_BUGS_PATH),
       this.templates.renderQueue()
     );
 
@@ -115,7 +115,7 @@ export class BugService {
     await this.ensureInitialized(rootDir);
     await this.ensureSupportArtifacts(rootDir);
 
-    const queuePath = path.join(rootDir, BUG_QUEUE_PATH);
+    const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
     const queue = await this.repo.readText(queuePath);
     const index = await this.readBugIndex(rootDir);
     const bugId = this.formatBugId(index.nextBugNumber);
@@ -154,7 +154,7 @@ export class BugService {
     const record = this.findBugRecord(index, bugId);
     this.ensureAllowedCurrentStatus(record, ["reported"], "fixed");
 
-    const queuePath = path.join(rootDir, BUG_QUEUE_PATH);
+    const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
     const queue = await this.repo.readText(queuePath);
     const parsed = this.parseQueue(queue);
     const section = this.findQueueSection(parsed.sections, bugId);
@@ -185,7 +185,7 @@ export class BugService {
     const record = this.findBugRecord(index, bugId);
     this.ensureAllowedCurrentStatus(record, ["fixed"], "applied");
 
-    const queuePath = path.join(rootDir, BUG_QUEUE_PATH);
+    const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
     const queue = await this.repo.readText(queuePath);
     const parsed = this.parseQueue(queue);
     const section = this.findQueueSection(parsed.sections, bugId);
@@ -350,7 +350,7 @@ export class BugService {
   private replaceLabeledValue(content: string, label: string, value: string): string {
     const regex = new RegExp(`(^- ${this.escapeRegex(label)}:\\s*).+$`, "m");
     if (!regex.test(content)) {
-      throw new OSpecLiteError(`Missing ${label} in bug queue section.`);
+      throw new OSpecLiteError(`Missing ${label} in active bug section.`);
     }
     return content.replace(regex, `$1${value}`);
   }
@@ -376,25 +376,25 @@ export class BugService {
 
     for (const label of requiredFixLabels) {
       if (!this.hasMeaningfulEntries(this.extractLabeledValues(section, label), true)) {
-        issues.push(`bug queue entry must include a real \`${label}\` entry.`);
+        issues.push(`active bug entry must include a real \`${label}\` entry.`);
       }
     }
 
     if (phase === "apply") {
       for (const label of ["Command", "Result", "Validation", "Gap", "Reality", "Check First", "Remember"]) {
         if (!this.hasMeaningfulEntries(this.extractLabeledValues(section, label), true)) {
-          issues.push(`bug queue entry must include a real \`${label}\` entry.`);
+          issues.push(`active bug entry must include a real \`${label}\` entry.`);
         }
       }
 
       const checkFirstValues = this.extractLabeledValues(section, "Check First");
       const checkFirstPaths = this.extractRepoPaths(checkFirstValues.join(", "));
       if (checkFirstPaths.length === 0) {
-        issues.push("bug queue entry must point `Check First` at at least one repo path.");
+        issues.push("active bug entry must point `Check First` at at least one repo path.");
       } else {
         const hasExistingPath = await this.someRepoPathExists(rootDir, checkFirstPaths);
         if (!hasExistingPath) {
-          issues.push("bug queue entry must point `Check First` at an existing repo path.");
+          issues.push("active bug entry must point `Check First` at an existing repo path.");
         }
       }
     }
@@ -408,7 +408,7 @@ export class BugService {
   private readBugId(section: string): string {
     const match = /^##\s+(bug-\d{4}):/m.exec(section);
     if (!match) {
-      throw new OSpecLiteError("Missing bug id in queue section.");
+      throw new OSpecLiteError("Missing bug id in active bug section.");
     }
     return match[1];
   }

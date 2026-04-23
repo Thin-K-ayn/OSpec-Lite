@@ -17,8 +17,9 @@ V1 intentionally keeps the surface area small: one-time bootstrap, non-destructi
 - Creates `.oslite/docs/project/*` and `.oslite/docs/agents/*` so repo knowledge lives next to the code.
 - Supports content-only profiles that add authoring packs and thin agent wrappers without introducing a plugin runtime.
 - Tracks lightweight changes in `.oslite/changes/active/*` and archives them when verified.
-- Tracks active bugs in `.oslite/bugs/queue.md`, persists reusable lessons into rotating bug-memory files, and compacts stale knowledge when the memory grows too large.
+- Tracks active bugs in `.oslite/bugs/active-bugs.md`, persists reusable lessons into rotating bug-memory files, and compacts stale knowledge when the memory grows too large.
 - Verifies profile-driven documentation deterministically with `oslite docs verify`.
+- Generates non-destructive daily or weekly work reports with `oslite report`.
 - Ships repo-local Codex companion plugins and a plugin module for scaffolding or installing more.
 
 ## What It Creates
@@ -44,7 +45,7 @@ V1 intentionally keeps the surface area small: one-time bootstrap, non-destructi
       change-playbook.md
       bug-playbook.md
   bugs/
-    queue.md
+    active-bugs.md
   changes/
     active/
     archived/
@@ -109,6 +110,17 @@ npx oslite refresh .
 
 `status` reports whether the repo is initialized, which profile is active, where docs live, and how many active and archived changes and bugs exist.
 `refresh` updates `.oslite/index.json` plus the managed sections in `AGENTS.md` and `CLAUDE.md`, then reports human-owned docs that need review without overwriting them.
+
+### Generate a daily or weekly work report
+
+```sh
+npx oslite report .
+npx oslite report . --cadence daily
+npx oslite report . --cadence weekly
+```
+
+`report` is non-destructive. It summarizes open changes, completed changes in the selected window, open bugs, recently applied bug fixes, and project docs whose generated suggestions have drifted.
+For Codex automations, this is the preferred reporting entrypoint for OSpec Lite repositories.
 
 ### Verify profile-driven docs
 
@@ -179,22 +191,22 @@ A bug item is the defect-oriented sibling of a change. It is where the team reco
 
 Why it helps:
 
-- keeps one defect focused in one shared queue section from report through applied fix
+- keeps one defect focused in one shared active bug section from report through applied fix
 - requires the agent to write down the mistaken assumption and the actual code logic
 - appends reusable reminders into `.oslite/docs/project/bug-memory.md` and its linked segment files
 
 What `oslite bug new "<title>" .` creates:
 
 ```text
-.oslite/bugs/queue.md
+.oslite/bugs/active-bugs.md
 .oslite/docs/project/bug-memory.md
 .oslite/docs/project/bug-memory/memory-0001.md
 ```
 
 Typical flow:
 
-1. Create the bug item and fill the new `bug-####` section in `.oslite/bugs/queue.md`.
-2. Record the symptom, reproduction, investigation, and root cause in that queue section.
+1. Create the bug item and fill the new `bug-####` section in `.oslite/bugs/active-bugs.md`.
+2. Record the symptom, reproduction, investigation, and root cause in that active bug section.
 3. Implement the fix and replace `Fix Summary`, `File`, and `Reason` with real details.
 4. Run `oslite bug fix <bug-id>` once the implementation is complete.
 5. Add real verification evidence plus cognitive-gap notes, including a concrete `Check First` repo path.
@@ -202,7 +214,7 @@ Typical flow:
 
 ```sh
 npx oslite bug new "startup ordering blocks cold boot" .
-# fill the new queue entry in .oslite/bugs/queue.md, then implement the fix
+# fill the new entry in .oslite/bugs/active-bugs.md, then implement the fix
 npx oslite bug fix bug-0001 .
 npx oslite bug apply bug-0001 .
 ```
@@ -250,6 +262,7 @@ Example prompts:
 - `Check OSpec Lite status and explain the missing markers.`
 - `Continue the profile docs and run oslite docs verify.`
 - `Create an OSpec Lite change for add-login-flow.`
+- `Set up a weekly OSpec Lite report automation for this repo.`
 
 ## Plugins
 
@@ -274,6 +287,7 @@ npx oslite plugins create my-plugin . --with-skills --with-hooks
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
 oslite status [path]
 oslite refresh [path]
+oslite report [path] [--cadence daily|weekly]
 oslite bug new <title> [path]
 oslite bug fix <bug-id> [path]
 oslite bug apply <bug-id> [path]

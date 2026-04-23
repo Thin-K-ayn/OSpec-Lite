@@ -22,6 +22,7 @@ Example prompts:
 - `Check OSpec Lite status and explain the missing markers.`
 - `Continue the profile docs and run oslite docs verify.`
 - `Create an OSpec Lite change for add-login-flow.`
+- `Set up a daily OSpec Lite report automation for this repo.`
 
 ## Command Strategy
 

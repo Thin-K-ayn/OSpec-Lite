@@ -100,6 +100,16 @@ export class RefreshStateError extends OSpecLiteError {
   }
 }
 
+export class ReportStateError extends OSpecLiteError {
+  constructor(
+    public readonly rootDir: string,
+    public readonly state: "uninitialized" | "incomplete",
+    public readonly missingMarkers: string[]
+  ) {
+    super(`Cannot report repository in state ${state}: ${rootDir}`);
+  }
+}
+
 export class ChangeValidationError extends OSpecLiteError {
   constructor(
     public readonly changePath: string,

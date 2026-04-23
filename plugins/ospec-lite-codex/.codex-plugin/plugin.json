@@ -13,7 +13,8 @@
     "ospec-lite",
     "codex",
     "workflow",
-    "documentation"
+    "documentation",
+    "reporting"
   ],
   "skills": "./skills/",
   "interface": {
@@ -30,7 +31,8 @@
     "defaultPrompt": [
       "Initialize this repo with OSpec Lite.",
       "Check OSpec Lite status and missing markers.",
-      "Continue the profile docs and run oslite docs verify."
+      "Continue the profile docs and run oslite docs verify.",
+      "Set up a weekly OSpec Lite report automation."
     ],
     "brandColor": "#157A6E"
   }

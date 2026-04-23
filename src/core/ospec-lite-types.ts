@@ -1,5 +1,6 @@
 export type DocumentLanguage = "en-US" | "zh-CN";
 export type ProfileInitField = "projectName" | "bootstrapAgent";
+export type ReportCadence = "daily" | "weekly";
 
 export type AgentTarget = "codex" | "claude-code";
 export type BootstrapAgent = AgentTarget | "none";
@@ -224,6 +225,50 @@ export interface StatusReport {
 export interface RefreshReport {
   rootDir: string;
   updatedArtifacts: string[];
+  reviewNeededDocs: string[];
+  baselineInitializedDocs: string[];
+}
+
+export interface ReportWindow {
+  cadence: ReportCadence;
+  lookbackDays: number;
+  startsAt: string;
+  endsAt: string;
+}
+
+export interface ChangeReportItem {
+  slug: string;
+  status: ChangeStatus;
+  path: string;
+  createdAt: string;
+  updatedAt: string;
+  affects: string[];
+  owner: string;
+}
+
+export interface BugReportItem {
+  id: string;
+  title: string;
+  status: BugStatus;
+  createdAt: string;
+  updatedAt: string;
+  appliedAt?: string;
+  affects: string[];
+  owner: string;
+}
+
+export interface OSpecLiteWorkReport {
+  rootDir: string;
+  generatedAt: string;
+  state: InitState;
+  projectName?: string;
+  profileId?: string;
+  bootstrapAgent?: BootstrapAgent;
+  reportWindow: ReportWindow;
+  activeChanges: ChangeReportItem[];
+  recentArchivedChanges: ChangeReportItem[];
+  activeBugs: BugReportItem[];
+  recentAppliedBugs: BugReportItem[];
   reviewNeededDocs: string[];
   baselineInitializedDocs: string[];
 }
