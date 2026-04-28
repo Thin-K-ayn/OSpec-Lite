@@ -47,7 +47,7 @@ Install and read the ospec-lite npm package. If the current repo has not been in
 推荐项目先安装本地依赖：
 
 ```powershell
-npm.cmd install --save-dev ospec-lite@latest
+npm.cmd install --save-dev ospec-lite
 ```
 
 安装完成后，大厅项目组成员不需要记 GitHub repo 地址或本机绝对路径，直接按下面这句触发即可：
