@@ -8,7 +8,7 @@ Minimal agent-first repository bootstrap for Codex and Claude Code.
 
 V1 intentionally keeps the surface area small: one-time bootstrap, non-destructive refresh, optional profiles, deterministic profile-backed doc verification, and simple repo-local change and bug tracking.
 
-[Why OSpec Lite](#why-ospec-lite) | [What It Creates](#what-it-creates) | [Install](#install) | [Usage](#usage) | [Profiles](#profiles) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Development](#development)
+[Why OSpec Lite](#why-ospec-lite) | [Quick Start](#quick-start) | [What It Creates](#what-it-creates) | [Profiles](#profiles) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Command Reference](#command-reference) | [Development](#development)
 
 ## Why OSpec Lite
 
@@ -21,6 +21,125 @@ V1 intentionally keeps the surface area small: one-time bootstrap, non-destructi
 - Verifies profile-driven documentation deterministically with `oslite docs verify`.
 - Generates non-destructive daily or weekly work reports with `oslite report`.
 - Ships repo-local Codex companion plugins and a plugin module for scaffolding or installing more.
+
+## Quick Start
+
+Start using `oslite` by telling your coding agent, Codex or Claude Code, to install and initialize it for you. Do not start by typing CLI commands directly.
+
+```text
+Install ospec-lite in this repository, initialize OSpec Lite, inspect the generated files, and tell me what I should review.
+```
+
+OSpec Lite also includes built-in profiles tailored for specific project structures and frameworks. If your repository matches one of these profiles, tell your agent to use it during initialization:
+
+- [`unity-tolua-game`](./profiles/unity-tolua-game/README.md): Unity + ToLua sub-game repositories with `Script/MJGame.lua`
+- [`unity-tolua-hall`](./profiles/unity-tolua-hall/README.md): Unity + ToLua hall / lobby repositories with `Assets/_GameCenter/...` startup files
+
+For a profile-backed Unity + ToLua repository, tell them:
+
+```text
+Install ospec-lite in this repository and initialize OSpec Lite with the unity-tolua-game profile. Use project name "BuYuDaLuanDou" and bootstrap agent codex. Then inspect the generated authoring pack and tell me what evidence you need.
+```
+
+After that, keep using OSpec Lite by telling your agent what you want:
+
+```text
+Check OSpec Lite status and refresh the repository knowledge layer.
+Create an OSpec Lite change for improve-readme and keep the change record updated while you work.
+Create an OSpec Lite bug for "startup ordering blocks cold boot" and apply the bug memory lesson after verification.
+Run OSpec Lite docs verification and explain any missing requirements.
+Generate a weekly OSpec Lite work report.
+```
+
+The agent should decide which `oslite` commands to run. Use the command reference below only when you want direct terminal control.
+
+### Track a lightweight change
+
+A change is a repo-local work record for one non-trivial task. It is not a git branch and not a commit. Think of it as the smallest reviewable unit of intent, plan, implementation notes, and verification that lives next to the code.
+
+Why it helps:
+
+- gives humans and agents one shared place to capture scope before edits start
+- makes handoff and review easier because request, plan, applied work, and verification are separated
+- leaves an archived trail of why a change happened and how it was validated
+- prevents status-only handoffs because apply/verify require actual evidence
+
+Use a change when the task is more than a tiny typo, especially if it:
+
+- touches multiple files
+- changes behavior, interfaces, rules, or architecture
+- needs explicit review notes or verification steps
+- may outlive one chat session or one coding pass
+
+What `oslite change new <slug> .` creates:
+
+```text
+.oslite/changes/active/<slug>/
+  change.json
+  request.md
+  plan.md
+  apply.md
+  verify.md
+```
+
+File roles:
+
+- `request.md`: what was asked for, intended scope, and acceptance notes
+- `plan.md`: intended approach, expected files, and risks before editing
+- `apply.md`: what actually changed and where implementation deviated from plan
+- `verify.md`: commands, results, manual validation, and remaining risks
+- `change.json`: machine-readable status and metadata
+
+Ask your agent to create and maintain the change record while it works:
+
+```text
+Create an OSpec Lite change for improve-readme. Fill the request and plan before editing, keep the affected files list accurate, record what changed in apply.md, run verification, then mark the change verified when the evidence is real.
+```
+
+Typical agent flow:
+
+1. Create the change folder.
+2. Write `request.md` and `plan.md` before broad edits.
+3. Fill `change.json.affects` before marking the change applied.
+4. Implement the change.
+5. Record the real work in `apply.md`, then mark it applied.
+6. Record real commands and results in `verify.md`, then mark it verified.
+7. Archive it once the work is done and verified.
+
+The agent will use `oslite change new`, `oslite change apply`, `oslite change verify`, and `oslite change archive` as the record moves from request to verified work.
+
+### Track and apply a bug fix
+
+A bug item is the defect-oriented sibling of a change. It is where the team records the symptom, investigation, fix, validation, and the lessons that should prevent the same wrong assumption next time.
+
+Why it helps:
+
+- keeps one defect focused in one shared active bug section from report through applied fix
+- requires the agent to write down the mistaken assumption and the actual code logic
+- appends reusable reminders into `.oslite/docs/project/bug-memory.md` and its linked segment files
+
+What `oslite bug new "<title>" .` creates:
+
+```text
+.oslite/bugs/active-bugs.md
+.oslite/docs/project/bug-memory.md
+.oslite/docs/project/bug-memory/memory-0001.md
+```
+
+Ask your agent:
+
+```text
+Create an OSpec Lite bug for "startup ordering blocks cold boot". Record the symptom, reproduction, investigation, root cause, fix, verification, and the lesson we should remember before applying the bug memory update.
+```
+
+Typical agent flow:
+
+1. Create the bug item and fill the new `bug-####` section in `.oslite/bugs/active-bugs.md`.
+2. Record the symptom, reproduction, investigation, and root cause in that active bug section.
+3. Implement the fix and replace `Fix Summary`, `File`, and `Reason` with real details.
+4. Run `oslite bug fix <bug-id>` once the implementation is complete.
+5. Add real verification evidence plus cognitive-gap notes, including a concrete `Check First` repo path.
+6. Run `oslite bug apply <bug-id>` to persist the lesson in bug memory, remove the bug from the active queue, and compact stale knowledge when needed.
 
 ## What It Creates
 
@@ -65,166 +184,15 @@ When a profile is selected, it can also add:
 If the repo is already initialized, `oslite init` reports the current state and exits instead of rewriting the knowledge layer.
 Use `oslite refresh` later to rescan the repo, rewrite only machine-managed artifacts, and report human-owned docs whose generated suggestions have drifted.
 
-## Install
-
-Use `ospec-lite` in a target repository:
-
-```sh
-npm install --save-dev ospec-lite
-npx oslite init .
-```
-
-If you are developing this package locally:
-
-```sh
-npm install
-npm run build
-npm test
-```
-
-When running from this cloned repository instead of an installed package, use `node ./dist/cli/index.js ...`.
-
-## Usage
-
-### Initialize a repository
-
-```sh
-npx oslite init .
-npx oslite init . --document-language zh-CN
-npx oslite init . --profile unity-tolua-game --project-name "BuYuDaLuanDou" --bootstrap-agent codex
-npx oslite init . --profile unity-tolua-hall --project-name "NeoHall" --bootstrap-agent codex
-```
-
-Notes:
-
-- Supported document languages are `en-US` and `zh-CN`.
-- In non-interactive environments, the shipped profiles require both `--project-name` and `--bootstrap-agent`.
-- `--bootstrap-agent` accepts `codex`, `claude-code`, or `none`.
-
-### Inspect bootstrap state
-
-```sh
-npx oslite status .
-npx oslite refresh .
-```
-
-`status` reports whether the repo is initialized, which profile is active, where docs live, and how many active and archived changes and bugs exist.
-`refresh` updates `.oslite/index.json` plus the managed sections in `AGENTS.md` and `CLAUDE.md`, then reports human-owned docs that need review without overwriting them.
-
-### Generate a daily or weekly work report
-
-```sh
-npx oslite report .
-npx oslite report . --cadence daily
-npx oslite report . --cadence weekly
-```
-
-`report` is non-destructive. It summarizes open changes, completed changes in the selected window, open bugs, recently applied bug fixes, and project docs whose generated suggestions have drifted.
-For Codex automations, this is the preferred reporting entrypoint for OSpec Lite repositories.
-
-### Verify profile-driven docs
-
-```sh
-npx oslite docs verify .
-```
-
-`docs verify` is only available for repositories initialized with a profile, because it validates the active profile's authoring pack and checklist.
-
-### Track a lightweight change
-
-A change is a repo-local work record for one non-trivial task. It is not a git branch and not a commit. Think of it as the smallest reviewable unit of intent, plan, implementation notes, and verification that lives next to the code.
-
-Why it helps:
-
-- gives humans and agents one shared place to capture scope before edits start
-- makes handoff and review easier because request, plan, applied work, and verification are separated
-- leaves an archived trail of why a change happened and how it was validated
-- prevents status-only handoffs because apply/verify require actual evidence
-
-Use a change when the task is more than a tiny typo, especially if it:
-
-- touches multiple files
-- changes behavior, interfaces, rules, or architecture
-- needs explicit review notes or verification steps
-- may outlive one chat session or one coding pass
-
-What `oslite change new <slug> .` creates:
-
-```text
-.oslite/changes/active/<slug>/
-  change.json
-  request.md
-  plan.md
-  apply.md
-  verify.md
-```
-
-File roles:
-
-- `request.md`: what was asked for, intended scope, and acceptance notes
-- `plan.md`: intended approach, expected files, and risks before editing
-- `apply.md`: what actually changed and where implementation deviated from plan
-- `verify.md`: commands, results, manual validation, and remaining risks
-- `change.json`: machine-readable status and metadata
-
-Typical flow:
-
-1. Create the change folder.
-2. Write `request.md` and `plan.md` before broad edits.
-3. Fill `change.json.affects` before marking the change applied.
-4. Implement the change.
-5. Record the real work in `apply.md`, then mark it applied.
-6. Record real commands and results in `verify.md`, then mark it verified.
-7. Archive it once the work is done and verified.
-
-```sh
-npx oslite change new improve-readme .
-# fill request.md and plan.md, then edit files
-npx oslite change apply .oslite/changes/active/improve-readme
-npx oslite change verify .oslite/changes/active/improve-readme
-npx oslite change archive .oslite/changes/active/improve-readme
-```
-
-### Track and apply a bug fix
-
-A bug item is the defect-oriented sibling of a change. It is where the team records the symptom, investigation, fix, validation, and the lessons that should prevent the same wrong assumption next time.
-
-Why it helps:
-
-- keeps one defect focused in one shared active bug section from report through applied fix
-- requires the agent to write down the mistaken assumption and the actual code logic
-- appends reusable reminders into `.oslite/docs/project/bug-memory.md` and its linked segment files
-
-What `oslite bug new "<title>" .` creates:
-
-```text
-.oslite/bugs/active-bugs.md
-.oslite/docs/project/bug-memory.md
-.oslite/docs/project/bug-memory/memory-0001.md
-```
-
-Typical flow:
-
-1. Create the bug item and fill the new `bug-####` section in `.oslite/bugs/active-bugs.md`.
-2. Record the symptom, reproduction, investigation, and root cause in that active bug section.
-3. Implement the fix and replace `Fix Summary`, `File`, and `Reason` with real details.
-4. Run `oslite bug fix <bug-id>` once the implementation is complete.
-5. Add real verification evidence plus cognitive-gap notes, including a concrete `Check First` repo path.
-6. Run `oslite bug apply <bug-id>` to persist the lesson in bug memory, remove the bug from the active queue, and compact stale knowledge when needed.
-
-```sh
-npx oslite bug new "startup ordering blocks cold boot" .
-# fill the new entry in .oslite/bugs/active-bugs.md, then implement the fix
-npx oslite bug fix bug-0001 .
-npx oslite bug apply bug-0001 .
-```
-
 ## Typical Profile Workflow
 
-1. Run `oslite init` with the right profile.
-2. Fill `.oslite/docs/agents/authoring/evidence-map.md` before the final docs.
-3. Complete `AGENTS.md`, `CLAUDE.md`, `.oslite/docs/project/*`, and `.oslite/docs/agents/*`.
-4. Finish with `oslite docs verify .`.
+Give the agent the profile, project name, and bootstrap target first. Then ask it to work in this order:
+
+1. Initialize with the right profile.
+2. Inspect the generated authoring pack before writing final docs.
+3. Fill `.oslite/docs/agents/authoring/evidence-map.md` with concrete repository evidence before the final docs.
+4. Complete `AGENTS.md`, `CLAUDE.md`, `.oslite/docs/project/*`, and `.oslite/docs/agents/*`.
+5. Finish by running docs verification and explaining any remaining gaps.
 
 ## Profiles
 
@@ -272,16 +240,21 @@ Bundled starter plugins:
 
 - `ospec-lite-codex`: the OSpec Lite workflow companion plugin
 
-Example commands:
+Ask your agent:
 
-```sh
-npx oslite plugins list .
-npx oslite plugins install-defaults .
-npx oslite plugins install ../shared-plugins/my-plugin .
-npx oslite plugins create my-plugin . --with-skills --with-hooks
+```text
+List the repo-local OSpec Lite plugins, install the bundled defaults if they are missing, and explain what changed in plugins/ and .agents/plugins/marketplace.json.
 ```
 
-## Command Summary
+For a custom plugin:
+
+```text
+Create a repo-local OSpec Lite companion plugin named my-plugin with skills and hooks enabled. Keep the marketplace entry in sync and summarize the generated files.
+```
+
+## Command Reference
+
+These are the raw CLI commands your agent may run while following the workflows above. They are useful for automation, debugging, and maintainers who prefer direct terminal control.
 
 ```text
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
