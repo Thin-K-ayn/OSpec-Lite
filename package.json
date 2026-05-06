@@ -13,7 +13,7 @@
     "plugins",
     "profiles",
     "README.md",
-    "README.zh-CN.md",
+    "README.en-US.md",
     "LICENSE"
   ],
   "scripts": {

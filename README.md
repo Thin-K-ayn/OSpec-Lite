@@ -1,81 +1,86 @@
 # OSpec Lite
 
-[English](./README.md) | [简体中文](./README.zh-CN.md)
+[简体中文](./README.md) | [English](./README.en-US.md)
 
-Minimal agent-first repository bootstrap for Codex and Claude Code.
+面向 Codex 和 Claude Code 的轻量级 agent-first 仓库引导工具。
 
-`ospec-lite` helps a repository become easier for coding agents to understand, easier for humans to review, and safer to change. It bootstraps repo-local instructions, a machine-readable index, a small project knowledge layer, plus lightweight change and bug workflows under `.oslite/`.
+`ospec-lite` 的目标是让仓库更容易被编码 agent 理解，也更方便团队审阅并安全修改。它会在 `.oslite/` 下初始化仓库本地指令、机器可读索引、小型项目知识层，以及轻量的 change 与 bug 工作流。
 
-V1 intentionally keeps the surface area small: one-time bootstrap, non-destructive refresh, optional profiles, deterministic profile-backed doc verification, and simple repo-local change and bug tracking.
+V1 刻意保持小而稳的能力边界：一次性 bootstrap、非破坏式 refresh、可选 profile、基于 profile 的确定性文档校验，以及简单的 change / bug 跟踪。
 
-[Why OSpec Lite](#why-ospec-lite) | [Quick Start](#quick-start) | [What It Creates](#what-it-creates) | [Profiles](#profiles) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Command Reference](#command-reference) | [Development](#development)
+[为什么使用 OSpec Lite](#为什么使用-ospec-lite) | [快速开始](#快速开始) | [会生成什么](#会生成什么) | [Profiles](#profiles) | [Codex 插件](#codex-插件) | [Plugins 模块](#plugins-模块) | [命令参考](#命令参考) | [开发](#开发)
 
-## Why OSpec Lite
+## 为什么使用 OSpec Lite
 
-- Bootstraps `AGENTS.md` and `CLAUDE.md` so Codex and Claude Code get repo-local guidance immediately.
-- Generates `.oslite/index.json` as a machine-readable summary of the repository.
-- Creates `.oslite/docs/project/*` and `.oslite/docs/agents/*` so repo knowledge lives next to the code.
-- Supports content-only profiles that add authoring packs and thin agent wrappers without introducing a plugin runtime.
-- Tracks lightweight changes in `.oslite/changes/active/*` and archives them when verified.
-- Tracks active bugs in `.oslite/bugs/active-bugs.md`, persists reusable lessons into rotating bug-memory files, and compacts stale knowledge when the memory grows too large.
-- Verifies profile-driven documentation deterministically with `oslite docs verify`.
-- Generates non-destructive daily or weekly work reports with `oslite report`.
-- Ships repo-local Codex companion plugins and a plugin module for scaffolding or installing more.
+- 自动生成 `AGENTS.md` 和 `CLAUDE.md`，让 Codex 与 Claude Code 一进仓库就能拿到本地指引。
+- 生成 `.oslite/index.json`，提供机器可读的仓库摘要。
+- 创建 `.oslite/docs/project/*` 与 `.oslite/docs/agents/*`，把项目知识层和代码放在同一个仓库里维护。
+- 支持纯内容型 profile，可追加 authoring pack 和轻量 agent wrapper，而不引入插件运行时。
+- 在 `.oslite/changes/active/*` 下跟踪轻量变更，并在验证完成后归档。
+- 在 `.oslite/bugs/active-bugs.md` 里跟踪活跃 bug，把可复用经验写进滚动的 bug-memory 文件，并在记忆过大时自动 compact 失效知识。
+- 通过 `oslite docs verify` 对 profile 驱动的文档进行确定性校验。
+- 通过 `oslite report` 生成非破坏式的日报或周报。
+- 自带一组 repo-local 的 Codex companion plugins，并提供插件模块来继续安装或脚手架更多插件。
 
-## Quick Start
+## 快速开始
 
-Start using `oslite` by telling your coding agent, Codex or Claude Code, to install and initialize it for you. Do not start by typing CLI commands directly.
-
-```text
-Install ospec-lite in this repository, initialize OSpec Lite, inspect the generated files, and tell me what I should review.
-```
-
-![OSpec Lite initialization flow](./docs/assets/ospec-lite-initialization-flow.svg)
-
-OSpec Lite also includes built-in profiles tailored for specific project structures and frameworks. If your repository matches one of these profiles, tell your agent to use it during initialization:
-
-- [`unity-tolua-game`](./profiles/unity-tolua-game/README.md): Unity + ToLua sub-game repositories with `Script/MJGame.lua`
-- [`unity-tolua-hall`](./profiles/unity-tolua-hall/README.md): Unity + ToLua hall / lobby repositories with `Assets/_GameCenter/...` startup files
-
-For a profile-backed Unity + ToLua repository, tell them:
+开始使用 `oslite` 时，直接告诉你的编码 agent，也就是 Codex 或 Claude Code，让它为你安装并初始化。不要一开始就自己输入 CLI 命令。
 
 ```text
-Install ospec-lite in this repository and initialize OSpec Lite with the unity-tolua-game profile. Use project name "BuYuDaLuanDou" and bootstrap agent codex. Then inspect the generated authoring pack and tell me what evidence you need.
+请在当前仓库安装 ospec-lite，初始化 OSpec Lite，检查生成的文件，并告诉我哪些内容需要 review。
 ```
 
-After that, keep using OSpec Lite by telling your agent what you want:
+![OSpec Lite 初始化流程](./docs/assets/ospec-lite-initialization-flow-zh-cn.svg)
+
+OSpec Lite 也内置了一些针对特定项目结构和技术框架的 profiles。如果你的仓库匹配其中之一，请告诉 agent 在初始化时使用对应 profile：
+
+- [`unity-tolua-game`](./profiles/unity-tolua-game/README.md)：带有 `Script/MJGame.lua` 的 Unity + ToLua 子游戏仓库
+- [`unity-tolua-hall`](./profiles/unity-tolua-hall/README.md)：带有 `Assets/_GameCenter/...` 启动链路文件的 Unity + ToLua 大厅 / Lobby 仓库
+
+如果是使用 profile 的 Unity + ToLua 仓库，告诉它：
 
 ```text
-Check OSpec Lite status and refresh the repository knowledge layer.
-Create an OSpec Lite change for improve-readme and keep the change record updated while you work.
-Create an OSpec Lite bug for "startup ordering blocks cold boot" and apply the bug memory lesson after verification.
-Run OSpec Lite docs verification and explain any missing requirements.
-Generate a weekly OSpec Lite work report.
+请在当前仓库安装 ospec-lite，并用 unity-tolua-game profile 初始化 OSpec Lite。项目名用 "BuYuDaLuanDou"，bootstrap agent 用 codex。然后检查生成的 authoring pack，并告诉我还需要哪些代码证据。
 ```
 
-The agent should decide which `oslite` commands to run. Use the command reference below only when you want direct terminal control.
+如果要生成中文文档，告诉它：
 
-### Track a lightweight change
+```text
+请在当前仓库安装 ospec-lite，并用 zh-CN 文档初始化 OSpec Lite。完成后用普通语言解释生成的文件。
+```
 
-A change is a repo-local work record for one non-trivial task. It is not a git branch and not a commit. Think of it as the smallest reviewable unit of intent, plan, implementation notes, and verification that lives next to the code.
+之后继续通过告诉 agent 目标来使用 OSpec Lite：
 
-![OSpec Lite change flow](./docs/assets/ospec-lite-change-flow.svg)
+```text
+检查 OSpec Lite 状态，并刷新仓库知识层。
+为 improve-readme 创建一个 OSpec Lite change，并在工作过程中维护 change 记录。
+为 "startup ordering blocks cold boot" 创建一个 OSpec Lite bug，并在验证后 apply bug memory lesson。
+运行 OSpec Lite docs verification，并解释所有缺失要求。
+生成一份每周 OSpec Lite 工作汇报。
+```
 
-Why it helps:
+agent 应该自己判断要运行哪些 `oslite` 命令。只有在你想直接控制终端时，才需要看下面的命令参考。
 
-- gives humans and agents one shared place to capture scope before edits start
-- makes handoff and review easier because request, plan, applied work, and verification are separated
-- leaves an archived trail of why a change happened and how it was validated
-- prevents status-only handoffs because apply/verify require actual evidence
+### 跟踪一个轻量 change
 
-Use a change when the task is more than a tiny typo, especially if it:
+一个 change 是围绕单个非琐碎任务的仓库内工作记录。它不是 git branch，也不是 commit。你可以把它理解成“最小可审阅工作单元”：把需求、计划、实际改动和验证记录放在代码旁边。
 
-- touches multiple files
-- changes behavior, interfaces, rules, or architecture
-- needs explicit review notes or verification steps
-- may outlive one chat session or one coding pass
+![OSpec Lite change 流程](./docs/assets/ospec-lite-change-flow-zh-cn.svg)
 
-What `oslite change new <slug> .` creates:
+它的价值主要在于：
+
+- 让人和 agent 在动手前先对范围达成一致
+- 把需求、计划、实施、验证拆开记录，方便交接和 review
+- 在归档后保留“为什么改、怎么改、怎么验”的历史线索
+
+什么时候值得开一个 change：
+
+- 会改多个文件
+- 会改变行为、接口、规则或架构认知
+- 需要明确的 review 说明或验证步骤
+- 这项工作可能跨多个会话、多个提交，甚至需要中途交接
+
+`oslite change new <slug> .` 会创建：
 
 ```text
 .oslite/changes/active/<slug>/
@@ -86,45 +91,45 @@ What `oslite change new <slug> .` creates:
   verify.md
 ```
 
-File roles:
+各文件职责：
 
-- `request.md`: what was asked for, intended scope, and acceptance notes
-- `plan.md`: intended approach, expected files, and risks before editing
-- `apply.md`: what actually changed and where implementation deviated from plan
-- `verify.md`: commands, results, manual validation, and remaining risks
-- `change.json`: machine-readable status and metadata
+- `request.md`：记录用户请求、范围和验收说明
+- `plan.md`：记录动手前的实现思路、预计影响文件和风险
+- `apply.md`：记录实际改了什么，以及和计划不一致的地方
+- `verify.md`：记录执行过的命令、结果、人工验证和剩余风险
+- `change.json`：机器可读的状态和元数据
 
-Ask your agent to create and maintain the change record while it works:
+告诉你的 agent：
 
 ```text
-Create an OSpec Lite change for improve-readme. Fill the request and plan before editing, keep the affected files list accurate, record what changed in apply.md, run verification, then mark the change verified when the evidence is real.
+请为 improve-readme 创建一个 OSpec Lite change，并在工作过程中维护 request、plan、apply 和 verify 记录。
 ```
 
-Typical agent flow:
+推荐的 agent 流程：
 
-1. Create the change folder.
-2. Write `request.md` and `plan.md` before broad edits.
-3. Fill `change.json.affects` before marking the change applied.
-4. Implement the change.
-5. Record the real work in `apply.md`, then mark it applied.
-6. Record real commands and results in `verify.md`, then mark it verified.
-7. Archive it once the work is done and verified.
+1. 先创建 change 目录。
+2. 在大改之前先写 `request.md` 和 `plan.md`。
+3. 在标记为 applied 之前先补齐 `change.json.affects`。
+4. 再开始实现。
+5. 实现完成后补 `apply.md`，再标记为 applied。
+6. 验证时在 `verify.md` 里写明真实命令和结果，再标记为 verified。
+7. 确认完成后再归档。
 
-The agent will use `oslite change new`, `oslite change apply`, `oslite change verify`, and `oslite change archive` as the record moves from request to verified work.
+agent 会在记录从需求推进到已验证工作的过程中使用 `oslite change new`、`oslite change apply`、`oslite change verify` 和 `oslite change archive`。
 
-### Track and apply a bug fix
+### 跟踪并应用一个 bug 修复
 
-A bug item is the defect-oriented sibling of a change. It is where the team records the symptom, investigation, fix, validation, and the lessons that should prevent the same wrong assumption next time.
+bug item 可以理解成 defect 版本的 change：它用来把症状、排查、修复、验证，以及“这次为什么会想错”都放在一个地方。
 
-![OSpec Lite bug flow](./docs/assets/ospec-lite-bug-flow.svg)
+![OSpec Lite bug 流程](./docs/assets/ospec-lite-bug-flow-zh-cn.svg)
 
-Why it helps:
+它的价值主要在于：
 
-- keeps one defect focused in one shared active bug section from report through applied fix
-- requires the agent to write down the mistaken assumption and the actual code logic
-- appends reusable reminders into `.oslite/docs/project/bug-memory.md` and its linked segment files
+- 让一个缺陷从报告到修复落地都留在同一个共享 active bug section 里
+- 强制把错误假设和真实代码逻辑写清楚
+- 在 `.oslite/docs/project/bug-memory.md` 及其关联 segment 文件里积累以后能复用的提醒
 
-What `oslite bug new "<title>" .` creates:
+`oslite bug new "<title>" .` 会创建：
 
 ```text
 .oslite/bugs/active-bugs.md
@@ -132,24 +137,24 @@ What `oslite bug new "<title>" .` creates:
 .oslite/docs/project/bug-memory/memory-0001.md
 ```
 
-Ask your agent:
+告诉你的 agent：
 
 ```text
-Create an OSpec Lite bug for "startup ordering blocks cold boot". Record the symptom, reproduction, investigation, root cause, fix, verification, and the lesson we should remember before applying the bug memory update.
+请为 "startup ordering blocks cold boot" 创建一个 OSpec Lite bug，记录症状、复现、根因、修复、验证和应该沉淀的 bug memory lesson。
 ```
 
-Typical agent flow:
+推荐的 agent 流程：
 
-1. Create the bug item and fill the new `bug-####` section in `.oslite/bugs/active-bugs.md`.
-2. Record the symptom, reproduction, investigation, and root cause in that active bug section.
-3. Implement the fix and replace `Fix Summary`, `File`, and `Reason` with real details.
-4. Run `oslite bug fix <bug-id>` once the implementation is complete.
-5. Add real verification evidence plus cognitive-gap notes, including a concrete `Check First` repo path.
-6. Run `oslite bug apply <bug-id>` to persist the lesson in bug memory, remove the bug from the active queue, and compact stale knowledge when needed.
+1. 先创建 bug item，并在 `.oslite/bugs/active-bugs.md` 里填写新的 `bug-####` section。
+2. 在这个 active bug section 里补齐症状、复现、排查证据和根因。
+3. 完成修复后，把 `Fix Summary`、`File`、`Reason` 改成真实内容。
+4. 运行 `oslite bug fix <bug-id>` 标记修复已完成。
+5. 再补上真实验证证据，以及包含具体 `Check First` 路径的认知缺口记录。
+6. 运行 `oslite bug apply <bug-id>`，把经验沉淀进 bug memory、把条目移出 active queue，并在需要时 compact 失效知识。
 
-## What It Creates
+## 会生成什么
 
-`oslite init` is a one-time bootstrap. On a fresh repository, generic init creates:
+`oslite init` 是一次性 bootstrap。对一个全新的仓库执行通用初始化时，会生成：
 
 ```text
 .oslite/
@@ -179,7 +184,7 @@ AGENTS.md
 CLAUDE.md
 ```
 
-When a profile is selected, it can also add:
+如果选择了 profile，还可能额外生成：
 
 ```text
 .oslite/docs/agents/authoring/*
@@ -187,80 +192,74 @@ When a profile is selected, it can also add:
 .claude/commands/oslite-fill-project-docs.md
 ```
 
-If the repo is already initialized, `oslite init` reports the current state and exits instead of rewriting the knowledge layer.
-Use `oslite refresh` later to rescan the repo, rewrite only machine-managed artifacts, and report human-owned docs whose generated suggestions have drifted.
+如果仓库已经初始化过，`oslite init` 会报告当前状态并直接退出，而不会重写已有知识层。
+如果仓库后续发生了结构变化，可以运行 `oslite refresh`：它会重新扫描仓库，只更新 machine-managed 产物，并提示哪些 human-owned 文档需要人工复核。
 
-## Typical Profile Workflow
+## 典型 Profile 工作流
 
-Give the agent the profile, project name, and bootstrap target first. Then ask it to work in this order:
+告诉你的 agent profile、项目名和 bootstrap agent，然后让它：
 
-1. Initialize with the right profile.
-2. Inspect the generated authoring pack before writing final docs.
-3. Fill `.oslite/docs/agents/authoring/evidence-map.md` with concrete repository evidence before the final docs.
-4. Complete `AGENTS.md`, `CLAUDE.md`, `.oslite/docs/project/*`, and `.oslite/docs/agents/*`.
-5. Finish by running docs verification and explaining any remaining gaps.
+1. 用正确的 profile 初始化仓库。
+2. 先检查生成的 authoring pack，再写最终文档。
+3. 先用具体代码证据填写 `.oslite/docs/agents/authoring/evidence-map.md`。
+4. 完成 `AGENTS.md`、`CLAUDE.md`、`.oslite/docs/project/*` 与 `.oslite/docs/agents/*`。
+5. 最后运行 docs verification，并解释是否还有缺口。
 
 ## Profiles
 
-| Profile | Target repository | Required repo anchors | Output language |
+| Profile | 目标仓库 | 必需仓库锚点 | 输出语言 |
 | --- | --- | --- | --- |
-| `unity-tolua-game` | Unity + ToLua sub-game repos | `Script/MJGame.lua` | `zh-CN` |
-| `unity-tolua-hall` | Unity + ToLua hall / lobby repos | `Assets/_GameCenter/...` startup files | `zh-CN` |
+| `unity-tolua-game` | Unity + ToLua 子游戏仓库 | `Script/MJGame.lua` | `zh-CN` |
+| `unity-tolua-hall` | Unity + ToLua 大厅 / Lobby 仓库 | `Assets/_GameCenter/...` 启动链路文件 | `zh-CN` |
 
-Both shipped profiles:
+当前内置的两个 profile 都：
 
-- are content-only asset packs, not executable plugins
-- add `.oslite/docs/agents/authoring/*`
-- can generate repo-local Codex and Claude Code wrappers
-- require `projectName` and `bootstrapAgent` during init
+- 是纯内容型 asset pack，不是可执行插件
+- 会追加 `.oslite/docs/agents/authoring/*`
+- 可以生成仓库本地的 Codex 与 Claude Code wrapper
+- 在 init 时要求 `projectName` 和 `bootstrapAgent`
 
-Profile docs:
+Profile 文档：
 
 - [profiles/README.md](./profiles/README.md)
 - [profiles/unity-tolua-game/README.md](./profiles/unity-tolua-game/README.md)
 - [profiles/unity-tolua-hall/README.md](./profiles/unity-tolua-hall/README.md)
 
-## Codex Plugins
+## Codex 插件
 
-This repository now ships repo-local Codex companion plugins under [`plugins/`](./plugins).
+本仓库现在自带一组 repo-local 的 Codex companion plugins，位于 [`plugins/`](./plugins)。
 
-- Core workflow plugin: [`plugins/ospec-lite-codex/`](./plugins/ospec-lite-codex)
-- Repo marketplace entry: [`.agents/plugins/marketplace.json`](./.agents/plugins/marketplace.json)
-- Primary `ospec-lite` skill: `$ospec-lite-workflow`
+- 核心工作流插件：[`plugins/ospec-lite-codex/`](./plugins/ospec-lite-codex)
+- 仓库 marketplace：[`.agents/plugins/marketplace.json`](./.agents/plugins/marketplace.json)
+- 主技能：`$ospec-lite-workflow`
 
-Open this repository in Codex and let it discover the repo-local marketplace. The plugin does not replace `oslite`; it teaches Codex when to use the CLI and how to follow profile-backed OSpec Lite workflows consistently.
+在 Codex 中打开本仓库后，让它读取 repo-local marketplace。这个插件不会替代 `oslite` CLI；它的作用是教 Codex 何时调用 CLI，以及怎样稳定地遵循 profile 驱动的 OSpec Lite 工作流。
 
-Example prompts:
+示例提示词：
 
-- `Initialize this repo with OSpec Lite.`
-- `Check OSpec Lite status and explain the missing markers.`
-- `Continue the profile docs and run oslite docs verify.`
-- `Create an OSpec Lite change for add-login-flow.`
-- `Set up a weekly OSpec Lite report automation for this repo.`
+- `用 OSpec Lite 初始化这个仓库。`
+- `检查 OSpec Lite 状态，并解释缺失的 markers。`
+- `继续补 profile 文档，并运行 oslite docs verify。`
+- `为 add-login-flow 创建一个 OSpec Lite change。`
+- `为这个仓库设置一个每周 OSpec Lite 汇报 automation。`
 
-## Plugins
+## Plugins 模块
 
-`oslite plugins` manages repo-local Codex companion plugins as assets, not as an execution runtime. It keeps `plugins/<name>/` and `.agents/plugins/marketplace.json` in sync so a repository can ship discoverable local plugins without hand-editing manifests every time.
+`oslite plugins` 管理的是 repo-local Codex companion plugin 资产，不是可执行插件运行时。它负责维护 `plugins/<name>/` 与 `.agents/plugins/marketplace.json`，让仓库可以稳定地携带本地插件，而不是每次都手改 manifest 和 marketplace。
 
-Bundled starter plugins:
+当前内置的 starter plugins：
 
-- `ospec-lite-codex`: the OSpec Lite workflow companion plugin
+- `ospec-lite-codex`：OSpec Lite 工作流 companion plugin
 
-Ask your agent:
-
-```text
-List the repo-local OSpec Lite plugins, install the bundled defaults if they are missing, and explain what changed in plugins/ and .agents/plugins/marketplace.json.
-```
-
-For a custom plugin:
+告诉你的 agent：
 
 ```text
-Create a repo-local OSpec Lite companion plugin named my-plugin with skills and hooks enabled. Keep the marketplace entry in sync and summarize the generated files.
+请列出当前仓库的 OSpec Lite repo-local plugins。如果缺少内置 defaults，请安装它们，并解释 plugins/ 和 .agents/plugins/marketplace.json 发生了什么变化。
 ```
 
-## Command Reference
+## 命令参考
 
-These are the raw CLI commands your agent may run while following the workflows above. They are useful for automation, debugging, and maintainers who prefer direct terminal control.
+下面是上述工作流背后可能用到的原始 CLI 命令。它们适合 automation、debug，以及偏好直接控制终端的维护者。
 
 ```text
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
@@ -281,11 +280,11 @@ oslite change verify <change-path>
 oslite change archive <change-path>
 ```
 
-## Docs
+## 文档
 
 - [docs/ospec-lite-v1-core-spec.md](./docs/ospec-lite-v1-core-spec.md)
 
-## Development
+## 开发
 
 ```sh
 npm install
