@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="980" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
+  <title id="title">OSpec Lite bug 流程</title>
+  <desc id="desc">面向用户的流程图，展示编码 agent 如何使用 OSpec Lite bug 工作流记录缺陷、修复、验证，并把经验沉淀进 bug memory。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#475569" />
+    </marker>
+    <filter id="shadow" x="-8%" y="-12%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { fill: #0f172a; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 32px; font-weight: 700; }
+      .subtitle { fill: #475569; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 17px; font-weight: 400; }
+      .prompt { fill: #ecfdf5; stroke: #047857; stroke-width: 2.5; filter: url(#shadow); }
+      .agent { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.5; filter: url(#shadow); }
+      .decision { fill: #fff7ed; stroke: #ea580c; stroke-width: 2.5; filter: url(#shadow); }
+      .bug { fill: #fef2f2; stroke: #dc2626; stroke-width: 2.5; filter: url(#shadow); }
+      .memory { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 2.5; filter: url(#shadow); }
+      .result { fill: #f0fdfa; stroke: #0f766e; stroke-width: 2.5; filter: url(#shadow); }
+      .label { fill: #0f172a; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 17px; font-weight: 700; }
+      .body { fill: #334155; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 14.5px; font-weight: 400; }
+      .edge { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .loop { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); stroke-dasharray: 7 6; }
+      .tag { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; }
+      .tagText { fill: #475569; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 13px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1280" height="980" rx="28" />
+  <text class="title" x="56" y="58">使用 OSpec Lite Bug</text>
+  <text class="subtitle" x="56" y="90">报告哪里出问题；agent 会记录缺陷、修复并验证，再把经验沉淀进 bug memory。</text>
+
+  <rect class="prompt" x="56" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="84" y="187">说出哪里坏了</text>
+  <text class="body" x="84" y="215">用自然语言</text>
+  <text class="body" x="84" y="237">描述症状。</text>
+
+  <rect class="agent" x="330" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="358" y="187">Agent 检查状态</text>
+  <text class="body" x="358" y="215">读取 OSpec Lite 状态</text>
+  <text class="body" x="358" y="237">和仓库上下文。</text>
+
+  <polygon class="decision" points="720,128 850,198 720,268 590,198" />
+  <text class="label" x="690" y="193">这是</text>
+  <text class="label" x="690" y="216">缺陷？</text>
+
+  <rect class="agent" x="960" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="988" y="187">走其他路径</text>
+  <text class="body" x="988" y="215">作为普通任务</text>
+  <text class="body" x="988" y="237">或问题处理。</text>
+
+  <rect class="bug" x="56" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="84" y="393">创建 bug item</text>
+  <text class="body" x="84" y="421">打开一个聚焦的</text>
+  <text class="body" x="84" y="443">active bug section。</text>
+
+  <rect class="bug" x="346" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="374" y="393">记录证据</text>
+  <text class="body" x="374" y="421">记录症状、复现</text>
+  <text class="body" x="374" y="443">和排查过程。</text>
+
+  <rect class="bug" x="636" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="664" y="393">定位根因</text>
+  <text class="body" x="664" y="421">写清楚错误假设</text>
+  <text class="body" x="664" y="443">和真实逻辑。</text>
+
+  <rect class="agent" x="926" y="356" width="270" height="100" rx="18" />
+  <text class="label" x="954" y="393">实施修复</text>
+  <text class="body" x="954" y="421">在真实源头修改</text>
+  <text class="body" x="954" y="443">代码或文档。</text>
+
+  <rect class="agent" x="56" y="600" width="238" height="100" rx="18" />
+  <text class="label" x="84" y="637">记录修复笔记</text>
+  <text class="body" x="84" y="665">列出文件、摘要</text>
+  <text class="body" x="84" y="687">和原因。</text>
+
+  <rect class="agent" x="346" y="600" width="238" height="100" rx="18" />
+  <text class="label" x="374" y="637">用证据验证</text>
+  <text class="body" x="374" y="665">运行检查并保存</text>
+  <text class="body" x="374" y="687">真实结果。</text>
+
+  <polygon class="decision" points="755,580 875,650 755,720 635,650" />
+  <text class="label" x="719" y="645">验证通过？</text>
+
+  <rect class="memory" x="960" y="600" width="230" height="100" rx="18" />
+  <text class="label" x="988" y="637">沉淀经验</text>
+  <text class="body" x="988" y="665">把 check-first 经验</text>
+  <text class="body" x="988" y="687">写入 bug memory。</text>
+
+  <rect class="agent" x="594" y="798" width="270" height="90" rx="18" />
+  <text class="label" x="626" y="833">清理 active queue</text>
+  <text class="body" x="626" y="861">从 active work 中移除已修 bug。</text>
+
+  <rect class="result" x="910" y="798" width="300" height="90" rx="18" />
+  <text class="label" x="942" y="833">复核交接</text>
+  <text class="body" x="942" y="861">根因、修复、检查、经验和风险。</text>
+
+  <path class="edge" d="M286 198 L330 198" />
+  <path class="edge" d="M560 198 L590 198" />
+  <path class="edge" d="M850 198 L960 198" />
+  <path class="edge" d="M720 268 C720 318 175 310 175 356" />
+  <path class="edge" d="M294 406 L346 406" />
+  <path class="edge" d="M584 406 L636 406" />
+  <path class="edge" d="M874 406 L926 406" />
+  <path class="edge" d="M1061 456 C1061 540 175 520 175 600" />
+  <path class="edge" d="M294 650 L346 650" />
+  <path class="edge" d="M584 650 L635 650" />
+  <path class="loop" d="M755 580 C755 535 1000 525 1061 456" />
+  <path class="edge" d="M875 650 L960 650" />
+  <path class="edge" d="M1075 700 C1075 774 864 760 729 798" />
+  <path class="edge" d="M864 843 L910 843" />
+  <path class="edge" d="M1190 198 L1232 198 L1232 843 L1210 843" />
+
+  <rect class="tag" x="858" y="168" width="40" height="24" rx="12" />
+  <text class="tagText" x="872" y="185">否</text>
+  <rect class="tag" x="386" y="304" width="46" height="24" rx="12" />
+  <text class="tagText" x="402" y="321">是</text>
+  <rect class="tag" x="884" y="548" width="40" height="24" rx="12" />
+  <text class="tagText" x="898" y="565">否</text>
+  <rect class="tag" x="902" y="620" width="46" height="24" rx="12" />
+  <text class="tagText" x="918" y="637">是</text>
+</svg>

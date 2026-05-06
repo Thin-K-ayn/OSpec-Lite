@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+  <title id="title">OSpec Lite change 流程</title>
+  <desc id="desc">面向用户的流程图，展示编码 agent 如何为非琐碎任务使用 OSpec Lite change 记录，包括计划、实施、验证和归档。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#475569" />
+    </marker>
+    <filter id="shadow" x="-8%" y="-12%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { fill: #0f172a; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 32px; font-weight: 700; }
+      .subtitle { fill: #475569; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 17px; font-weight: 400; }
+      .prompt { fill: #ecfdf5; stroke: #047857; stroke-width: 2.5; filter: url(#shadow); }
+      .agent { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.5; filter: url(#shadow); }
+      .decision { fill: #fff7ed; stroke: #ea580c; stroke-width: 2.5; filter: url(#shadow); }
+      .record { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 2.5; filter: url(#shadow); }
+      .result { fill: #f0fdfa; stroke: #0f766e; stroke-width: 2.5; filter: url(#shadow); }
+      .label { fill: #0f172a; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 17px; font-weight: 700; }
+      .body { fill: #334155; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 14.5px; font-weight: 400; }
+      .edge { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .loop { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); stroke-dasharray: 7 6; }
+      .tag { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; }
+      .tagText { fill: #475569; font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif; font-size: 13px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1280" height="900" rx="28" />
+  <text class="title" x="56" y="58">使用 OSpec Lite Change</text>
+  <text class="subtitle" x="56" y="90">提出一个非琐碎改动；agent 会把需求、计划、实施记录和验证证据保存在代码旁边。</text>
+
+  <rect class="prompt" x="56" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="84" y="187">说出要改什么</text>
+  <text class="body" x="84" y="215">用自然语言</text>
+  <text class="body" x="84" y="237">描述目标。</text>
+
+  <rect class="agent" x="330" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="358" y="187">Agent 检查状态</text>
+  <text class="body" x="358" y="215">读取 OSpec Lite 状态</text>
+  <text class="body" x="358" y="237">和仓库上下文。</text>
+
+  <polygon class="decision" points="720,128 850,198 720,268 590,198" />
+  <text class="label" x="681" y="193">非琐碎</text>
+  <text class="label" x="698" y="216">工作？</text>
+
+  <rect class="agent" x="960" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="988" y="187">小改动直接处理</text>
+  <text class="body" x="988" y="215">微小安全改动</text>
+  <text class="body" x="988" y="237">无需创建记录。</text>
+
+  <rect class="record" x="56" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="84" y="393">创建 change 记录</text>
+  <text class="body" x="84" y="421">打开仓库内</text>
+  <text class="body" x="84" y="443">工作目录。</text>
+
+  <rect class="record" x="346" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="374" y="393">记录请求</text>
+  <text class="body" x="374" y="421">写明范围、验收、</text>
+  <text class="body" x="374" y="443">计划和风险。</text>
+
+  <rect class="agent" x="636" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="664" y="393">实施改动</text>
+  <text class="body" x="664" y="421">按约定范围修改</text>
+  <text class="body" x="664" y="443">代码或文档。</text>
+
+  <rect class="agent" x="926" y="356" width="270" height="100" rx="18" />
+  <text class="label" x="954" y="393">记录 apply 笔记</text>
+  <text class="body" x="954" y="421">列出影响文件和</text>
+  <text class="body" x="954" y="443">实际改动。</text>
+
+  <rect class="agent" x="346" y="590" width="238" height="100" rx="18" />
+  <text class="label" x="374" y="627">用证据验证</text>
+  <text class="body" x="374" y="655">运行检查并保存</text>
+  <text class="body" x="374" y="677">真实结果。</text>
+
+  <polygon class="decision" points="755,570 875,640 755,710 635,640" />
+  <text class="label" x="719" y="635">验证通过？</text>
+
+  <rect class="record" x="960" y="590" width="230" height="100" rx="18" />
+  <text class="label" x="988" y="627">归档 change</text>
+  <text class="body" x="988" y="655">保留完成后的</text>
+  <text class="body" x="988" y="677">证据链。</text>
+
+  <rect class="result" x="880" y="762" width="300" height="80" rx="18" />
+  <text class="label" x="912" y="799">复核交接</text>
+  <text class="body" x="912" y="821">范围、文件、检查和风险。</text>
+
+  <path class="edge" d="M286 198 L330 198" />
+  <path class="edge" d="M560 198 L590 198" />
+  <path class="edge" d="M850 198 L960 198" />
+  <path class="edge" d="M720 268 C720 315 175 310 175 356" />
+  <path class="edge" d="M294 406 L346 406" />
+  <path class="edge" d="M584 406 L636 406" />
+  <path class="edge" d="M874 406 L926 406" />
+  <path class="edge" d="M1061 456 C1061 536 465 520 465 590" />
+  <path class="edge" d="M584 640 L635 640" />
+  <path class="loop" d="M755 570 C755 525 755 505 755 456" />
+  <path class="edge" d="M875 640 L960 640" />
+  <path class="edge" d="M1075 690 L1075 762" />
+  <path class="edge" d="M1190 198 L1232 198 L1232 802 L1180 802" />
+
+  <rect class="tag" x="858" y="168" width="40" height="24" rx="12" />
+  <text class="tagText" x="872" y="185">否</text>
+  <rect class="tag" x="386" y="304" width="46" height="24" rx="12" />
+  <text class="tagText" x="402" y="321">是</text>
+  <rect class="tag" x="766" y="520" width="40" height="24" rx="12" />
+  <text class="tagText" x="780" y="537">否</text>
+  <rect class="tag" x="902" y="610" width="46" height="24" rx="12" />
+  <text class="tagText" x="918" y="627">是</text>
+</svg>

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+  <title id="title">OSpec Lite change flow</title>
+  <desc id="desc">A user-facing flowchart showing how a coding agent uses an OSpec Lite change record for non-trivial work, including planning, implementation, verification, and archival.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#475569" />
+    </marker>
+    <filter id="shadow" x="-8%" y="-12%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10" />
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { fill: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 32px; font-weight: 700; }
+      .subtitle { fill: #475569; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 400; }
+      .prompt { fill: #ecfdf5; stroke: #047857; stroke-width: 2.5; filter: url(#shadow); }
+      .agent { fill: #eff6ff; stroke: #2563eb; stroke-width: 2.5; filter: url(#shadow); }
+      .decision { fill: #fff7ed; stroke: #ea580c; stroke-width: 2.5; filter: url(#shadow); }
+      .record { fill: #f5f3ff; stroke: #7c3aed; stroke-width: 2.5; filter: url(#shadow); }
+      .result { fill: #f0fdfa; stroke: #0f766e; stroke-width: 2.5; filter: url(#shadow); }
+      .label { fill: #0f172a; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 700; }
+      .body { fill: #334155; font-family: Arial, Helvetica, sans-serif; font-size: 14.5px; font-weight: 400; }
+      .edge { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .loop { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); stroke-dasharray: 7 6; }
+      .tag { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1; }
+      .tagText { fill: #475569; font-family: Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1280" height="900" rx="28" />
+  <text class="title" x="56" y="58">Use an OSpec Lite Change</text>
+  <text class="subtitle" x="56" y="90">Ask for a non-trivial change. The agent keeps request, plan, implementation notes, and verification beside the code.</text>
+
+  <rect class="prompt" x="56" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="84" y="187">Say what to change</text>
+  <text class="body" x="84" y="215">Describe the outcome</text>
+  <text class="body" x="84" y="237">in plain language.</text>
+
+  <rect class="agent" x="330" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="358" y="187">Agent checks state</text>
+  <text class="body" x="358" y="215">Reads OSpec Lite status</text>
+  <text class="body" x="358" y="237">and repo context.</text>
+
+  <polygon class="decision" points="720,128 850,198 720,268 590,198" />
+  <text class="label" x="674" y="193">Non-trivial</text>
+  <text class="label" x="693" y="216">work?</text>
+
+  <rect class="agent" x="960" y="150" width="230" height="96" rx="18" />
+  <text class="label" x="988" y="187">Small direct edit</text>
+  <text class="body" x="988" y="215">Skip the record for</text>
+  <text class="body" x="988" y="237">tiny safe changes.</text>
+
+  <rect class="record" x="56" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="84" y="393">Create change record</text>
+  <text class="body" x="84" y="421">Open the repo-local</text>
+  <text class="body" x="84" y="443">work folder.</text>
+
+  <rect class="record" x="346" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="374" y="393">Capture request</text>
+  <text class="body" x="374" y="421">Write scope, acceptance,</text>
+  <text class="body" x="374" y="443">plan, and risks.</text>
+
+  <rect class="agent" x="636" y="356" width="238" height="100" rx="18" />
+  <text class="label" x="664" y="393">Implement change</text>
+  <text class="body" x="664" y="421">Edit code or docs using</text>
+  <text class="body" x="664" y="443">the agreed scope.</text>
+
+  <rect class="agent" x="926" y="356" width="270" height="100" rx="18" />
+  <text class="label" x="954" y="393">Record apply notes</text>
+  <text class="body" x="954" y="421">List affected files and</text>
+  <text class="body" x="954" y="443">what actually changed.</text>
+
+  <rect class="agent" x="346" y="590" width="238" height="100" rx="18" />
+  <text class="label" x="374" y="627">Verify with evidence</text>
+  <text class="body" x="374" y="655">Run checks and save</text>
+  <text class="body" x="374" y="677">real results.</text>
+
+  <polygon class="decision" points="755,570 875,640 755,710 635,640" />
+  <text class="label" x="719" y="635">Verified?</text>
+
+  <rect class="record" x="960" y="590" width="230" height="100" rx="18" />
+  <text class="label" x="988" y="627">Archive change</text>
+  <text class="body" x="988" y="655">Keep the completed</text>
+  <text class="body" x="988" y="677">evidence trail.</text>
+
+  <rect class="result" x="880" y="762" width="300" height="80" rx="18" />
+  <text class="label" x="912" y="799">Review the handoff</text>
+  <text class="body" x="912" y="821">Scope, files, checks, and risks.</text>
+
+  <path class="edge" d="M286 198 L330 198" />
+  <path class="edge" d="M560 198 L590 198" />
+  <path class="edge" d="M850 198 L960 198" />
+  <path class="edge" d="M720 268 C720 315 175 310 175 356" />
+  <path class="edge" d="M294 406 L346 406" />
+  <path class="edge" d="M584 406 L636 406" />
+  <path class="edge" d="M874 406 L926 406" />
+  <path class="edge" d="M1061 456 C1061 536 465 520 465 590" />
+  <path class="edge" d="M584 640 L635 640" />
+  <path class="loop" d="M755 570 C755 525 755 505 755 456" />
+  <path class="edge" d="M875 640 L960 640" />
+  <path class="edge" d="M1075 690 L1075 762" />
+  <path class="edge" d="M1190 198 L1232 198 L1232 802 L1180 802" />
+
+  <rect class="tag" x="858" y="168" width="40" height="24" rx="12" />
+  <text class="tagText" x="871" y="185">No</text>
+  <rect class="tag" x="386" y="304" width="46" height="24" rx="12" />
+  <text class="tagText" x="400" y="321">Yes</text>
+  <rect class="tag" x="766" y="520" width="40" height="24" rx="12" />
+  <text class="tagText" x="779" y="537">No</text>
+  <rect class="tag" x="902" y="610" width="46" height="24" rx="12" />
+  <text class="tagText" x="916" y="627">Yes</text>
+</svg>

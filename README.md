@@ -30,6 +30,8 @@ Start using `oslite` by telling your coding agent, Codex or Claude Code, to inst
 Install ospec-lite in this repository, initialize OSpec Lite, inspect the generated files, and tell me what I should review.
 ```
 
+![OSpec Lite initialization flow](./docs/assets/ospec-lite-initialization-flow.svg)
+
 OSpec Lite also includes built-in profiles tailored for specific project structures and frameworks. If your repository matches one of these profiles, tell your agent to use it during initialization:
 
 - [`unity-tolua-game`](./profiles/unity-tolua-game/README.md): Unity + ToLua sub-game repositories with `Script/MJGame.lua`
@@ -56,6 +58,8 @@ The agent should decide which `oslite` commands to run. Use the command referenc
 ### Track a lightweight change
 
 A change is a repo-local work record for one non-trivial task. It is not a git branch and not a commit. Think of it as the smallest reviewable unit of intent, plan, implementation notes, and verification that lives next to the code.
+
+![OSpec Lite change flow](./docs/assets/ospec-lite-change-flow.svg)
 
 Why it helps:
 
@@ -111,6 +115,8 @@ The agent will use `oslite change new`, `oslite change apply`, `oslite change ve
 ### Track and apply a bug fix
 
 A bug item is the defect-oriented sibling of a change. It is where the team records the symptom, investigation, fix, validation, and the lessons that should prevent the same wrong assumption next time.
+
+![OSpec Lite bug flow](./docs/assets/ospec-lite-bug-flow.svg)
 
 Why it helps:
 
