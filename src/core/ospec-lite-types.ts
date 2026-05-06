@@ -273,6 +273,44 @@ export interface OSpecLiteWorkReport {
   baselineInitializedDocs: string[];
 }
 
+export interface ReportArtifact {
+  rootDir: string;
+  cadence: ReportCadence;
+  period: string;
+  generatedAt: string;
+  artifactPath: string;
+  dataPath: string;
+}
+
+export interface ReportAutomationSchedule {
+  version: 1;
+  cadence: ReportCadence;
+  artifactRoot: string;
+  createdAt: string;
+  updatedAt: string;
+  nextRunAt: string;
+  lastGeneratedAt?: string;
+  lastGeneratedPeriod?: string;
+  lastArtifactPath?: string;
+  lastDataPath?: string;
+}
+
+export interface ReportAutomationScheduleResult {
+  rootDir: string;
+  schedulePath: string;
+  schedule: ReportAutomationSchedule;
+}
+
+export interface ReportAutomationRunResult {
+  rootDir: string;
+  schedulePath: string;
+  schedule: ReportAutomationSchedule;
+  generated: boolean;
+  due: boolean;
+  reason?: string;
+  artifact?: ReportArtifact;
+}
+
 export interface OSpecLiteProfileAsset {
   source: string;
   target: string;

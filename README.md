@@ -19,7 +19,7 @@ V1 intentionally keeps the surface area small: one-time bootstrap, non-destructi
 - Tracks lightweight changes in `.oslite/changes/active/*` and archives them when verified.
 - Tracks active bugs in `.oslite/bugs/active-bugs.md`, persists reusable lessons into rotating bug-memory files, and compacts stale knowledge when the memory grows too large.
 - Verifies profile-driven documentation deterministically with `oslite docs verify`.
-- Generates non-destructive daily or weekly work reports with `oslite report`.
+- Generates non-destructive daily or weekly work reports with `oslite report`, and can emit recurring artifacts under `.oslite/reports/`.
 - Ships repo-local Codex companion plugins and a plugin module for scaffolding or installing more.
 
 ## Quick Start
@@ -51,6 +51,7 @@ Create an OSpec Lite change for improve-readme and keep the change record update
 Create an OSpec Lite bug for "startup ordering blocks cold boot" and apply the bug memory lesson after verification.
 Run OSpec Lite docs verification and explain any missing requirements.
 Generate a weekly OSpec Lite work report.
+Set up a weekly OSpec Lite report automation for this repo.
 ```
 
 The agent should decide which `oslite` commands to run. Use the command reference below only when you want direct terminal control.
@@ -262,11 +263,16 @@ Create a repo-local OSpec Lite companion plugin named my-plugin with skills and 
 
 These are the raw CLI commands your agent may run while following the workflows above. They are useful for automation, debugging, and maintainers who prefer direct terminal control.
 
+Report automation is repo-local: `oslite report schedule` writes `.oslite/reports/schedule.json`, and a cron job, CI task, or agent automation can call `oslite report run` repeatedly. Each due run writes markdown plus JSON artifacts under `.oslite/reports/<cadence>/`; daily periods use UTC dates and weekly periods use ISO week keys.
+
 ```text
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
 oslite status [path]
 oslite refresh [path]
 oslite report [path] [--cadence daily|weekly]
+oslite report write [path] [--cadence daily|weekly]
+oslite report schedule [path] [--cadence daily|weekly]
+oslite report run [path] [--force]
 oslite bug new <title> [path]
 oslite bug fix <bug-id> [path]
 oslite bug apply <bug-id> [path]
