@@ -29,6 +29,11 @@
 - 改打包内运行时 C# 前先征求用户明确许可；Editor-only 脚本是主要例外。
 - 只要改动触及真钱支付、订单、票据校验、出入款、收银台、渠道计费，就先与用户二次确认。
 
+## 工作汇报
+- `oslite report . --cadence daily|weekly`：在终端生成当前 OSpec Lite 工作摘要。
+- `oslite report write . --cadence daily|weekly`：在 `.oslite/reports/<cadence>/` 下写入 Markdown 和 JSON report artifacts。
+- `oslite report schedule . --cadence daily|weekly`：写入仓库本地 report schedule；之后让 cron、CI 或 agent automation 反复执行 `oslite report run .`。
+
 ## 不要浪费时间的区域
 - `Assets/Editor/`
 - `Assets/_GameWrap/Generate/`

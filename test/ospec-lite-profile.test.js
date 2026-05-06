@@ -44,6 +44,12 @@ test("profile init succeeds non-interactively when project name and bootstrap ag
   assert.match(brief, /Test Unity ToLua Repo/);
   assert.match(brief, /`none`/);
   assert.doesNotMatch(brief, /\{\{projectName\}\}/);
+  const quickstart = await fs.readFile(
+    path.join(rootDir, ".oslite", "docs", "agents", "quickstart.md"),
+    "utf8"
+  );
+  assert.match(quickstart, /工作汇报/);
+  assert.match(quickstart, /oslite report schedule \. --cadence daily\|weekly/);
 
   for (const relativePath of [
     ".oslite/docs/agents/authoring/doc-contract.md",

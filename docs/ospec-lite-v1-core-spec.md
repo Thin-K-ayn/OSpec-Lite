@@ -512,6 +512,7 @@ Required sections:
 - Read These First
 - How To Explore Safely
 - How To Choose Where Code Belongs
+- How To Report Work
 - What To Double-Check Before Editing
 
 ### `docs/agents/change-playbook.md`

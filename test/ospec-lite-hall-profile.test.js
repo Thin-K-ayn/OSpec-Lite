@@ -114,6 +114,8 @@ test("hall profile assets preserve hall-specific guidance", async () => {
   assert.match(codingRules, /二次确认/);
   assert.match(quickstart, /改打包内运行时 C# 前先征求用户明确许可/);
   assert.match(quickstart, /先与用户二次确认/);
+  assert.match(quickstart, /工作汇报/);
+  assert.match(quickstart, /oslite report run \./);
   assert.match(codexWrapper, /oslite init --profile unity-tolua-hall/);
   assert.match(codexWrapper, /--bootstrap-agent codex/);
   assert.match(codexWrapper, /"<repo-root>"/);

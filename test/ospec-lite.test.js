@@ -55,8 +55,14 @@ test("init bootstraps the repository knowledge layer", async (t) => {
   const agents = await repo.readText(path.join(rootDir, "AGENTS.md"));
   const claude = await repo.readText(path.join(rootDir, "CLAUDE.md"));
   const overview = await repo.readText(path.join(rootDir, ".oslite", "docs", "project", "overview.md"));
+  const quickstart = await repo.readText(
+    path.join(rootDir, ".oslite", "docs", "agents", "quickstart.md")
+  );
 
   assert.match(overview, /Project Overview/);
+  assert.match(quickstart, /How To Report Work/);
+  assert.match(quickstart, /oslite report write \. --cadence daily\|weekly/);
+  assert.match(quickstart, /oslite report run \./);
   assert.ok(agents.includes(AGENTS_MANAGED_START));
   assert.ok(claude.includes(CLAUDE_MANAGED_START));
   assert.ok(claude.includes("@AGENTS.md"));

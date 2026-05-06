@@ -25,6 +25,11 @@
 - 网络、资源、UI、宿主边界是否被写清楚
 - 排除目录是否被误写进核心项目文档
 
+## 工作汇报
+- `oslite report . --cadence daily|weekly`：在终端生成当前 OSpec Lite 工作摘要。
+- `oslite report write . --cadence daily|weekly`：在 `.oslite/reports/<cadence>/` 下写入 Markdown 和 JSON report artifacts。
+- `oslite report schedule . --cadence daily|weekly`：写入仓库本地 report schedule；之后让 cron、CI 或 agent automation 反复执行 `oslite report run .`。
+
 ## 不要浪费时间的区域
 - 临时目录
 - 辅助目录

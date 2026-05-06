@@ -18,6 +18,12 @@
 - Prefer local, bounded changes near the relevant entrypoint or source area.
 - Record your decision in the active change plan when placement is ambiguous.
 
+## How To Report Work
+
+- Run `oslite report . --cadence daily|weekly` for a terminal summary of current OSpec Lite work.
+- Run `oslite report write . --cadence daily|weekly` to write Markdown and JSON artifacts under `.oslite/reports/<cadence>/`.
+- Run `oslite report schedule . --cadence daily|weekly`, then have cron, CI, or an agent automation call `oslite report run .` repeatedly for recurring artifacts.
+
 ## What To Double-Check Before Editing
 
 - Relevant project rules in `{{projectDocsRoot}}/coding-rules.md`
