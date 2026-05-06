@@ -8,7 +8,7 @@ Minimal agent-first repository bootstrap for Codex and Claude Code.
 
 V1 intentionally keeps the surface area small: one-time bootstrap, non-destructive refresh, optional profiles, deterministic profile-backed doc verification, and simple repo-local change and bug tracking.
 
-[Why OSpec Lite](#why-ospec-lite) | [Quick Start](#quick-start) | [What It Creates](#what-it-creates) | [Profiles](#profiles) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Command Reference](#command-reference) | [Development](#development)
+[Why OSpec Lite](#why-ospec-lite) | [Quick Start](#quick-start) | [Work Reports](#work-reports) | [What It Creates](#what-it-creates) | [Profiles](#profiles) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Command Reference](#command-reference) | [Development](#development)
 
 ## Why OSpec Lite
 
@@ -147,6 +147,50 @@ Typical agent flow:
 4. Run `oslite bug fix <bug-id>` once the implementation is complete.
 5. Add real verification evidence plus cognitive-gap notes, including a concrete `Check First` repo path.
 6. Run `oslite bug apply <bug-id>` to persist the lesson in bug memory, remove the bug from the active queue, and compact stale knowledge when needed.
+
+## Work Reports
+
+`oslite report` summarizes the OSpec Lite state for an initialized repository without mutating change, bug, or docs state. Reports are built from:
+
+- open changes in `.oslite/changes/active/*`
+- recently archived changes
+- open bugs in `.oslite/bugs/active-bugs.md`
+- recently applied bugs
+- docs whose generated suggestions now need review
+
+Use a terminal-only report when you just want to inspect the current state:
+
+```text
+oslite report . --cadence daily
+oslite report . --cadence weekly
+```
+
+Use a one-off artifact when you want files that can be archived, attached, or reviewed later:
+
+```text
+oslite report write . --cadence weekly
+```
+
+This writes Markdown and JSON under `.oslite/reports/<cadence>/`, for example:
+
+```text
+.oslite/reports/weekly/2026-W19.md
+.oslite/reports/weekly/2026-W19.json
+```
+
+For recurring artifacts, create the repo-local schedule once:
+
+```text
+oslite report schedule . --cadence daily
+```
+
+Then have cron, CI, or an agent automation call the idempotent runner repeatedly:
+
+```text
+oslite report run .
+```
+
+The runner emits a report only when the current daily or weekly period is due. Daily periods use UTC dates, weekly periods use ISO week keys, and `--force` can intentionally overwrite the current period artifact.
 
 ## What It Creates
 
