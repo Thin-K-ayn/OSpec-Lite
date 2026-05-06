@@ -19,7 +19,7 @@ V1 刻意保持小而稳的能力边界：一次性 bootstrap、非破坏式 ref
 - 在 `.oslite/changes/active/*` 下跟踪轻量变更，并在验证完成后归档。
 - 在 `.oslite/bugs/active-bugs.md` 里跟踪活跃 bug，把可复用经验写进滚动的 bug-memory 文件，并在记忆过大时自动 compact 失效知识。
 - 通过 `oslite docs verify` 对 profile 驱动的文档进行确定性校验。
-- 通过 `oslite report` 生成非破坏式的日报或周报。
+- 通过 `oslite report` 生成非破坏式的日报或周报，并可在 `.oslite/reports/` 下持续产出 report artifacts。
 - 自带一组 repo-local 的 Codex companion plugins，并提供插件模块来继续安装或脚手架更多插件。
 
 ## 快速开始
@@ -57,6 +57,7 @@ OSpec Lite 也内置了一些针对特定项目结构和技术框架的 profiles
 为 "startup ordering blocks cold boot" 创建一个 OSpec Lite bug，并在验证后 apply bug memory lesson。
 运行 OSpec Lite docs verification，并解释所有缺失要求。
 生成一份每周 OSpec Lite 工作汇报。
+为这个仓库设置一个每周 OSpec Lite report automation。
 ```
 
 agent 应该自己判断要运行哪些 `oslite` 命令。只有在你想直接控制终端时，才需要看下面的命令参考。
@@ -261,11 +262,16 @@ Profile 文档：
 
 下面是上述工作流背后可能用到的原始 CLI 命令。它们适合 automation、debug，以及偏好直接控制终端的维护者。
 
+Report automation 是仓库本地的：`oslite report schedule` 会写入 `.oslite/reports/schedule.json`，然后 cron、CI 或 agent automation 可以反复调用 `oslite report run`。每次到期运行都会在 `.oslite/reports/<cadence>/` 下写入 Markdown 和 JSON artifacts；daily period 使用 UTC 日期，weekly period 使用 ISO week key。
+
 ```text
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
 oslite status [path]
 oslite refresh [path]
 oslite report [path] [--cadence daily|weekly]
+oslite report write [path] [--cadence daily|weekly]
+oslite report schedule [path] [--cadence daily|weekly]
+oslite report run [path] [--force]
 oslite bug new <title> [path]
 oslite bug fix <bug-id> [path]
 oslite bug apply <bug-id> [path]

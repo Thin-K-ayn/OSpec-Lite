@@ -52,9 +52,10 @@ Pick the command runner that matches the current workspace:
 ## Periodic reporting
 
 1. For a one-off daily or weekly summary, run `oslite report . --cadence daily|weekly`.
-2. Treat `oslite report` as non-destructive; do not replace it with `oslite refresh` when the user only asked for a report.
-3. Report from OSpec Lite data first: open changes, recently archived changes, open bugs, recently applied bugs, and docs needing review.
-4. If the user asks for recurring reports in Codex, prefer a thread automation that revisits this repo and runs the same `oslite report` cadence on schedule.
+2. For a one-off artifact, run `oslite report write . --cadence daily|weekly`; this writes markdown and JSON under `.oslite/reports/<cadence>/`.
+3. For recurring artifacts, run `oslite report schedule . --cadence daily|weekly`, then arrange the external scheduler or Codex automation to call `oslite report run .` repeatedly. The runner is idempotent, skips periods already emitted, and names periods by UTC day or ISO week.
+4. Treat `oslite report` as non-destructive; do not replace it with `oslite refresh` when the user only asked for a report.
+5. Report from OSpec Lite data first: open changes, recently archived changes, open bugs, recently applied bugs, and docs needing review.
 
 ## Editing guardrails
 

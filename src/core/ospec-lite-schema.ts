@@ -44,6 +44,8 @@ export const BUG_MEMORY_PATH = ".oslite/docs/project/bug-memory.md";
 export const BUG_MEMORY_DIR = ".oslite/docs/project/bug-memory";
 export const BUG_ACTIVE_BUGS_PATH = ".oslite/bugs/active-bugs.md";
 export const BUG_INDEX_PATH = ".oslite/bugs/index.json";
+export const REPORTS_ROOT = ".oslite/reports";
+export const REPORT_SCHEDULE_PATH = ".oslite/reports/schedule.json";
 
 export const DEFAULT_RULES = [
   "Preserve public interfaces unless the change explicitly allows a breaking update.",

@@ -124,6 +124,9 @@ test("cli prints help when no command is provided", () => {
   assert.match(result.stdout, /oslite status \[path]/);
   assert.match(result.stdout, /oslite refresh \[path]/);
   assert.match(result.stdout, /oslite report \[path] \[--cadence daily\|weekly]/);
+  assert.match(result.stdout, /oslite report write \[path] \[--cadence daily\|weekly]/);
+  assert.match(result.stdout, /oslite report schedule \[path] \[--cadence daily\|weekly]/);
+  assert.match(result.stdout, /oslite report run \[path] \[--force]/);
   assert.match(result.stdout, /oslite bug new <title> \[path]/);
   assert.match(result.stdout, /oslite bug fix <bug-id> \[path]/);
   assert.match(result.stdout, /oslite bug apply <bug-id> \[path]/);
@@ -988,6 +991,84 @@ test("cli report summarizes daily ospec-lite work without mutating the repo", as
   );
   assert.match(result.stdout, /Docs needing review now:/);
   assert.match(result.stdout, /\.oslite\/docs\/project\/overview\.md/);
+});
+
+test("cli report write emits markdown and json artifacts", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-report-write-");
+  await seedRepo(rootDir);
+
+  const { initService } = createServices();
+  await initService.init(rootDir, { documentLanguage: "en-US" });
+
+  const result = runCli(["report", "write", "--cadence", "weekly", rootDir]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /OSpec Lite report artifact written/);
+  assert.match(result.stdout, /Cadence: weekly/);
+  assert.match(result.stdout, /Markdown: \.oslite\/reports\/weekly\/\d{4}-W\d{2}\.md/);
+  assert.match(result.stdout, /JSON: \.oslite\/reports\/weekly\/\d{4}-W\d{2}\.json/);
+
+  const markdownPath = result.stdout.match(/Markdown: (.+)/)[1].trim();
+  const jsonPath = result.stdout.match(/JSON: (.+)/)[1].trim();
+  const markdown = await fs.readFile(path.join(rootDir, markdownPath), "utf8");
+  const json = JSON.parse(await fs.readFile(path.join(rootDir, jsonPath), "utf8"));
+
+  assert.match(markdown, /^# OSpec Lite Work Report/m);
+  assert.match(markdown, /## Open changes now \(0\)/);
+  assert.equal(json.reportWindow.cadence, "weekly");
+});
+
+test("cli report automation schedules and runs due report artifacts once per period", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-report-automation-");
+  await seedRepo(rootDir);
+
+  const { initService, changeService } = createServices();
+  await initService.init(rootDir, { documentLanguage: "en-US" });
+  await changeService.newChange(rootDir, "scheduled-work");
+
+  const scheduleResult = runCli(["report", "schedule", "--cadence", "daily", rootDir]);
+  assert.equal(scheduleResult.status, 0, scheduleResult.stderr);
+  assert.match(scheduleResult.stdout, /OSpec Lite report automation scheduled/);
+  assert.match(scheduleResult.stdout, /Cadence: daily/);
+  assert.match(scheduleResult.stdout, /Schedule: \.oslite\/reports\/schedule\.json/);
+  assert.match(scheduleResult.stdout, /Runner: oslite report run \[path]/);
+
+  const schedulePath = path.join(rootDir, ".oslite", "reports", "schedule.json");
+  const scheduled = JSON.parse(await fs.readFile(schedulePath, "utf8"));
+  assert.equal(scheduled.cadence, "daily");
+  assert.equal(scheduled.artifactRoot, ".oslite/reports");
+  assert.ok(scheduled.nextRunAt);
+  assert.equal(scheduled.lastGeneratedPeriod, undefined);
+
+  const runResult = runCli(["report", "run", rootDir]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  assert.match(runResult.stdout, /OSpec Lite report automation run/);
+  assert.match(runResult.stdout, /Generated: yes/);
+  assert.match(runResult.stdout, /Markdown: \.oslite\/reports\/daily\/\d{4}-\d{2}-\d{2}\.md/);
+  assert.match(runResult.stdout, /JSON: \.oslite\/reports\/daily\/\d{4}-\d{2}-\d{2}\.json/);
+
+  const afterRun = JSON.parse(await fs.readFile(schedulePath, "utf8"));
+  assert.ok(afterRun.lastGeneratedAt);
+  assert.match(afterRun.lastGeneratedPeriod, /^\d{4}-\d{2}-\d{2}$/);
+  assert.match(afterRun.lastArtifactPath, /^\.oslite\/reports\/daily\/\d{4}-\d{2}-\d{2}\.md$/);
+  assert.match(afterRun.lastDataPath, /^\.oslite\/reports\/daily\/\d{4}-\d{2}-\d{2}\.json$/);
+  assert.ok(await fileExists(path.join(rootDir, afterRun.lastArtifactPath)));
+  assert.ok(await fileExists(path.join(rootDir, afterRun.lastDataPath)));
+
+  const markdown = await fs.readFile(path.join(rootDir, afterRun.lastArtifactPath), "utf8");
+  const json = JSON.parse(await fs.readFile(path.join(rootDir, afterRun.lastDataPath), "utf8"));
+  assert.match(markdown, /Cadence: daily/);
+  assert.match(markdown, /scheduled-work \[draft;/);
+  assert.equal(json.reportWindow.cadence, "daily");
+  assert.equal(json.activeChanges[0].slug, "scheduled-work");
+
+  const secondRun = runCli(["report", "run", rootDir]);
+  assert.equal(secondRun.status, 0, secondRun.stderr);
+  assert.match(secondRun.stdout, /Generated: no/);
+  assert.match(secondRun.stdout, /Report already emitted/);
+
+  const afterSecondRun = JSON.parse(await fs.readFile(schedulePath, "utf8"));
+  assert.equal(afterSecondRun.lastGeneratedPeriod, afterRun.lastGeneratedPeriod);
+  assert.equal(afterSecondRun.lastArtifactPath, afterRun.lastArtifactPath);
 });
 
 test("cli refresh initializes doc hashes for older indexes", async (t) => {
