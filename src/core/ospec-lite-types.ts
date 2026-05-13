@@ -151,6 +151,7 @@ export interface OSpecLiteIndex {
   riskyPaths: PathAdvisory[];
   askFirstAreas: PathAdvisory[];
   docSuggestionHashes?: Record<string, string>;
+  templateHashes?: Record<string, string>;
 }
 
 export interface InitResult {
@@ -220,11 +221,38 @@ export interface StatusReport {
   archivedChanges: string[];
   activeBugs: string[];
   appliedBugs: string[];
+  templateChanged?: boolean;
+  changedTemplates?: string[];
 }
 
 export interface RefreshReport {
   rootDir: string;
   updatedArtifacts: string[];
+  reviewNeededDocs: string[];
+  baselineInitializedDocs: string[];
+}
+
+export type UpdateActionKind =
+  | "ensure-dir"
+  | "write-missing"
+  | "refresh-managed"
+  | "refresh-index"
+  | "repair-bugs";
+
+export interface UpdateAction {
+  kind: UpdateActionKind;
+  path: string;
+  status: "planned" | "applied" | "skipped";
+  reason: string;
+}
+
+export interface UpdateResult {
+  rootDir: string;
+  dryRun: boolean;
+  stateBefore: InitState;
+  stateAfter: InitState;
+  actions: UpdateAction[];
+  warnings: string[];
   reviewNeededDocs: string[];
   baselineInitializedDocs: string[];
 }
@@ -398,9 +426,39 @@ export interface DocVerificationIssue {
   message: string;
 }
 
+export interface RepositoryVerificationCheck {
+  id: string;
+  status: "pass" | "warn" | "fail";
+  message: string;
+  path?: string;
+}
+
 export interface DocVerificationReport {
   profileId: string;
   checklistPath: string;
   checkedFiles: string[];
   issues: DocVerificationIssue[];
+  repoChecks?: RepositoryVerificationCheck[];
+  warnings?: DocVerificationIssue[];
+}
+
+export interface ProfileSummary {
+  id: string;
+  displayName: string;
+  description: string;
+  documentLanguage: DocumentLanguage;
+  profileJsonPath: string;
+}
+
+export interface ProfileValidationIssue {
+  file: string;
+  message: string;
+}
+
+export interface ProfileValidationReport {
+  profileId: string;
+  profileJsonPath: string;
+  valid: boolean;
+  issues: ProfileValidationIssue[];
+  checkedFiles: string[];
 }

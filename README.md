@@ -8,7 +8,7 @@ Minimal agent-first repository bootstrap for Codex and Claude Code.
 
 V1 intentionally keeps the surface area small: one-time bootstrap, non-destructive refresh, optional profiles, deterministic profile-backed doc verification, and simple repo-local change and bug tracking.
 
-[Why OSpec Lite](#why-ospec-lite) | [Quick Start](#quick-start) | [Work Reports](#work-reports) | [What It Creates](#what-it-creates) | [Profiles](#profiles) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Command Reference](#command-reference) | [Development](#development)
+[Why OSpec Lite](#why-ospec-lite) | [Quick Start](#quick-start) | [Work Reports](#work-reports) | [What It Creates](#what-it-creates) | [Profiles](#profiles) | [Upgrade Roadmap](./docs/upgrade-roadmap.md) | [Codex Plugins](#codex-plugins) | [Plugins](#plugins) | [Command Reference](#command-reference) | [Development](#development)
 
 ## Why OSpec Lite
 
@@ -313,6 +313,7 @@ Report automation is repo-local: `oslite report schedule` writes `.oslite/report
 oslite init [path] [--document-language en-US|zh-CN] [--profile <profile-id>] [--project-name <name>] [--bootstrap-agent codex|claude-code|none]
 oslite status [path]
 oslite refresh [path]
+oslite update [path] [--dry-run] [--json]
 oslite report [path] [--cadence daily|weekly]
 oslite report write [path] [--cadence daily|weekly]
 oslite report schedule [path] [--cadence daily|weekly]
@@ -321,7 +322,12 @@ oslite bug new <title> [path]
 oslite bug fix <bug-id> [path]
 oslite bug apply <bug-id> [path]
 oslite docs verify [path]
+oslite profiles list [--json]
+oslite profiles info <profile-id> [--json]
+oslite profiles validate <profile-id|all> [--json]
 oslite plugins list [path]
+oslite plugins info <plugin-name> [path] [--json]
+oslite plugins doctor [plugin-name] [path] [--json]
 oslite plugins install <plugin-name|plugin-path> [path] [--installation AVAILABLE|INSTALLED_BY_DEFAULT|NOT_AVAILABLE] [--authentication ON_INSTALL|ON_USE] [--force]
 oslite plugins install-defaults [path] [--force]
 oslite plugins create <plugin-name> [path] [--display-name <name>] [--description <text>] [--category <category>] [--with-skills] [--with-hooks] [--with-scripts] [--with-assets] [--with-mcp] [--with-apps] [--no-marketplace] [--installation AVAILABLE|INSTALLED_BY_DEFAULT|NOT_AVAILABLE] [--authentication ON_INSTALL|ON_USE] [--force]
@@ -334,6 +340,11 @@ oslite change archive <change-path>
 ## Docs
 
 - [docs/ospec-lite-v1-core-spec.md](./docs/ospec-lite-v1-core-spec.md)
+- [docs/upgrade-roadmap.md](./docs/upgrade-roadmap.md)
+- [docs/comparison.md](./docs/comparison.md)
+- [docs/profile-authoring.md](./docs/profile-authoring.md)
+- [docs/unity-tolua-verification.md](./docs/unity-tolua-verification.md)
+- [docs/upgrading.md](./docs/upgrading.md)
 
 ## Development
 
@@ -342,4 +353,5 @@ npm install
 npm run build
 npm run typecheck
 npm test
+npm run release:smoke
 ```

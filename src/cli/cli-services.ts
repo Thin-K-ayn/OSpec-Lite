@@ -9,14 +9,17 @@ import { ChangeService } from "../change/ospec-lite-change-service";
 import { BugService } from "../bug/ospec-lite-bug-service";
 import { RefreshService } from "../refresh/ospec-lite-refresh-service";
 import { ProfileLoader } from "../profile/ospec-lite-profile-loader";
+import { ProfileService } from "../profile/ospec-lite-profile-service";
 import { DocVerifierService } from "../docs/ospec-lite-doc-verifier-service";
 import { KnowledgeTemplateService } from "../init/ospec-lite-knowledge-template-service";
 import { PluginService } from "../plugins/ospec-lite-plugin-service";
 import { ReportService } from "../report/ospec-lite-report-service";
+import { UpdateService } from "../update/ospec-lite-update-service";
 
 export interface CliServices {
   repo: FileRepo;
   profileLoader: ProfileLoader;
+  profileService: ProfileService;
   initService: InitService;
   statusService: StatusService;
   refreshService: RefreshService;
@@ -25,6 +28,7 @@ export interface CliServices {
   docVerifier: DocVerifierService;
   pluginService: PluginService;
   reportService: ReportService;
+  updateService: UpdateService;
 }
 
 export function createCliServices(): CliServices {
@@ -34,6 +38,7 @@ export function createCliServices(): CliServices {
   const agentEntries = new AgentEntryService(repo);
   const indexService = new IndexService();
   const profileLoader = new ProfileLoader(repo);
+  const profileService = new ProfileService(repo, profileLoader);
   const knowledgeService = new KnowledgeTemplateService(renderer, profileLoader);
   const initService = new InitService(
     repo,
@@ -43,7 +48,7 @@ export function createCliServices(): CliServices {
     indexService,
     profileLoader
   );
-  const statusService = new StatusService(repo);
+  const statusService = new StatusService(repo, knowledgeService, profileLoader);
   const refreshService = new RefreshService(
     repo,
     scanService,
@@ -55,7 +60,7 @@ export function createCliServices(): CliServices {
   );
   const changeService = new ChangeService(repo, statusService);
   const bugService = new BugService(repo, statusService);
-  const docVerifier = new DocVerifierService(repo);
+  const docVerifier = new DocVerifierService(repo, profileLoader);
   const pluginService = new PluginService(repo);
   const reportService = new ReportService(
     repo,
@@ -64,10 +69,21 @@ export function createCliServices(): CliServices {
     statusService,
     knowledgeService
   );
+  const updateService = new UpdateService(
+    repo,
+    scanService,
+    agentEntries,
+    indexService,
+    profileLoader,
+    statusService,
+    knowledgeService,
+    bugService
+  );
 
   return {
     repo,
     profileLoader,
+    profileService,
     initService,
     statusService,
     refreshService,
@@ -75,6 +91,7 @@ export function createCliServices(): CliServices {
     bugService,
     docVerifier,
     pluginService,
-    reportService
+    reportService,
+    updateService
   };
 }

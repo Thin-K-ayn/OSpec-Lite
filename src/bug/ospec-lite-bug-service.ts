@@ -117,6 +117,16 @@ export class BugService {
 
     const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
     const queue = await this.repo.readText(queuePath);
+    const parsed = this.parseQueue(queue);
+    const duplicate = parsed.sections.find(
+      (section) => section.title.toLowerCase() === trimmedTitle.toLowerCase()
+    );
+    if (duplicate) {
+      throw new OSpecLiteError(
+        `Bug with same title already exists in active queue: ${duplicate.id}`
+      );
+    }
+
     const index = await this.readBugIndex(rootDir);
     const bugId = this.formatBugId(index.nextBugNumber);
     const now = new Date().toISOString();
@@ -215,6 +225,34 @@ export class BugService {
 
     await this.repo.writeJson(path.join(rootDir, BUG_INDEX_PATH), nextIndex);
     return path.join(rootDir, nextIndex.currentKnowledgeFile);
+  }
+
+  async reopenBug(rootDir: string, bugId: string): Promise<void> {
+    await this.ensureInitialized(rootDir);
+    await this.ensureSupportArtifacts(rootDir);
+
+    const index = await this.readBugIndex(rootDir);
+    const record = this.findBugRecord(index, bugId);
+    this.ensureAllowedCurrentStatus(record, ["applied"], "reported");
+
+    const queuePath = path.join(rootDir, BUG_ACTIVE_BUGS_PATH);
+    const queue = await this.repo.readText(queuePath);
+    const parsed = this.parseQueue(queue);
+    const duplicate = parsed.sections.find(
+      (section) => section.title.toLowerCase() === record.title.toLowerCase()
+    );
+    if (duplicate) {
+      throw new OSpecLiteError(
+        `Bug with same title already exists in active queue: ${duplicate.id}`
+      );
+    }
+
+    record.status = "reported";
+    record.updatedAt = new Date().toISOString();
+
+    const newItem = this.templates.renderQueueItem(bugId, record.title);
+    await this.repo.writeText(queuePath, `${queue.trimEnd()}\n\n${newItem.trimEnd()}\n`);
+    await this.repo.writeJson(path.join(rootDir, BUG_INDEX_PATH), index);
   }
 
   private createEmptyIndex(): BugIndex {

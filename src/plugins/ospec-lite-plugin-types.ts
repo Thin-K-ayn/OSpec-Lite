@@ -107,3 +107,27 @@ export interface PluginListReport {
   bundledPlugins: BundledPluginDefinition[];
   installedPlugins: PluginMarketplaceEntry[];
 }
+
+export interface PluginDiagnostic {
+  pluginName: string;
+  severity: "info" | "warning" | "error";
+  message: string;
+  path?: string;
+}
+
+export interface PluginInfoReport {
+  name: string;
+  bundled?: BundledPluginDefinition;
+  installed?: PluginMarketplaceEntry;
+  manifest?: PluginManifest;
+  manifestPath?: string;
+  diagnostics: PluginDiagnostic[];
+}
+
+export interface PluginDoctorReport {
+  rootDir: string;
+  marketplacePath: string;
+  marketplaceExists: boolean;
+  checkedPlugins: PluginInfoReport[];
+  diagnostics: PluginDiagnostic[];
+}

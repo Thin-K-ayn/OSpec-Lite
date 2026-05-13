@@ -5,11 +5,23 @@ import {
   INIT_MARKERS,
   OSPEC_LITE_DIR
 } from "../core/ospec-lite-schema";
-import { BugIndex, OSpecLiteConfig, StatusReport } from "../core/ospec-lite-types";
+import {
+  BugIndex,
+  LoadedOSpecLiteProfile,
+  OSpecLiteConfig,
+  OSpecLiteIndex,
+  StatusReport
+} from "../core/ospec-lite-types";
 import { FileRepo } from "../fs/file-repo";
+import { KnowledgeTemplateService } from "../init/ospec-lite-knowledge-template-service";
+import { ProfileLoader } from "../profile/ospec-lite-profile-loader";
 
 export class StatusService {
-  constructor(private readonly repo: FileRepo) {}
+  constructor(
+    private readonly repo: FileRepo,
+    private readonly knowledge?: KnowledgeTemplateService,
+    private readonly profiles?: ProfileLoader
+  ) {}
 
   async getStatus(rootDir: string): Promise<StatusReport> {
     const configPath = path.join(rootDir, OSPEC_LITE_DIR, "config.json");
@@ -39,6 +51,7 @@ export class StatusService {
           : "incomplete";
 
     const bugIndex = await this.tryReadBugIndex(path.join(rootDir, BUG_INDEX_PATH));
+    const templateComparison = await this.checkTemplateChanges(rootDir, config);
 
     return {
       state,
@@ -53,7 +66,8 @@ export class StatusService {
       appliedBugs: (bugIndex?.items ?? [])
         .filter((item) => item.status === "applied")
         .map((item) => item.id)
-        .sort((left, right) => left.localeCompare(right))
+        .sort((left, right) => left.localeCompare(right)),
+      ...templateComparison
     };
   }
 
@@ -72,6 +86,61 @@ export class StatusService {
 
     try {
       return await this.repo.readJson<BugIndex>(indexPath);
+    } catch {
+      return null;
+    }
+  }
+
+  private async checkTemplateChanges(
+    rootDir: string,
+    config: OSpecLiteConfig | null
+  ): Promise<{ templateChanged?: boolean; changedTemplates?: string[] }> {
+    if (!this.knowledge || !this.profiles || !config) {
+      return {};
+    }
+
+    const indexPath = path.join(rootDir, OSPEC_LITE_DIR, "index.json");
+    const index = await this.tryReadIndex(indexPath);
+    const storedHashes = index?.templateHashes;
+    if (!storedHashes) {
+      return {};
+    }
+
+    let profile: LoadedOSpecLiteProfile | null = null;
+    if (config.profileId) {
+      try {
+        profile = await this.profiles.loadProfile(config.profileId);
+      } catch {
+        return {};
+      }
+    }
+    const currentHashes = this.knowledge.collectTemplateHashes(profile);
+    const changedTemplates: string[] = [];
+
+    for (const [key, hash] of Object.entries(currentHashes)) {
+      if (storedHashes[key] !== hash) {
+        changedTemplates.push(key);
+      }
+    }
+    for (const key of Object.keys(storedHashes)) {
+      if (!(key in currentHashes)) {
+        changedTemplates.push(key);
+      }
+    }
+
+    return {
+      templateChanged: changedTemplates.length > 0,
+      changedTemplates: changedTemplates.sort((left, right) => left.localeCompare(right))
+    };
+  }
+
+  private async tryReadIndex(indexPath: string): Promise<OSpecLiteIndex | null> {
+    if (!(await this.repo.exists(indexPath))) {
+      return null;
+    }
+
+    try {
+      return await this.repo.readJson<OSpecLiteIndex>(indexPath);
     } catch {
       return null;
     }

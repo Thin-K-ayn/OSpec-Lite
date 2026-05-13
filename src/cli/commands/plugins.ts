@@ -2,18 +2,25 @@ import * as path from "node:path";
 import { OSpecLiteError } from "../../core/ospec-lite-errors";
 import {
   PluginAuthenticationPolicy,
+  PluginDoctorReport,
+  PluginInfoReport,
   PluginInstallationPolicy
 } from "../../plugins/ospec-lite-plugin-types";
 import { CliServices } from "../cli-services";
-import { readFlagValue } from "../cli-shared";
+import { printJson, readFlagValue, takeJsonFlag } from "../cli-shared";
 
 export async function handlePlugins(args: string[], services: CliServices): Promise<void> {
-  const [action, ...rest] = args;
+  const parsed = takeJsonFlag(args);
+  const [action, ...rest] = parsed.args;
 
   switch (action) {
     case "list": {
       const targetDir = path.resolve(rest[0] ?? ".");
       const report = await services.pluginService.list(targetDir);
+      if (parsed.json) {
+        printJson({ ok: true, report });
+        return;
+      }
       console.log("OSpec Lite Plugins");
       console.log(`Marketplace: ${report.marketplacePath}`);
       console.log(`Marketplace exists: ${report.marketplaceExists ? "yes" : "no"}`);
@@ -30,6 +37,37 @@ export async function handlePlugins(args: string[], services: CliServices): Prom
             `- ${installed.name} (${installed.source.path}; ${installed.policy.installation}; ${installed.policy.authentication})`
           );
         }
+      }
+      return;
+    }
+    case "info": {
+      const pluginName = rest[0];
+      if (!pluginName) {
+        throw new OSpecLiteError("Missing plugin name.");
+      }
+      const targetDir = path.resolve(rest[1] ?? ".");
+      const report = await services.pluginService.info(targetDir, pluginName);
+      if (parsed.json) {
+        printJson({ ok: true, report });
+        return;
+      }
+      printPluginInfo(report);
+      return;
+    }
+    case "doctor": {
+      const { pluginName, pathArg } = parsePluginDoctorArgs(rest);
+      const targetDir = path.resolve(pathArg);
+      const report = await services.pluginService.doctor(targetDir, pluginName);
+      if (parsed.json) {
+        printJson({
+          ok: !report.diagnostics.some((item) => item.severity === "error"),
+          report
+        });
+        return;
+      }
+      printPluginDoctor(report);
+      if (report.diagnostics.some((item) => item.severity === "error")) {
+        process.exitCode = 1;
       }
       return;
     }
@@ -104,6 +142,89 @@ export async function handlePlugins(args: string[], services: CliServices): Prom
     default:
       throw new OSpecLiteError(`Unsupported plugins action: ${action ?? "(missing)"}`);
   }
+}
+
+function printPluginInfo(report: PluginInfoReport): void {
+  console.log(`Plugin: ${report.name}`);
+  console.log(`Bundled: ${report.bundled ? "yes" : "no"}`);
+  console.log(`Installed: ${report.installed ? "yes" : "no"}`);
+  if (report.manifest) {
+    console.log(`Version: ${report.manifest.version}`);
+    console.log(`Description: ${report.manifest.description}`);
+  }
+  if (report.manifestPath) {
+    console.log(`Manifest: ${report.manifestPath}`);
+  }
+  console.log("Diagnostics:");
+  for (const diagnostic of report.diagnostics) {
+    console.log(`- ${diagnostic.severity}: ${diagnostic.message}`);
+    if (diagnostic.path) {
+      console.log(`  path: ${diagnostic.path}`);
+    }
+  }
+}
+
+function printPluginDoctor(report: PluginDoctorReport): void {
+  console.log("OSpec Lite plugin doctor");
+  console.log(`Path: ${report.rootDir}`);
+  console.log(`Marketplace: ${report.marketplacePath}`);
+  console.log(`Marketplace exists: ${report.marketplaceExists ? "yes" : "no"}`);
+  for (const plugin of report.checkedPlugins) {
+    console.log(`- ${plugin.name}`);
+    for (const diagnostic of plugin.diagnostics) {
+      console.log(`  - ${diagnostic.severity}: ${diagnostic.message}`);
+      if (diagnostic.path) {
+        console.log(`    path: ${diagnostic.path}`);
+      }
+    }
+  }
+}
+
+function parsePluginDoctorArgs(args: string[]): {
+  pluginName?: string;
+  pathArg: string;
+} {
+  if (args.length === 1 && looksLikePathArg(args[0])) {
+    return {
+      pathArg: args[0]
+    };
+  }
+
+  let pluginName: string | undefined;
+  let pathArg: string | undefined;
+
+  for (const arg of args) {
+    if (arg.startsWith("--")) {
+      throw new OSpecLiteError(`Unsupported option: ${arg}`);
+    }
+
+    if (!pluginName) {
+      pluginName = arg;
+      continue;
+    }
+
+    if (!pathArg) {
+      pathArg = arg;
+      continue;
+    }
+
+    throw new OSpecLiteError(`Unexpected argument: ${arg}`);
+  }
+
+  return {
+    pluginName,
+    pathArg: pathArg ?? "."
+  };
+}
+
+function looksLikePathArg(arg: string): boolean {
+  return (
+    arg === "." ||
+    arg === ".." ||
+    path.isAbsolute(arg) ||
+    arg.includes("/") ||
+    arg.includes("\\")
+  );
 }
 
 export function parsePluginInstallArgs(args: string[]): {

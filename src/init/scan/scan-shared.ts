@@ -7,7 +7,12 @@ import {
 import { FileRepo } from "../../fs/file-repo";
 
 export const ALWAYS_IGNORED_DIRECTORIES = new Set([".git", ".oslite", "node_modules"]);
-export const ALWAYS_IGNORED_TOP_LEVEL_FILES = new Set(["agents.md", "claude.md"]);
+export const ALWAYS_IGNORED_TOP_LEVEL_FILES = new Set([
+  "agents.md",
+  "agents.local.md",
+  "claude.md",
+  "claude.local.md"
+]);
 export const GENERATED_DIRECTORY_NAMES = new Set([
   ".cache",
   ".next",

@@ -43,12 +43,13 @@ export class RefreshService {
     const scan = await this.scanner.scan(rootDir);
     const artifacts = this.knowledge.buildArtifacts(scan, config, profile);
     const nextHashes = this.hashSuggestions(artifacts.humanDocSuggestions);
+    const templateHashes = this.knowledge.collectTemplateHashes(profile);
     const indexPath = path.join(rootDir, ".oslite", "index.json");
     const previousIndex = await this.readIndex(indexPath);
     const comparison = this.compareSuggestionHashes(previousIndex?.docSuggestionHashes, nextHashes);
     const updatedArtifacts: string[] = [];
 
-    const nextIndex = this.indexService.buildIndex(scan, config, nextHashes);
+    const nextIndex = this.indexService.buildIndex(scan, config, nextHashes, templateHashes);
     if (await this.writeJsonIfChanged(indexPath, nextIndex)) {
       updatedArtifacts.push(".oslite/index.json");
     }

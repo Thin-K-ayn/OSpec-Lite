@@ -49,8 +49,11 @@ test("init bootstraps the repository knowledge layer", async (t) => {
   }
 
   const config = await repo.readJson(path.join(rootDir, ".oslite", "config.json"));
+  const index = await repo.readJson(path.join(rootDir, ".oslite", "index.json"));
   assert.equal(config.documentLanguage, "zh-CN");
   assert.deepEqual(config.agentTargets, ["codex", "claude-code"]);
+  assert.ok(index.templateHashes["agents-templates/agents.md"]);
+  assert.ok(index.templateHashes["render-templates/overview.md"]);
 
   const agents = await repo.readText(path.join(rootDir, "AGENTS.md"));
   const claude = await repo.readText(path.join(rootDir, "CLAUDE.md"));
@@ -72,6 +75,8 @@ test("init bootstraps the repository knowledge layer", async (t) => {
   );
   assert.equal(await repo.exists(path.join(rootDir, BUG_MEMORY_PATH)), true);
   assert.equal(await repo.exists(path.join(rootDir, BUG_ACTIVE_BUGS_PATH)), true);
+  assert.equal(await repo.exists(path.join(rootDir, "AGENTS.local.md")), true);
+  assert.equal(await repo.exists(path.join(rootDir, "CLAUDE.local.md")), true);
 
   const status = await statusService.getStatus(rootDir);
   assert.equal(status.state, "initialized");
@@ -136,7 +141,11 @@ test("cli prints help when no command is provided", () => {
   assert.match(result.stdout, /oslite bug new <title> \[path]/);
   assert.match(result.stdout, /oslite bug fix <bug-id> \[path]/);
   assert.match(result.stdout, /oslite bug apply <bug-id> \[path]/);
+  assert.match(result.stdout, /oslite bug reopen <bug-id> \[path]/);
   assert.match(result.stdout, /oslite docs verify \[path]/);
+  assert.match(result.stdout, /oslite update \[path] \[--dry-run] \[--json]/);
+  assert.match(result.stdout, /oslite profiles list \[--json]/);
+  assert.match(result.stdout, /oslite plugins info <plugin-name> \[path] \[--json]/);
   assert.match(result.stdout, /--profile <profile-id>/);
   assert.equal(result.stderr, "");
 });
@@ -230,6 +239,77 @@ test("cli status reports initialized repositories with config details", async (t
   assert.match(result.stdout, /Archived changes: 0/);
   assert.match(result.stdout, /Active bugs: 0/);
   assert.match(result.stdout, /Applied bugs: 0/);
+});
+
+test("cli status and report support agent-readable json", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-json-");
+  await seedRepo(rootDir);
+
+  const { initService } = createServices();
+  await initService.init(rootDir, { documentLanguage: "en-US" });
+
+  const statusResult = runCli(["status", rootDir, "--json"]);
+  assert.equal(statusResult.status, 0, statusResult.stderr);
+  const statusPayload = parseJson(statusResult.stdout);
+  assert.equal(statusPayload.ok, true);
+  assert.equal(statusPayload.status.state, "initialized");
+  assert.equal(statusPayload.status.templateChanged, false);
+  assert.deepEqual(statusPayload.status.changedTemplates, []);
+  assert.equal(statusPayload.rootDir, path.resolve(rootDir));
+
+  const reportResult = runCli(["report", rootDir, "--cadence", "daily", "--json"]);
+  assert.equal(reportResult.status, 0, reportResult.stderr);
+  const reportPayload = parseJson(reportResult.stdout);
+  assert.equal(reportPayload.ok, true);
+  assert.equal(reportPayload.report.reportWindow.cadence, "daily");
+});
+
+test("cli update dry-run reports repairs and update restores managed markers", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-update-");
+  await seedRepo(rootDir);
+
+  const { initService } = createServices();
+  await initService.init(rootDir, { documentLanguage: "en-US" });
+  await fs.rm(path.join(rootDir, "AGENTS.md"));
+
+  const dryRun = runCli(["update", rootDir, "--dry-run", "--json"]);
+  assert.equal(dryRun.status, 0, dryRun.stderr);
+  const dryRunPayload = parseJson(dryRun.stdout);
+  assert.equal(dryRunPayload.ok, true);
+  assert.equal(dryRunPayload.result.dryRun, true);
+  assert.equal(dryRunPayload.result.stateBefore, "incomplete");
+  assert.ok(
+    dryRunPayload.result.actions.some(
+      (action) => action.path === "AGENTS.md" && action.status === "planned"
+    )
+  );
+  assert.equal(await fileExists(path.join(rootDir, "AGENTS.md")), false);
+
+  const update = runCli(["update", rootDir, "--json"]);
+  assert.equal(update.status, 0, update.stderr);
+  const updatePayload = parseJson(update.stdout);
+  assert.equal(updatePayload.ok, true);
+  assert.equal(updatePayload.result.stateAfter, "initialized");
+  assert.equal(await fileExists(path.join(rootDir, "AGENTS.md")), true);
+  assert.equal(await fileExists(path.join(rootDir, BUG_INDEX_PATH)), true);
+});
+
+test("cli plugin info and doctor report diagnostics as json", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-plugin-json-");
+  await seedRepo(rootDir);
+
+  const infoResult = runCli(["plugins", "info", "ospec-lite-codex", rootDir, "--json"]);
+  assert.equal(infoResult.status, 0, infoResult.stderr);
+  const infoPayload = parseJson(infoResult.stdout);
+  assert.equal(infoPayload.ok, true);
+  assert.equal(infoPayload.report.name, "ospec-lite-codex");
+  assert.equal(infoPayload.report.bundled.name, "ospec-lite-codex");
+
+  const doctorResult = runCli(["plugins", "doctor", "ospec-lite-codex", rootDir, "--json"]);
+  assert.equal(doctorResult.status, 0, doctorResult.stderr);
+  const doctorPayload = parseJson(doctorResult.stdout);
+  assert.equal(doctorPayload.ok, true);
+  assert.equal(doctorPayload.report.checkedPlugins[0].name, "ospec-lite-codex");
 });
 
 test("cli refresh rejects uninitialized repositories", async (t) => {
@@ -584,6 +664,50 @@ test("bug workflow advances from reported through apply and remembers lessons", 
   const status = await statusService.getStatus(rootDir);
   assert.equal(status.activeBugs.length, 0);
   assert.deepEqual(status.appliedBugs, [bugId]);
+});
+
+test("cli bug reopen restores an applied bug to the active queue", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-bug-reopen-");
+  await seedRepo(rootDir);
+
+  const { repo, initService, bugService } = createServices();
+  await initService.init(rootDir, { documentLanguage: "en-US" });
+
+  const bugId = await bugService.newBug(rootDir, "Startup reopen fixture");
+  await populateBugQueueEntry(rootDir, bugId, {
+    affects: ["src/bootstrap.ts"],
+    summary: "Startup reopen fixture needs a complete applied bug first.",
+    actual: "The fixture is active before it can be reopened.",
+    expected: "The fixture should be reapplied and then reopened.",
+    repro: "Run the fixture once.",
+    investigation: "The fixture follows the normal bug lifecycle.",
+    cause: "The test needs an applied bug to reopen.",
+    fixSummary: "Applied the fixture bug before reopening.",
+    files: ["src/bootstrap.ts - fixture path"],
+    reason: "The fixture now has enough detail to apply.",
+    command: "npm test",
+    result: "`npm test` passed for the reopen fixture.",
+    validation: "Confirmed the fixture can be reopened.",
+    risk: "none",
+    gap: "Assumed applied bugs could not return to active work.",
+    reality: "Applied bugs can need another investigation pass.",
+    checkFirst: "src/bootstrap.ts",
+    remember: "Re-check `src/bootstrap.ts` before reopening startup bugs."
+  });
+  await bugService.markFixed(rootDir, bugId);
+  await bugService.apply(rootDir, bugId);
+
+  const reopenResult = runCli(["bug", "reopen", bugId, rootDir, "--json"]);
+  assert.equal(reopenResult.status, 0, reopenResult.stderr);
+  const reopenPayload = parseJson(reopenResult.stdout);
+  assert.equal(reopenPayload.ok, true);
+  assert.equal(reopenPayload.action, "reopen");
+  assert.equal(reopenPayload.bugId, bugId);
+
+  const queue = await repo.readText(path.join(rootDir, BUG_ACTIVE_BUGS_PATH));
+  const index = await repo.readJson(path.join(rootDir, BUG_INDEX_PATH));
+  assert.match(queue, new RegExp(`## ${escapeRegex(bugId)}: Startup reopen fixture`));
+  assert.equal(index.items[0].status, "reported");
 });
 
 test("bug apply rejects missing learned guardrails", async (t) => {
@@ -1385,6 +1509,27 @@ test("newBug assigns sequential ids for free-form titles", async (t) => {
   assert.equal(await bugService.newBug(rootDir, "Second free-form title"), "bug-0002");
 });
 
+test("cli bug new rejects duplicate active titles without consuming the next id", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-bug-duplicate-title-");
+  await seedRepo(rootDir);
+
+  const initResult = runCli(["init", rootDir]);
+  assert.equal(initResult.status, 0, initResult.stderr);
+
+  const first = runCli(["bug", "new", "Duplicate startup bug", rootDir, "--json"]);
+  assert.equal(first.status, 0, first.stderr);
+  assert.equal(parseJson(first.stdout).bugId, "bug-0001");
+
+  const duplicate = runCli(["bug", "new", "duplicate startup bug", rootDir]);
+  assert.equal(duplicate.status, 1);
+  assert.match(duplicate.stderr, /bug with same title already exists/i);
+  assert.match(duplicate.stderr, /bug-0001/);
+
+  const next = runCli(["bug", "new", "Different startup bug", rootDir, "--json"]);
+  assert.equal(next.status, 0, next.stderr);
+  assert.equal(parseJson(next.stdout).bugId, "bug-0002");
+});
+
 test("newChange rejects duplicate slugs", async (t) => {
   const rootDir = await createTempRepo(t, "ospec-lite-duplicate-slug-");
   await seedRepo(rootDir);
@@ -1722,6 +1867,10 @@ function runCli(args) {
   return spawnSync(process.execPath, [CLI_PATH, ...args], {
     encoding: "utf8"
   });
+}
+
+function parseJson(content) {
+  return JSON.parse(content);
 }
 
 async function fileExists(targetPath) {

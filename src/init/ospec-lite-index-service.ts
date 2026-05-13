@@ -8,7 +8,8 @@ export class IndexService {
   buildIndex(
     scan: RepositoryScanResult,
     config: OSpecLiteConfig,
-    docSuggestionHashes: Record<string, string> = {}
+    docSuggestionHashes: Record<string, string> = {},
+    templateHashes: Record<string, string> = {}
   ): OSpecLiteIndex {
     return {
       version: 1,
@@ -33,7 +34,8 @@ export class IndexService {
       generatedDirectories: scan.generatedDirectories,
       riskyPaths: scan.riskyPaths,
       askFirstAreas: scan.askFirstAreas,
-      docSuggestionHashes
+      docSuggestionHashes,
+      templateHashes
     };
   }
 }

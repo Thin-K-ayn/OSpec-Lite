@@ -502,6 +502,53 @@ test("docs verify passes on a compliant unity-tolua fixture", async (t) => {
   assert.match(verifyResult.stdout, /\.oslite\/docs\/project\/entrypoints\.md/);
 });
 
+test("profiles command lists and validates bundled profiles as json", () => {
+  const listResult = runCli(["profiles", "list", "--json"]);
+  assert.equal(listResult.status, 0, listResult.stderr);
+  const listPayload = parseJson(listResult.stdout);
+  assert.equal(listPayload.ok, true);
+  assert.ok(
+    listPayload.profiles.some((profile) => profile.id === "unity-tolua-game")
+  );
+  assert.ok(
+    !listPayload.profiles.some((profile) => profile.id === "unity-tolua-xinyule")
+  );
+
+  const validateResult = runCli(["profiles", "validate", "all", "--json"]);
+  assert.equal(validateResult.status, 0, validateResult.stderr);
+  const validatePayload = parseJson(validateResult.stdout);
+  assert.equal(validatePayload.ok, true);
+  assert.ok(
+    validatePayload.reports.every((report) => report.valid),
+    JSON.stringify(validatePayload.reports, null, 2)
+  );
+});
+
+test("docs verify json includes Unity ToLua repository checks", async (t) => {
+  const rootDir = await createTempRepo(t, "ospec-lite-profile-verify-json-");
+  await seedUnityToLuaRepo(rootDir);
+
+  const initResult = runProfileInit(rootDir, {
+    projectName: "Verify Json Repo",
+    bootstrapAgent: "none"
+  });
+  assert.equal(initResult.status, 0, initResult.stderr);
+  await makeProfileDocsCompliant(rootDir);
+
+  const verifyResult = runCli(["docs", "verify", rootDir, "--json"]);
+  assert.equal(verifyResult.status, 0, verifyResult.stderr);
+  const payload = parseJson(verifyResult.stdout);
+  assert.equal(payload.ok, true);
+  assert.ok(
+    payload.report.repoChecks.some(
+      (check) => check.id === "required-repo-path" && check.status === "pass"
+    )
+  );
+  assert.ok(
+    payload.report.repoChecks.some((check) => check.id === "emmylua-signal")
+  );
+});
+
 async function createTempRepo(t, prefix) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
   t.after(async () => {
@@ -603,4 +650,8 @@ function runCli(args, options = {}) {
       ...options.env
     }
   });
+}
+
+function parseJson(content) {
+  return JSON.parse(content);
 }

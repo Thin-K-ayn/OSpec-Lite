@@ -9,6 +9,10 @@ export class MarkdownRenderer {
     private readonly templateRoot = path.join(__dirname, "templates")
   ) {}
 
+  getTemplateRoot(): string {
+    return this.templateRoot;
+  }
+
   renderOverview(scan: RepositoryScanResult, config: OSpecLiteConfig): string {
     const areas = scan.directoryMap
       .filter((item) => item.kind === "directory")

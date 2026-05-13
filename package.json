@@ -10,6 +10,7 @@
   "files": [
     "dist",
     ".agents",
+    "docs",
     "plugins",
     "profiles",
     "README.md",
@@ -21,7 +22,8 @@
     "build": "npm run clean && tsc -p tsconfig.json && node ./scripts/copy-templates.js",
     "prepack": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "npm run build && node --test ./test/*.test.js"
+    "test": "npm run build && node --test ./test/*.test.js",
+    "release:smoke": "npm run build && node ./scripts/release-smoke.js"
   },
   "keywords": [
     "agents",

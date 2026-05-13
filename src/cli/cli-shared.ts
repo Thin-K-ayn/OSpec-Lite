@@ -16,6 +16,29 @@ export function readFlagValue(
   return { value, nextIndex: index + 1 };
 }
 
+export function takeJsonFlag(args: string[]): {
+  args: string[];
+  json: boolean;
+} {
+  const remaining: string[] = [];
+  let json = false;
+
+  for (const arg of args) {
+    if (arg === "--json") {
+      json = true;
+      continue;
+    }
+
+    remaining.push(arg);
+  }
+
+  return { args: remaining, json };
+}
+
+export function printJson(value: unknown): void {
+  console.log(JSON.stringify(value, null, 2));
+}
+
 export function isCompleteStatusConfig(
   value: unknown
 ): value is {

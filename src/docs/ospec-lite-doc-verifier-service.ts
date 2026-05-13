@@ -10,7 +10,9 @@ import {
   DocTaskChecklist,
   DocVerificationIssue,
   DocVerificationReport,
-  OSpecLiteConfig
+  LoadedOSpecLiteProfile,
+  OSpecLiteConfig,
+  RepositoryVerificationCheck
 } from "../core/ospec-lite-types";
 import {
   DocVerificationError,
@@ -18,9 +20,13 @@ import {
   OSpecLiteError
 } from "../core/ospec-lite-errors";
 import { FileRepo } from "../fs/file-repo";
+import { ProfileLoader } from "../profile/ospec-lite-profile-loader";
 
 export class DocVerifierService {
-  constructor(private readonly repo: FileRepo) {}
+  constructor(
+    private readonly repo: FileRepo,
+    private readonly profiles: ProfileLoader
+  ) {}
 
   async verify(rootDir: string): Promise<DocVerificationReport> {
     const configPath = path.join(rootDir, OSPEC_LITE_DIR, "config.json");
@@ -52,7 +58,9 @@ export class DocVerifierService {
 
     const checklist = await this.repo.readJson<DocTaskChecklist>(checklistPath);
     const issues: DocVerificationIssue[] = [];
+    const warnings: DocVerificationIssue[] = [];
     const checkedFiles: string[] = [];
+    const profile = await this.profiles.loadProfile(config.profileId);
 
     if (checklist.profileId !== config.profileId) {
       issues.push({
@@ -70,7 +78,9 @@ export class DocVerifierService {
       profileId: config.profileId,
       checklistPath: path.relative(rootDir, checklistPath).replace(/\\/g, "/"),
       checkedFiles,
-      issues
+      issues,
+      repoChecks: await this.verifyRepositoryProfile(rootDir, profile, issues, warnings),
+      warnings
     };
 
     if (issues.length > 0) {
@@ -313,6 +323,161 @@ export class DocVerifierService {
         }
       }
     }
+  }
+
+  private async verifyRepositoryProfile(
+    rootDir: string,
+    profile: LoadedOSpecLiteProfile,
+    issues: DocVerificationIssue[],
+    warnings: DocVerificationIssue[]
+  ): Promise<RepositoryVerificationCheck[]> {
+    if (!profile.id.startsWith("unity-tolua-")) {
+      return [];
+    }
+
+    const checks: RepositoryVerificationCheck[] = [];
+    for (const requiredPath of profile.requiredRepoPaths ?? []) {
+      const exists = await this.repo.exists(path.join(rootDir, requiredPath));
+      const check: RepositoryVerificationCheck = {
+        id: "required-repo-path",
+        status: exists ? "pass" : "fail",
+        path: requiredPath,
+        message: exists
+          ? `Required profile anchor exists: ${requiredPath}`
+          : `Required profile anchor is missing: ${requiredPath}`
+      };
+      checks.push(check);
+      if (!exists) {
+        issues.push({
+          file: requiredPath,
+          message: check.message
+        });
+      }
+    }
+
+    const luaFiles = await this.findRepoFiles(rootDir, (relativePath) =>
+      relativePath.toLowerCase().endsWith(".lua")
+    );
+    checks.push({
+      id: "lua-entrypoints",
+      status: luaFiles.length > 0 ? "pass" : "fail",
+      message:
+        luaFiles.length > 0
+          ? `Found ${luaFiles.length} Lua file(s) for profile verification.`
+          : "No Lua files found in a Unity/ToLua profile repository."
+    });
+    if (luaFiles.length === 0) {
+      issues.push({
+        file: ".",
+        message: "Unity/ToLua profile verification requires at least one Lua file."
+      });
+    }
+
+    const toluaSignals = await this.findRepoFiles(rootDir, (relativePath) =>
+      /tolua|luaframework/i.test(relativePath)
+    );
+    if (toluaSignals.length === 0) {
+      const warning = {
+        file: ".",
+        message: "No ToLua or LuaFramework path signal was found; confirm this profile matches the repository."
+      };
+      warnings.push(warning);
+      checks.push({
+        id: "tolua-signal",
+        status: "warn",
+        message: warning.message
+      });
+    } else {
+      checks.push({
+        id: "tolua-signal",
+        status: "pass",
+        path: toluaSignals[0],
+        message: `Found ToLua/LuaFramework signal: ${toluaSignals[0]}`
+      });
+    }
+
+    const annotatedLuaFiles = await this.countAnnotatedLuaFiles(rootDir, luaFiles);
+    if (luaFiles.length > 0 && annotatedLuaFiles === 0) {
+      const warning = {
+        file: ".",
+        message:
+          "No EmmyLua annotations were found in Lua files; classes and vague multi-parameter functions should use annotations."
+      };
+      warnings.push(warning);
+      checks.push({
+        id: "emmylua-signal",
+        status: "warn",
+        message: warning.message
+      });
+    } else if (luaFiles.length > 0) {
+      checks.push({
+        id: "emmylua-signal",
+        status: "pass",
+        message: `Found EmmyLua annotations in ${annotatedLuaFiles} Lua file(s).`
+      });
+    }
+
+    return checks;
+  }
+
+  private async findRepoFiles(
+    rootDir: string,
+    predicate: (relativePath: string) => boolean
+  ): Promise<string[]> {
+    const result: string[] = [];
+    await this.walkRepo(rootDir, ".", predicate, result);
+    return result;
+  }
+
+  private async walkRepo(
+    rootDir: string,
+    relativeDir: string,
+    predicate: (relativePath: string) => boolean,
+    result: string[]
+  ): Promise<void> {
+    const absoluteDir = path.join(rootDir, relativeDir);
+    if (!(await this.repo.exists(absoluteDir))) {
+      return;
+    }
+
+    const entries = await this.repo.listDirents(absoluteDir);
+    for (const entry of entries) {
+      const relativePath = relativeDir === "." ? entry.name : `${relativeDir}/${entry.name}`;
+      if (entry.isDirectory()) {
+        if (this.shouldSkipDirectory(entry.name)) {
+          continue;
+        }
+        await this.walkRepo(rootDir, relativePath, predicate, result);
+        continue;
+      }
+      if (entry.isFile() && predicate(relativePath)) {
+        result.push(relativePath);
+      }
+    }
+  }
+
+  private shouldSkipDirectory(name: string): boolean {
+    return [
+      ".git",
+      ".oslite",
+      "Library",
+      "Temp",
+      "Obj",
+      "Build",
+      "Builds",
+      "node_modules"
+    ].includes(name);
+  }
+
+  private async countAnnotatedLuaFiles(rootDir: string, luaFiles: string[]): Promise<number> {
+    let count = 0;
+    for (const luaFile of luaFiles) {
+      const content = await this.repo.readText(path.join(rootDir, luaFile));
+      if (/---@(?:class|param|return|field|type)\b/.test(content)) {
+        count += 1;
+      }
+    }
+    return count;
   }
 
   private extractSection(content: string, heading: string): string | null {

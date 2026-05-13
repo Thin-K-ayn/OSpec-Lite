@@ -115,6 +115,7 @@ export class InitService {
       profile ? options.bootstrapAgent : undefined
     );
     const artifacts = this.knowledge.buildArtifacts(scan, config, profile);
+    const templateHashes = this.knowledge.collectTemplateHashes(profile);
 
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR));
     await this.repo.ensureDir(path.join(rootDir, OSPEC_LITE_DIR, "bugs"));
@@ -130,7 +131,12 @@ export class InitService {
     await this.repo.writeJson(path.join(rootDir, OSPEC_LITE_DIR, "config.json"), config);
     await this.repo.writeJson(
       path.join(rootDir, OSPEC_LITE_DIR, "index.json"),
-      this.indexService.buildIndex(scan, config, this.hashSuggestions(artifacts.humanDocSuggestions))
+      this.indexService.buildIndex(
+        scan,
+        config,
+        this.hashSuggestions(artifacts.humanDocSuggestions),
+        templateHashes
+      )
     );
 
     await this.writeHumanDocSuggestionsIfMissing(rootDir, artifacts.humanDocSuggestions);
@@ -147,6 +153,7 @@ export class InitService {
       artifacts.codexSection.content,
       artifacts.claudeSection.content
     );
+    await this.writeLocalOverrides(rootDir);
     if (profile && artifacts.profileTemplateValues) {
       await this.applyProfileSupportAssets(
         rootDir,
@@ -274,6 +281,13 @@ export class InitService {
 
   private hashContent(content: string): string {
     return createHash("sha256").update(content).digest("hex");
+  }
+
+  private async writeLocalOverrides(rootDir: string): Promise<void> {
+    const skeleton =
+      "<!-- Add your local overrides below this line. This file is not managed by ospec-lite. -->\n";
+    await this.repo.writeTextIfMissing(path.join(rootDir, "CLAUDE.local.md"), skeleton);
+    await this.repo.writeTextIfMissing(path.join(rootDir, "AGENTS.local.md"), skeleton);
   }
 
   private async ensureProfileRequirements(

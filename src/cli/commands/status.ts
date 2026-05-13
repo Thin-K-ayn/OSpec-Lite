@@ -1,10 +1,25 @@
 import * as path from "node:path";
 import { CliServices } from "../cli-services";
-import { isCompleteStatusConfig, printAgentWrappers } from "../cli-shared";
+import {
+  isCompleteStatusConfig,
+  printAgentWrappers,
+  printJson,
+  takeJsonFlag
+} from "../cli-shared";
 
 export async function handleStatus(args: string[], services: CliServices): Promise<void> {
-  const targetDir = path.resolve(args[0] ?? ".");
+  const parsed = takeJsonFlag(args);
+  const targetDir = path.resolve(parsed.args[0] ?? ".");
   const status = await services.statusService.getStatus(targetDir);
+
+  if (parsed.json) {
+    printJson({
+      ok: true,
+      rootDir: targetDir,
+      status
+    });
+    return;
+  }
 
   console.log("OSpec Lite Status");
   console.log(`Initialized: ${status.state === "initialized" ? "yes" : "no"}`);
@@ -39,6 +54,14 @@ export async function handleStatus(args: string[], services: CliServices): Promi
   console.log(`Archived changes: ${status.archivedChanges.length}`);
   console.log(`Active bugs: ${status.activeBugs.length}`);
   console.log(`Applied bugs: ${status.appliedBugs.length}`);
+
+  if (status.templateChanged && status.changedTemplates && status.changedTemplates.length > 0) {
+    console.log("Template changes detected:");
+    for (const templatePath of status.changedTemplates) {
+      console.log(`- ${templatePath}`);
+    }
+    console.log("Run `oslite refresh` or `oslite update` to refresh managed artifacts.");
+  }
 
   if (status.missingMarkers.length > 0) {
     console.log("Missing markers:");

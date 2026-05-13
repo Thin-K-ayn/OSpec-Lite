@@ -8,16 +8,21 @@ import {
 } from "../../core/ospec-lite-types";
 import { OSpecLiteError } from "../../core/ospec-lite-errors";
 import { CliServices } from "../cli-services";
-import { printPathList, readFlagValue } from "../cli-shared";
+import { printJson, printPathList, readFlagValue, takeJsonFlag } from "../cli-shared";
 
 export async function handleReport(args: string[], services: CliServices): Promise<void> {
-  const [action, ...rest] = args;
+  const parsed = takeJsonFlag(args);
+  const [action, ...rest] = parsed.args;
 
   switch (action) {
     case "write": {
       const { pathArg, cadence } = parseReportArgs(rest);
       const targetDir = path.resolve(pathArg);
       const artifact = await services.reportService.emitReportArtifact(targetDir, cadence);
+      if (parsed.json) {
+        printJson({ ok: true, action: "write", artifact });
+        return;
+      }
       printReportArtifact(artifact);
       return;
     }
@@ -25,6 +30,10 @@ export async function handleReport(args: string[], services: CliServices): Promi
       const { pathArg, cadence } = parseReportArgs(rest);
       const targetDir = path.resolve(pathArg);
       const result = await services.reportService.scheduleAutomation(targetDir, cadence);
+      if (parsed.json) {
+        printJson({ ok: true, action: "schedule", result });
+        return;
+      }
       printAutomationSchedule(result);
       return;
     }
@@ -32,6 +41,10 @@ export async function handleReport(args: string[], services: CliServices): Promi
       const { pathArg, force } = parseReportRunArgs(rest);
       const targetDir = path.resolve(pathArg);
       const result = await services.reportService.runAutomation(targetDir, { force });
+      if (parsed.json) {
+        printJson({ ok: true, action: "run", result });
+        return;
+      }
       printAutomationRun(result);
       return;
     }
@@ -39,9 +52,14 @@ export async function handleReport(args: string[], services: CliServices): Promi
       break;
   }
 
-  const { pathArg, cadence } = parseReportArgs(args);
+  const { pathArg, cadence } = parseReportArgs(parsed.args);
   const targetDir = path.resolve(pathArg);
   const report = await services.reportService.report(targetDir, cadence);
+
+  if (parsed.json) {
+    printJson({ ok: true, report });
+    return;
+  }
 
   printWorkReport(report);
 }

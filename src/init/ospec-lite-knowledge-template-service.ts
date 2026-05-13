@@ -1,3 +1,6 @@
+import { createHash } from "node:crypto";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import {
   AGENTS_MANAGED_END,
   AGENTS_MANAGED_START,
@@ -44,6 +47,34 @@ export class KnowledgeTemplateService {
     return profile
       ? this.buildProfileArtifacts(scan, config, profile, summary)
       : this.buildGenericArtifacts(scan, config, summary);
+  }
+
+  collectTemplateHashes(profile?: LoadedOSpecLiteProfile | null): Record<string, string> {
+    const hashes: Record<string, string> = {};
+    const agentsTemplateRoot = path.resolve(__dirname, "..", "agents", "templates");
+
+    for (const file of this.listMarkdownFiles(agentsTemplateRoot)) {
+      const key = `agents-templates/${file}`;
+      hashes[key] = this.hashFile(path.join(agentsTemplateRoot, file));
+    }
+
+    if (profile) {
+      for (const asset of profile.assets) {
+        const assetPath = path.join(profile.rootDir, asset.source);
+        if (fs.existsSync(assetPath)) {
+          hashes[asset.source] = this.hashFile(assetPath);
+        }
+      }
+      return hashes;
+    }
+
+    const renderTemplateRoot = this.renderer.getTemplateRoot();
+    for (const file of this.listMarkdownFiles(renderTemplateRoot)) {
+      const key = `render-templates/${file}`;
+      hashes[key] = this.hashFile(path.join(renderTemplateRoot, file));
+    }
+
+    return hashes;
   }
 
   buildSummary(scan: {
@@ -219,5 +250,18 @@ export class KnowledgeTemplateService {
     }
 
     return `${label}: \`${command}\``;
+  }
+
+  private listMarkdownFiles(dirPath: string): string[] {
+    if (!fs.existsSync(dirPath)) {
+      return [];
+    }
+
+    return fs.readdirSync(dirPath).filter((fileName) => fileName.endsWith(".md"));
+  }
+
+  private hashFile(filePath: string): string {
+    const content = fs.readFileSync(filePath, "utf8");
+    return createHash("sha256").update(content).digest("hex");
   }
 }

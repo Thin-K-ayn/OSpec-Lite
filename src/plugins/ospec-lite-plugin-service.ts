@@ -11,6 +11,9 @@ import {
   BundledPluginDefinition,
   PluginAuthenticationPolicy,
   PluginCreateResult,
+  PluginDiagnostic,
+  PluginDoctorReport,
+  PluginInfoReport,
   PluginInstallResult,
   PluginInstallationPolicy,
   PluginListReport,
@@ -37,6 +40,70 @@ export class PluginService {
       marketplaceExists: marketplace !== null,
       bundledPlugins: [...this.bundledPlugins],
       installedPlugins: marketplace?.plugins ?? []
+    };
+  }
+
+  async info(rootDir: string, pluginName: string): Promise<PluginInfoReport> {
+    const normalizedName = this.normalizePluginName(pluginName);
+    const marketplace = await this.readMarketplace(rootDir);
+    const installed = marketplace?.plugins.find((item) => item.name === normalizedName);
+    const bundled = this.bundledPlugins.find((item) => item.name === normalizedName);
+    const report = await this.buildPluginInfo(rootDir, normalizedName, bundled, installed);
+
+    if (!bundled && !installed) {
+      report.diagnostics.push({
+        pluginName: normalizedName,
+        severity: "error",
+        message: `Plugin is neither bundled nor installed in this repository: ${normalizedName}`
+      });
+    }
+
+    return report;
+  }
+
+  async doctor(rootDir: string, pluginName?: string): Promise<PluginDoctorReport> {
+    const marketplacePath = this.getMarketplacePath(rootDir);
+    const marketplace = await this.readMarketplace(rootDir);
+    const requestedName = pluginName ? this.normalizePluginName(pluginName) : null;
+    const names = new Set<string>();
+
+    for (const bundled of this.bundledPlugins) {
+      if (!requestedName || requestedName === bundled.name) {
+        names.add(bundled.name);
+      }
+    }
+    for (const installed of marketplace?.plugins ?? []) {
+      if (!requestedName || requestedName === installed.name) {
+        names.add(installed.name);
+      }
+    }
+    if (requestedName) {
+      names.add(requestedName);
+    }
+
+    const checkedPlugins: PluginInfoReport[] = [];
+    for (const name of [...names].sort((left, right) => left.localeCompare(right))) {
+      const bundled = this.bundledPlugins.find((item) => item.name === name);
+      const installed = marketplace?.plugins.find((item) => item.name === name);
+      checkedPlugins.push(await this.buildPluginInfo(rootDir, name, bundled, installed));
+    }
+
+    const diagnostics = checkedPlugins.flatMap((item) => item.diagnostics);
+    if (!marketplace && !requestedName) {
+      diagnostics.push({
+        pluginName: "(marketplace)",
+        severity: "warning",
+        path: marketplacePath,
+        message: "Marketplace file does not exist yet."
+      });
+    }
+
+    return {
+      rootDir,
+      marketplacePath,
+      marketplaceExists: marketplace !== null,
+      checkedPlugins,
+      diagnostics
     };
   }
 
@@ -355,6 +422,179 @@ export class PluginService {
     }
 
     return manifest as PluginManifest;
+  }
+
+  private async buildPluginInfo(
+    rootDir: string,
+    pluginName: string,
+    bundled: BundledPluginDefinition | undefined,
+    installed: PluginMarketplaceEntry | undefined
+  ): Promise<PluginInfoReport> {
+    const diagnostics: PluginDiagnostic[] = [];
+    const manifestSource = installed
+      ? path.resolve(rootDir, installed.source.path)
+      : bundled?.sourceDir;
+    const manifestPath = manifestSource
+      ? path.join(manifestSource, ".codex-plugin", "plugin.json")
+      : undefined;
+    let manifest: PluginManifest | undefined;
+
+    if (bundled && !(await this.repo.exists(bundled.sourceDir))) {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        path: bundled.sourceDir,
+        message: "Bundled plugin source directory is missing."
+      });
+    }
+
+    if (installed && installed.source.source !== "local") {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        message: `Unsupported marketplace source type: ${installed.source.source}`
+      });
+    }
+
+    if (manifestSource) {
+      if (!(await this.repo.exists(manifestSource))) {
+        diagnostics.push({
+          pluginName,
+          severity: "error",
+          path: manifestSource,
+          message: "Plugin directory is missing."
+        });
+      } else if (!manifestPath || !(await this.repo.exists(manifestPath))) {
+        diagnostics.push({
+          pluginName,
+          severity: "error",
+          path: manifestPath,
+          message: "Plugin manifest is missing."
+        });
+      } else {
+        try {
+          manifest = await this.repo.readJson<PluginManifest>(manifestPath);
+          diagnostics.push(...(await this.validateManifest(pluginName, manifestSource, manifest)));
+        } catch (error) {
+          diagnostics.push({
+            pluginName,
+            severity: "error",
+            path: manifestPath,
+            message: error instanceof Error ? error.message : String(error)
+          });
+        }
+      }
+    }
+
+    if (installed && manifest && installed.name !== manifest.name) {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        path: manifestPath,
+        message: `Marketplace entry name ${installed.name} does not match manifest name ${manifest.name}.`
+      });
+    }
+
+    if (!bundled && !installed) {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        message: "Plugin is not known to the bundled catalog or local marketplace."
+      });
+    }
+
+    if (diagnostics.length === 0) {
+      diagnostics.push({
+        pluginName,
+        severity: "info",
+        path: manifestPath,
+        message: "Plugin metadata looks valid."
+      });
+    }
+
+    return {
+      name: pluginName,
+      bundled,
+      installed,
+      manifest,
+      manifestPath,
+      diagnostics
+    };
+  }
+
+  private async validateManifest(
+    pluginName: string,
+    pluginDir: string,
+    manifest: PluginManifest
+  ): Promise<PluginDiagnostic[]> {
+    const diagnostics: PluginDiagnostic[] = [];
+    const requiredStringFields: Array<keyof PluginManifest> = [
+      "name",
+      "version",
+      "description"
+    ];
+
+    for (const field of requiredStringFields) {
+      if (typeof manifest[field] !== "string" || String(manifest[field]).trim().length === 0) {
+        diagnostics.push({
+          pluginName,
+          severity: "error",
+          message: `Manifest field is missing or empty: ${field}`
+        });
+      }
+    }
+
+    if (manifest.name && this.normalizePluginName(manifest.name) !== pluginName) {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        message: `Manifest name normalizes away from expected plugin name: ${manifest.name}`
+      });
+    }
+
+    if (!manifest.interface || typeof manifest.interface.displayName !== "string") {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        message: "Manifest interface.displayName is missing."
+      });
+    }
+    if (!manifest.interface || typeof manifest.interface.shortDescription !== "string") {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        message: "Manifest interface.shortDescription is missing."
+      });
+    }
+    if (!manifest.interface || !Array.isArray(manifest.interface.capabilities)) {
+      diagnostics.push({
+        pluginName,
+        severity: "error",
+        message: "Manifest interface.capabilities must be an array."
+      });
+    }
+
+    for (const [field, value] of Object.entries({
+      skills: manifest.skills,
+      hooks: manifest.hooks,
+      scripts: manifest.scripts,
+      assets: manifest.assets
+    })) {
+      if (!value) {
+        continue;
+      }
+      const targetPath = path.resolve(pluginDir, value);
+      if (!(await this.repo.exists(targetPath))) {
+        diagnostics.push({
+          pluginName,
+          severity: "error",
+          path: targetPath,
+          message: `Manifest ${field} path does not exist: ${value}`
+        });
+      }
+    }
+
+    return diagnostics;
   }
 
   private createMarketplaceEntry(
